@@ -38,21 +38,20 @@
 (def find-concept-by-preferred-term-schema
   "The response schema for the query below."
   [{:id s/Str
-    :description s/Str
-    :category s/Keyword
+    :definition s/Str
+    :instanceType s/Str
     (s/optional-key :deprecated) s/Bool}])
 
-(defn find-concept-by-preferred-term-simplificator [concept]
-  "Rename the keys to exclude the concept/-part."
-  (map #(set/rename-keys (first %) {:concept/id :id, :concept/description :description, :concept/category :category :concept/deprecated :deprecated})
-       concept))
+(defn rename-concept-keys-for-api [concept]
+  (set/rename-keys concept {:concept/preferred-term :preferredLabel, :concept/id :id, :concept/description :definition, :concept/category :instanceType :concept/deprecated :deprecated}))
+
 
 (defn find-concept-by-preferred-term [term]
   "Lookup concepts by term. Special term '___THROW_EXCEPTION' throws an exception, handy for testning error handling."
   {:pre  [(is (and (not (nil? term)) (> (count term) 0))  "supply a non-empty string argument")]}
   (if (= term "___THROW_EXCEPTION")
     (throw (NullPointerException. "Throwing test exception.")))
-  (find-concept-by-preferred-term-simplificator
+  (rename-concept-keys-for-api
    (d/q find-concept-by-preferred-term-query (get-db) term)))
 
 (def find-concept-by-id-query
@@ -265,16 +264,37 @@
                 [:concept/id
                  :concept/description
                  :concept/category
+                 :concept/deprecated
                  {:concept/preferred-term [:term/base-form]}
-                 {:concept/referring-terms [:term/base-form]}])
+                 {:concept/referring-terms [:term/base-form]}
+                 ])
     :in $ ?letter
     :where [?c :concept/preferred-term ?t]
     [?t :term/base-form ?term]
     ;;[(.startsWith ^String ?term ?letter)]
     [(.matches ^String ?term ?letter)]])
 
+(def get-concepts-by-term-start-schema
+  "The response schema for the query below."
+  [{:id s/Str
+    :definition s/Str
+    :instanceType s/Str
+    (s/optional-key :preferredLabel) s/Str
+    (s/optional-key :deprecated) s/Bool}])
+
+
+(defn lift-term [concept]
+  (assoc (dissoc concept :preferred-term)
+         :concept/preferred-term (get-in concept [:concept/preferred-term :term/base-form] )))
+
 (defn get-concepts-by-term-start [letter]
-  (d/q find-concepts-by-term-start-query (get-db) (ignore-case letter)))
+  (->> (d/q find-concepts-by-term-start-query (get-db) (ignore-case letter))
+       (map first)
+       (map #(lift-term %))
+       (map #(update % :concept/category name))
+       (map rename-concept-keys-for-api)
+       )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; DEBUG TOOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

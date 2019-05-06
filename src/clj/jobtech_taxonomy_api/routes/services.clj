@@ -87,7 +87,7 @@
          (response/ok result)
          (response/not-found {:reason :NOT_FOUND}))))
 
-   (context "/taxonomy/public-api" []
+   (context "/taxonomy/public" []
      :tags ["public"]
      :auth-rules authenticated?
 
@@ -104,13 +104,18 @@
 
      (GET "/term-part" []
        :query-params [term :- String]
+       :responses {200 {:schema get-concepts-by-term-start-schema}
+                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
+                   500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "get concepts by part of string"
-       ;;:return       find-concept-by-preferred-term-schema
-       {:body (take 10 (get-concepts-by-term-start term))})
+       (let [result (take 10 (get-concepts-by-term-start term))]
+         (if (not-empty result)
+           (response/ok result)
+           (response/not-found {:reason :NOT_FOUND}))))
 
 ;; Jag tog bort den eftersom den tar 15 sekunder att köra. Vi får hitta något annat sätt att dumpa databasen på.
 
-     #_(GET "/full-history" []
+     (GET "/full-history" []
        :query-params []
        :responses {200 {:schema show-concept-events-schema}
                    500 {:schema {:type s/Str, :message s/Str}}}
@@ -139,12 +144,8 @@
        (let [result (show-deprecated-concepts-and-replaced-by (c/to-date (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") date-time)))]
          (if (not (empty? result))
            (response/ok result)
-           (response/not-found {:reason :NOT_FOUND})))))
+           (response/not-found {:reason :NOT_FOUND}))))
 
-   (context "/taxonomy/private-api" []
-     :tags ["private"]
-            ;;:auth-rules {:or [swagger-ui-user? (fn [req] (and (authenticated? req) (authorized-private? req)))]}
-     :auth-rules {:and [authenticated? authorized-private?]}
 
      (GET "/concept"    []
        :query-params [id :- String]
@@ -160,6 +161,16 @@
        :query-params [type :- String]
        :summary      "Read all concepts of the given type."
        {:body (get-concepts-for-type type)})
+
+     )
+
+
+
+   (context "/taxonomy/private" []
+     :tags ["private"]
+            ;;:auth-rules {:or [swagger-ui-user? (fn [req] (and (authenticated? req) (authorized-private? req)))]}
+     :auth-rules {:and [authenticated? authorized-private?]}
+
 
      (DELETE "/concept"    []
        :query-params [id :- String]
