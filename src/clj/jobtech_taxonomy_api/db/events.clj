@@ -158,3 +158,26 @@ Like replaced-by will return nil."
   (sort-by :transaction-id
            (convert-history-to-events
             (d/q show-concept-history-since-query (get-db-hist db) date-time))))
+
+(defn transform-event-result [{:keys [category transaction-id preferred-term timestamp concept-id event-type] }]
+  {:eventType event-type
+   :transactionId transaction-id,
+   :timestamp timestamp,
+   :concept {:id concept-id,
+             :type (name category),
+             :preferredLabel preferred-term}}
+  )
+
+(defn get-all-events-since-v0-9 [db date-time offset limit]
+  "Beta for v0.9."
+  (map transform-event-result  (get-all-events-since db date-time))
+  )
+
+#_(defn get-all-events-since-v0-9 [db date-time offset limit]
+  "Beta for v0.9."
+  '({:eventType "CREATED",
+     :transactionId 13194139534315,
+     :timestamp #inst "2019-05-16T13:55:40.451-00:00",
+     :concept { :id "Vpaw_yX7_BNY",
+               :preferredLabel "Sportdykning",
+               :type :skill }}))

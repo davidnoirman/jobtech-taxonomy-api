@@ -54,26 +54,89 @@
    {:exceptions
     {:handlers
      {::ex/default (custom-handler response/internal-server-error :fatal)}}
-    :swagger {:ui "/taxonomy/swagger-ui"
-              :spec "/taxonomy/swagger.json"
-              :data {:info {:version "1.0.0"
+    :swagger {:ui "/v0/taxonomy/swagger-ui"
+              :spec "/v0/taxonomy/swagger.json"
+              :data {:info {:version "0.9.0"
                             :title "Jobtech Taxonomy"
                             :description "Jobtech taxonomy services"}
                      ;; API header config found here: https://gist.github.com/Deraen/ef7f65d7ec26f048e2bb
                      :securityDefinitions {:api_key {:type "apiKey" :name "api-key" :in "header"}}}}}
 
-   (GET "/authenticated" []
+   #_(GET "/authenticated" []
      :current-user user
      (response/ok {:user user}))
 
-   (GET "/relation/graph" []
-     :query-params [relation-type :- String]
-                    ; taxonomy :- String]
+
+   (context "/v0/taxonomy/public" []
+     :tags ["public"]
+     :auth-rules authenticated?
+
+     (GET "/changes" []
+       :query-params [fromDateTime :- String
+                      {offset       :- Long 0}
+                      {limit        :- Long 0}]
+       :responses {200 {:schema show-changes-schema}
+                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary      "Show the history since the given date. Use the format yyyy-MM-dd HH:mm:ss (i.e. 2017-06-09 14:30:01)."
+       (let [result (show-changes-since (c/to-date (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") fromDateTime)) offset limit)]
+         (if (not (empty? result))
+           (response/ok result)
+           (response/not-found {:reason :NOT_FOUND}))))
+
+
+     (GET "/concepts"    []
+       :query-params [{id :- String ""}
+                      {preferredLabel :- String ""}
+                      {type :- String ""}
+                      {deprecated :- Boolean false}
+                      {offset :- Long 0}
+                      {limit :- Long 0}
+                      ]
+
+       :responses {200 {:schema find-concepts-schema}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary      "Get concepts."
+       (let [result (find-concepts id preferredLabel type deprecated offset limit)]
+         (response/ok result)))
+
+     (GET "/search" []
+       :query-params [q       :- String
+                      {type   :- String ""}
+                      {offset :- Long 0}
+                      {limit  :- Long 0}]
+       :responses {200 {:schema get-concepts-by-term-start-schema}
+                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary      "get concepts by part of string"
+       (let [result (take 10 (get-concepts-by-search q type offset limit))]
+         (if (not-empty result)
+           (response/ok result)
+           (response/not-found {:reason :NOT_FOUND}))))
+
+
+
+
+
+ (GET "/relation/graph/:relation-type" []
+     :path-params [relation-type :- String]
      :responses {200 {:schema s/Any}
                  404 {:schema {:reason (s/enum :NOT_FOUND)}}
                  500 {:schema {:type s/Str, :message s/Str}}}
      :summary "Relation graphs."
      (let [result (get-relation-graph (keyword relation-type))] ; (keyword taxonomy)
+       (if (not-empty result)
+         (response/ok result)
+         (response/not-found {:reason :NOT_FOUND}))))
+
+   (GET "/relation/graph/:relation-type/:id" []
+     :path-params [relation-type :- String
+                   id :- String]
+     :responses {200 {:schema s/Any}
+                 404 {:schema {:reason (s/enum :NOT_FOUND)}}
+                 500 {:schema {:type s/Str, :message s/Str}}}
+     :summary "Relation graphs."
+     (let [result (get-relation-graph-from-concept (keyword relation-type) id)]
        (if (not-empty result)
          (response/ok result)
          (response/not-found {:reason :NOT_FOUND}))))
@@ -87,13 +150,14 @@
          (response/ok result)
          (response/not-found {:reason :NOT_FOUND}))))
 
-   (context "/taxonomy/public" []
-     :tags ["public"]
-     :auth-rules authenticated?
+
+
+
+
 
      (GET "/term" []
        :query-params [term :- String]
-       :responses {200 {:schema find-concept-by-preferred-term-schema}
+       :responses {200 {:schema get-concepts-by-term-start-schema}
                    404 {:schema {:reason (s/enum :NOT_FOUND)}}
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary "Search for a term across all taxonomies."
@@ -113,7 +177,7 @@
            (response/ok result)
            (response/not-found {:reason :NOT_FOUND}))))
 
-;; Jag tog bort den eftersom den tar 15 sekunder att köra. Vi får hitta något annat sätt att dumpa databasen på.
+
 
      (GET "/full-history" []
        :query-params []
@@ -121,6 +185,7 @@
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "Show the complete history."
        (response/ok (show-concept-events)))
+
 
 
 
@@ -147,6 +212,7 @@
            (response/not-found {:reason :NOT_FOUND}))))
 
 
+
      (GET "/concept"    []
        :query-params [id :- String]
        :summary      "Read a concept by ID."
@@ -166,7 +232,7 @@
 
 
 
-   (context "/taxonomy/private" []
+   (context "/v0/taxonomy/private" []
      :tags ["private"]
             ;;:auth-rules {:or [swagger-ui-user? (fn [req] (and (authenticated? req) (authorized-private? req)))]}
      :auth-rules {:and [authenticated? authorized-private?]}
