@@ -14,6 +14,7 @@
    [clj-time.coerce :as c]
    [jobtech-taxonomy-api.db.core :refer :all]
    [jobtech-taxonomy-api.middleware :as middleware]
+   [jobtech-taxonomy-api.db.concepts :refer :all]
    [clojure.tools.logging :as log]
    [clojure.pprint :as pp]))
 
@@ -62,11 +63,6 @@
                      ;; API header config found here: https://gist.github.com/Deraen/ef7f65d7ec26f048e2bb
                      :securityDefinitions {:api_key {:type "apiKey" :name "api-key" :in "header"}}}}}
 
-   #_(GET "/authenticated" []
-     :current-user user
-     (response/ok {:user user}))
-
-
    (context "/v0/taxonomy/public" []
      :tags ["public"]
      :auth-rules authenticated?
@@ -76,14 +72,9 @@
                       {offset       :- Long 0}
                       {limit        :- Long 0}]
        :responses {200 {:schema show-changes-schema}
-                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "Show the history since the given date. Use the format yyyy-MM-dd HH:mm:ss (i.e. 2017-06-09 14:30:01)."
-       (let [result (show-changes-since (c/to-date (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") fromDateTime)) offset limit)]
-         (if (not (empty? result))
-           (response/ok result)
-           (response/not-found {:reason :NOT_FOUND}))))
-
+       (response/ok (show-changes-since (c/to-date (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") fromDateTime)) offset limit)))
 
      (GET "/concepts"    []
        :query-params [{id :- String ""}
@@ -97,8 +88,7 @@
        :responses {200 {:schema find-concepts-schema}
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "Get concepts."
-       (let [result (find-concepts id preferredLabel type deprecated offset limit)]
-         (response/ok result)))
+       (response/ok (find-concepts id preferredLabel type deprecated offset limit)))
 
      (GET "/search" []
        :query-params [q       :- String
@@ -106,144 +96,35 @@
                       {offset :- Long 0}
                       {limit  :- Long 0}]
        :responses {200 {:schema get-concepts-by-term-start-schema}
-                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "get concepts by part of string"
-       (let [result (take 10 (get-concepts-by-search q type offset limit))]
-         (if (not-empty result)
-           (response/ok result)
-           (response/not-found {:reason :NOT_FOUND}))))
-
-
-
-
-
- (GET "/relation/graph/:relation-type" []
-     :path-params [relation-type :- String]
-     :responses {200 {:schema s/Any}
-                 404 {:schema {:reason (s/enum :NOT_FOUND)}}
-                 500 {:schema {:type s/Str, :message s/Str}}}
-     :summary "Relation graphs."
-     (let [result (get-relation-graph (keyword relation-type))] ; (keyword taxonomy)
-       (if (not-empty result)
-         (response/ok result)
-         (response/not-found {:reason :NOT_FOUND}))))
-
-   (GET "/relation/graph/:relation-type/:id" []
-     :path-params [relation-type :- String
-                   id :- String]
-     :responses {200 {:schema s/Any}
-                 404 {:schema {:reason (s/enum :NOT_FOUND)}}
-                 500 {:schema {:type s/Str, :message s/Str}}}
-     :summary "Relation graphs."
-     (let [result (get-relation-graph-from-concept (keyword relation-type) id)]
-       (if (not-empty result)
-         (response/ok result)
-         (response/not-found {:reason :NOT_FOUND}))))
-
-   (GET "/relation/types" []
-     :responses {200 {:schema s/Any}
-                 500 {:schema {:type s/Str, :message s/Str}}}
-     :summary "Relation graphs."
-     (let [result (get-relation-types)]
-       (if (not-empty result)
-         (response/ok result)
-         (response/not-found {:reason :NOT_FOUND}))))
-
-
-
-
-
-
-     (GET "/term" []
-       :query-params [term :- String]
-       :responses {200 {:schema get-concepts-by-term-start-schema}
-                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Search for a term across all taxonomies."
-       (let [result (find-concept-by-preferred-term term)]
-         (if (not-empty result)
-           (response/ok result)
-           (response/not-found {:reason :NOT_FOUND}))))
-
-     (GET "/term-part" []
-       :query-params [term :- String]
-       :responses {200 {:schema get-concepts-by-term-start-schema}
-                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary      "get concepts by part of string"
-       (let [result (take 10 (get-concepts-by-term-start term))]
-         (if (not-empty result)
-           (response/ok result)
-           (response/not-found {:reason :NOT_FOUND}))))
-
-
-
-     (GET "/full-history" []
-       :query-params []
-       :responses {200 {:schema show-concept-events-schema}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary      "Show the complete history."
-       (response/ok (show-concept-events)))
-
-
-
-
-     (GET "/concept-history-since" []
-       :query-params [date-time :- String]
-       :responses {200 {:schema show-concept-events-schema}
-                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary      "Show the history since the given date. Use the format yyyy-MM-dd HH:mm:ss (i.e. 2017-06-09 14:30:01)."
-       (let [result (show-concept-events-since (c/to-date (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") date-time)))]
-         (if (not (empty? result))
-           (response/ok result)
-           (response/not-found {:reason :NOT_FOUND}))))
+       (response/ok (get-concepts-by-search q type offset limit)))
 
      (GET "/deprecated-concept-history-since" []
        :query-params [date-time :- String]
        :responses {200 {:schema s/Any} ;; show-concept-events-schema} TODO FIXME
-                   404 {:schema {:reason (s/enum :NOT_FOUND)}}
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "Show the history since the given date. Use the format yyyy-MM-dd HH:mm:ss (i.e. 2017-06-09 14:30:01)."
-       (let [result (show-deprecated-concepts-and-replaced-by (c/to-date (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") date-time)))]
-         (if (not (empty? result))
-           (response/ok result)
-           (response/not-found {:reason :NOT_FOUND}))))
-
-
-
-     (GET "/concept"    []
-       :query-params [id :- String]
-       :summary      "Read a concept by ID."
-       {:body (find-concept-by-id id)})
+       (response/ok (show-deprecated-concepts-and-replaced-by (c/to-date (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") date-time)))))
 
      (GET "/concept/types"    []
        :query-params []
-       :summary      "Read a list of all taxonomy types."
-       {:body (get-all-taxonomy-types)})
-
-     (GET "/concept/all"    []
-       :query-params [type :- String]
-       :summary      "Read all concepts of the given type."
-       {:body (get-concepts-for-type type)})
-
-     )
-
-
+       :responses {200 {:schema [ s/Str ]}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary "Return a list of all taxonomy types."
+       {:body (get-all-taxonomy-types)}))
 
    (context "/v0/taxonomy/private" []
      :tags ["private"]
-            ;;:auth-rules {:or [swagger-ui-user? (fn [req] (and (authenticated? req) (authorized-private? req)))]}
+     ;;:auth-rules {:or [swagger-ui-user? (fn [req] (and (authenticated? req) (authorized-private? req)))]}
      :auth-rules {:and [authenticated? authorized-private?]}
-
 
      (DELETE "/concept"    []
        :query-params [id :- String]
        :summary      "Retract the concept with the given ID."
        {:body (retract-concept id)})
 
-            ;; alternativeTerms (optional - kolla om/hur det görs)
+     ;; alternativeTerms (optional - kolla om/hur det görs)
      (POST "/concept"    []
        :query-params [type :- String
                       description :- String
@@ -255,4 +136,25 @@
        :query-params [old-concept-id :- String
                       new-concept-id :- String]
        :summary      "Replace old concept with a new concept."
-       {:body (replace-deprecated-concept old-concept-id new-concept-id)}))))
+       {:body (replace-deprecated-concept old-concept-id new-concept-id)})
+
+          (GET "/relation/graph/:relation-type" []
+       :path-params [relation-type :- String]
+       :responses {200 {:schema s/Any}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary "Relation graphs."
+       (response/ok (get-relation-graph (keyword relation-type))))
+
+     (GET "/relation/graph/:relation-type/:id" []
+       :path-params [relation-type :- String
+                     id :- String]
+       :responses {200 {:schema s/Any}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary "Relation graphs."
+       (response/ok (get-relation-graph-from-concept (keyword relation-type) id)))
+
+     (GET "/relation/types" []
+       :responses {200 {:schema s/Any}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary "Relation graphs."
+       (response/ok (get-relation-types))))))

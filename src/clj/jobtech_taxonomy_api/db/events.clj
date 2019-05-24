@@ -1,6 +1,7 @@
 (ns jobtech-taxonomy-api.db.events
   (:require
    [datomic.client.api :as d]
+   [jobtech-taxonomy-api.config :refer [env]]
    [mount.core :refer [defstate]]))
 
 (def show-concept-history
@@ -15,7 +16,7 @@
     [?tx :db/txInstant ?inst]])
 
 (def show-concept-history-since-query
-  '[:find ?e ?aname ?v ?tx ?added ?inst ?concept-id ?term ?pft ?cat
+  '[:find ?e ?aname ?v ?tx ?added ?inst ?concept-id ?term ?pft ?cat ?deprecated
     :in $ ?since
     :where
 
@@ -23,12 +24,17 @@
     [?pft :term/base-form ?term]
     [?e :concept/id ?concept-id]
     [?e :concept/category ?cat]
+    [(get-else $ ?e :concept/deprecated false) ?deprecated]
     [?e ?a ?v ?tx ?added]
     [?tx :db/txInstant ?inst]
     [(< ?since ?inst)]
     [?a :db/ident ?aname]
     ]
   )
+
+
+
+
 
 #_(def show-concept-history-since-transaction-query
   '[:find ?e ?aname ?v ?tx ?added ?concept-id ?term ?pft ?cat
@@ -48,12 +54,12 @@
 
 (def show-deprecated-replaced-by-query
   '[:find (pull ?c
-                [:concept/id
-                 :concept/description
-                 {:concept/preferred-term [:term/base-form]}
-                 {:concept/referring-terms [:term/base-form]}
-                 {:concept/replaced-by [:concept/id
-                                        {:concept/preferred-term [:term/base-form]}]}])
+                    [:concept/id
+                     :concept/description
+                     {:concept/preferred-term [:term/base-form]}
+                     {:concept/referring-terms [:term/base-form]}
+                     {:concept/replaced-by [:concept/id
+                                            {:concept/preferred-term [:term/base-form]}]}])
 
     ?inst
     :in $ ?since
@@ -159,19 +165,18 @@ Like replaced-by will return nil."
            (convert-history-to-events
             (d/q show-concept-history-since-query (get-db-hist db) date-time))))
 
-(defn transform-event-result [{:keys [category transaction-id preferred-term timestamp concept-id event-type] }]
+(defn transform-event-result [{:keys [category transaction-id preferred-term timestamp concept-id event-type deprecated] }]
   {:eventType event-type
    :transactionId transaction-id,
    :timestamp timestamp,
-   :concept {:id concept-id,
-             :type (name category),
-             :preferredLabel preferred-term}}
-  )
+   :concept (merge (if (true? deprecated) {:deprecated true} {}) ; deprecated optional
+                   {:id concept-id,
+                    :type (name category),
+                    :preferredLabel preferred-term})})
 
 (defn get-all-events-since-v0-9 [db date-time offset limit]
   "Beta for v0.9."
-  (map transform-event-result  (get-all-events-since db date-time))
-  )
+  (map transform-event-result  (get-all-events-since db date-time)))
 
 #_(defn get-all-events-since-v0-9 [db date-time offset limit]
   "Beta for v0.9."
