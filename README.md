@@ -66,18 +66,148 @@ Load http://127.0.0.1:4444/graphview.html in your web browser.
 
 
 ## Testing
+The integration test setup creates a temporary database for each test,
+which makes it safe to do any modifications without leaving traces
+behind.
 
-There are two main test directories: test/ and integration-test/. The
-former is for unit tests and the latter for functional testing.
+Summary:
+ - test runner: Kaocha (https://github.com/lambdaisland/kaocha).
+ - test command: `lein kaocha --focus-meta TAG`
+   where TAG is the name of one of the test's tags (such as `integration`).
+ - status: for integration tests that rely on a live database, only one test
+   can be run at a time. This means that you should assign each test a unique
+   tag (e.g. `(test/deftest ^:changes-test-2 changes-test-2 ...)`), and then
+   run it with `lein kaocha --focus-meta changes-test-2`.
 
-Run the tests in test/ by
+### Howto write an integration test
 
-    lein test
+#### File and namespace
+Your test should reside in the directory `test/clj/jobtech_taxonomy_api/test/`.
 
-Run all tests including the tests in integration-test/ by
+You should either pick an existing file, or create a new file, ending
+with `_test.clj`.  It should use a namespace like this: `(ns
+jobtech-taxonomy-api.test.FILENAME ...)`, where FILENAME is for example
+`changes-test`.
 
-    lein with-profile integration-test test
+You need to require `[jobtech-taxonomy-api.test.test-utils :as util]`.
 
+#### Define fixtures
+Place one occurance of this line in your test file:
+`(test/use-fixtures :each util/fixture)`.
+
+#### Define a test which calls functions directly
+Here is a simple example of a test which asserts a skill concept, and
+then checks for its existence.
+
+First, require
+```
+[jobtech-taxonomy-api.db.core :as core]
+
+```
+
+Then write a test:
+```
+(test/deftest ^:concept-test-0 concept-test-0
+  (test/testing "Test concept assertion."
+    (core/assert-concept "skill" "cykla" "cykla")
+    (let [found-concept (first (core/find-concept-by-preferred-term "cykla"))]
+      (test/is (= "cykla" (get found-concept :preferredLabel))))))
+```
+
+#### Define a test which calls the Luminus REST API
+Here is a simple example of a test which asserts a skill concept, and
+then checks for its existence via the REST API:
+
+First, require
+```
+[jobtech-taxonomy-api.db.core :as core]
+
+```
+
+Then write a test:
+```
+(test/deftest ^:changes-test-1 changes-test-1
+  (test/testing "test event stream"
+    (core/assert-concept "skill" "cykla" "cykla")
+    (let [[status body] (util/send-request-to-json-service
+                         :get "/v0/taxonomy/public/concepts"
+                         :headers [util/header-auth-user]
+                         :query-params [{:key "preferredLabel", :val "cykla"}])]
+      (test/is (= "cykla" (get (first body) :preferredLabel))))))
+```
+
+
+### Local testing vs Jenkins testing
+Kaocha can only use one of either the configuration to run locally, or to run from Jenkins. The default is Jenkins.
+
+To run locally, check your project.clj that is has the right kaocha
+resource commented:
+
+```
+    :project/kaocha {:dependencies [[lambdaisland/kaocha "0.0-418"]]
+                    ;; You can only comment in one resource-path:
+                    :resource-paths ["env/dev/resources"] ; comment in for local use
+                    ; :resource-paths ["env/integration-test/resources"] ; comment in for Jenkins
+                    }
+```
+
+
+
+## Logging
+
+By default, logging functionality is provided by the
+clojure.tools.logging library. The library provides macros that
+delegate to a specific logging implementation. The default
+implementation used in Luminus is the logback library.
+
+Any Clojure data structures can be logged directly.
+
+
+### Examples
+```
+(ns example
+ (:require [clojure.tools.logging :as log]))
+
+(log/info "Hello")
+=>[2015-12-24 09:04:25,711][INFO][myapp.handler] Hello
+
+(log/debug {:user {:id "Anonymous"}})
+=>[2015-12-24 09:04:25,711][DEBUG][myapp.handler] {:user {:id "Anonymous"}}
+```
+
+
+### Description of log levels
+#### trace
+#### debug
+#### info
+#### warn
+#### error
+#### fatal
+
+### Logging of exceptions
+
+
+```
+(ns example
+ (:require [clojure.tools.logging :as log]))
+
+(log/error (Exception. "I'm an error") "something bad happened")
+=>[2015-12-24 09:43:47,193][ERROR][myapp.handler] something bad happened
+  java.lang.Exception: I'm an error
+    	at myapp.handler$init.invoke(handler.clj:21)
+    	at myapp.core$start_http_server.invoke(core.clj:44)
+    	at myapp.core$start_app.invoke(core.clj:61)
+    	...
+```
+
+### Logging backends
+### Configuring logging
+Each profile has its own log configuration. For example, `dev`'s
+configuration is located in `env/dev/resources/logback.xml`.
+
+It works like a standard Java log configuration, with appenders and loggers.
+
+The default configuration logs to standard out, and to log files in log/.
 
 ## License
 

@@ -1,7 +1,9 @@
 (ns jobtech-taxonomy-api.db.events
   (:require
    [datomic.client.api :as d]
+   [jobtech-taxonomy-api.db.database-connection :refer :all]
    [jobtech-taxonomy-api.config :refer [env]]
+   [jobtech-taxonomy-api.db.api-util :as util]
    [mount.core :refer [defstate]]))
 
 (def show-concept-history
@@ -134,8 +136,7 @@
      :category cat
      :timestamp timestamp
      :concept-id concept-id
-     :old-preferred-term old-preferred-term
-     :new-preferred-term new-preferred-term}))
+     :preferred-term new-preferred-term}))
 
 (defn determine-event-type [datoms-by-attibute]
   "This function will return nil events when the event is not CREATED, DEPRECATED or UPDATED.
@@ -143,7 +144,6 @@ Like replaced-by will return nil."
   (let [is-event-create-concept (is-event-create-concept? datoms-by-attibute)
         is-event-deprecated-concept (is-event-deprecated-concept? datoms-by-attibute)
         is-event-update-preferred-term (is-event-update-preferred-term? datoms-by-attibute)]
-
     (cond
       is-event-create-concept (create-event-create-concept-from-datom datoms-by-attibute)
       is-event-deprecated-concept (create-event-deprecated-concept-from-datom datoms-by-attibute)
@@ -176,7 +176,8 @@ Like replaced-by will return nil."
 
 (defn get-all-events-since-v0-9 [db date-time offset limit]
   "Beta for v0.9."
-  (map transform-event-result  (get-all-events-since db date-time)))
+  (let [result (map transform-event-result  (get-all-events-since db date-time))]
+    (util/paginate-datomic-result result offset limit)))
 
 #_(defn get-all-events-since-v0-9 [db date-time offset limit]
   "Beta for v0.9."
