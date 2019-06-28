@@ -101,7 +101,7 @@ then checks for its existence.
 
 First, require
 ```
-[jobtech-taxonomy-api.db.core :as core]
+[jobtech-taxonomy-api.db.concept :as c]
 
 ```
 
@@ -109,7 +109,7 @@ Then write a test:
 ```
 (test/deftest ^:concept-test-0 concept-test-0
   (test/testing "Test concept assertion."
-    (core/assert-concept "skill" "cykla" "cykla")
+    (c/assert-concept "skill" "cykla" "cykla")
     (let [found-concept (first (core/find-concept-by-preferred-term "cykla"))]
       (test/is (= "cykla" (get found-concept :preferredLabel))))))
 ```
@@ -120,7 +120,7 @@ then checks for its existence via the REST API:
 
 First, require
 ```
-[jobtech-taxonomy-api.db.core :as core]
+[jobtech-taxonomy-api.db.concept :as c]
 
 ```
 
@@ -128,7 +128,7 @@ Then write a test:
 ```
 (test/deftest ^:changes-test-1 changes-test-1
   (test/testing "test event stream"
-    (core/assert-concept "skill" "cykla" "cykla")
+    (c/assert-concept "skill" "cykla" "cykla")
     (let [[status body] (util/send-request-to-json-service
                          :get "/v0/taxonomy/public/concepts"
                          :headers [util/header-auth-user]
@@ -235,3 +235,8 @@ Create the file "dev-config.edn" with this content
  ; :database-url "datomic:mem://jobtech_taxonomy_api_datomic_dev"
 }
 ```
+
+## COMMON ERRORS
+
+If you get :server-type must be :cloud, :peer-server, or :local
+you have forgot to start luminus. Run (start) in the user> namespace
