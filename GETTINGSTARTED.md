@@ -5,7 +5,7 @@ DOCUMENT IS WORK IN PROGRESS!
 Hello developer! This document will get you started using the API at [www.jobtech-taxonomy-api.dev.services.jtech.se/v0/taxonomy/swagger-ui/index.html][API Swagger page]
 . The tools we provide gives you access to the Taxonomy Database containing terminology used in the Swedish labour market and the relationships between concepts within taxonomies like occupations, skills, education levels and much more!
 
-The public API is open source (code found at [www.github.com/JobtechSwe/jobtech-taxonomy-api][This repo on Github]) and the data is free to use by anyone. Make sure to read through the documentation for the specific resource you want, and the information about the Taxonomy Database, to understand what this API can offer. If you have any questions about the API or the data, don’t hesitate to contact us at [contact@jobtechdev.se][contact email adress] , or create an issue on Github if you find any bugs.
+The public API is open source (code found at [www.github.com/JobtechSwe/jobtech-taxonomy-api][This repo on Github]) and the data is free to use by anyone. Make sure to read through the documentation for the specific resource you want, and the information about the Taxonomy Database, to understand what this API can offer. If you have any questions about the API or the data, don’t hesitate to contact us at [contact@jobtechdev.se][Jobtechdev contact email adress] , or create an issue on Github if you find any bugs.
 
 # Table of content
 * [ Getting started - Short version ](#short)
@@ -59,9 +59,9 @@ The Taxonomy Database contains a number of schemas. Some of these schemas are mu
 ### Schema: Occupations
 
 
-```
+<!---
 Chart created in www.draw.io
-```
+--->
 
 ![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Untitled%20Diagram.png "Diagram for Occupation Schema")
 
@@ -75,9 +75,9 @@ The lower you get in the taxonomy, the more detailed concepts you’ll find with
 
 Every concept at a lower and more detailed level is connected to one concept at the parent level, throughout the taxonomy. Example: 
 
-```
+<!---
 Chart created in www.draw.io
-```
+--->
 
 ![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Hierarchy.png "Diagram linked occupation levels")
 
@@ -244,5 +244,4 @@ Check out our other open API:s at [jobtechdev][Jobtechdev].
 [Driving licence]: https://europa.eu/youreurope/citizens/vehicles/driving-licence/driving-licence-recognition-validity/index_en.htm
 [SNI]: https://www.scb.se/contentassets/d43b798da37140999abf883e206d0545/mis-2007-2.pdf
 [Languages]: https://www.iso.org/iso-639-language-codes.html
-
 [Jobtechdev]: www.jobtechdev.se
