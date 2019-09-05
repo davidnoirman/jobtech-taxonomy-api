@@ -2,28 +2,47 @@
   (:require
     [datahike.api :as d]
     [mount.core :refer [defstate]]
-   [jobtech-taxonomy-api.config :refer [env]]
-   ))
+    [jobtech-taxonomy-api.config :refer [env]]))
+
+
 
 
 (def uri "datahike:mem://jobtech-v13")
+;; I'll move the config to the env after testing
+#_(def config {:backend :pg
+             :host "localhost"
+             :port 5432
+             :username "alice"
+             :password "foobar"
+               :path "/pg_example"})
 
-(defn get-client []
-  uri
-  #_(d/client (:datomic-cfg env)))
+(def config {:backend :mem
+             :host "jobtech-v13"})
+
+#_(defn get-client []
+  (d/client (:datomic-cfg env)))
 
 #_(defstate ^{:on-reload :noop} conn
   :start (do (println (str "start:conn " (:datomic-name env))) (d/connect (get-client)  {:db-name (:datomic-name env)}))
   ;;:stop (da/release (get-conn))
   )
 
-(defstate ^{:on-reload :noop} conn
-          :start (do (println (str "start:conn " uri)) (d/connect (get-client)))
-          ;;:stop (da/release (get-conn))
-          )
+(defstate
+  ^{:on-reload :noop} conn
+  :start (do
+           (println (str "start:conn " config))
+           (if-not (d/database-exists? config)
+             (do
+               (d/create-database config)
+               ;; only for local testing if database does not exist locally, remove if you connect to remote database
+               (let [conn (d/connect config)] 
+                 (d/transact conn (read-string (slurp "scrap/schema.edn")))
+                 conn))
+             (d/connect config)))
+  :stop (d/release conn))
 
 (defn get-conn []
-  (d/connect (get-client)))
+  (d/connect config))
 
 (def get-database-instance-from-version-query
   '[:find ?txid
