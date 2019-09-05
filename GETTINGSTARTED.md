@@ -18,6 +18,7 @@ The public API is open source (code found at [www.github.com/JobtechSwe/jobtech-
     * [ Schema: Employment type ](#eType)
     * [ Schema: Driving licence ](#driving)
     * [ Schema: Worktime extent ](#worktime)
+    * [ Schema: SUN ](#sun)
     * [ Schema: SNI ](#sni)
     * [ Schema: Languages ](#language)
     * [ Schema: Language levels ](#languageLevel)
@@ -123,7 +124,11 @@ All but the “lowest” ranked licence also contain a list of the licences that
 ### Schema: Worktime extent
  
 This schema only contains the two concepts “Heltid” and “Deltid”.
-(DEN NYA SUN ÄR FÖRHOPPNINGSVIS FÄRDIG OM NÅGRA VECKOR men rimligt löfte är i september. Redaktionen säger: skippa nuvarande versionen och tryck in den nya när den kommer ut)
+
+<a name="sun"></a>
+### Schema: SUN
+
+DEN NYA SUN ÄR FÖRHOPPNINGSVIS FÄRDIG i september. Redaktionen säger: skippa nuvarande versionen och tryck in den nya när den kommer ut
 
 <a name="sni"></a>
 ### Schema: SNI
