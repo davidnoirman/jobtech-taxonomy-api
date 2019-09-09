@@ -66,11 +66,11 @@ Chart created in www.draw.io
 
 ![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Untitled%20Diagram.png "Diagram for Occupation Schema")
 
-The occupation taxonomy is a multilevel collection of occupations. The taxonomy is based on different external standards together with content created by the editorial team for use in the Swedish labour market, with the concepts all connected to each other directly or indirectly. Depending on your needs you might be interested in different parts of the schema. If you work with job seekers or employers the recommended types to use is the Occupation Field type together with SSYK-4 and Occupation Names. The Occupation collections and Keywords might also be useful. If you are working with official labour market statistics you are more likely to use the SSYK or ISCO types.
+The occupation taxonomy is a multilevel collection of occupations. The taxonomy is based on external standards together with content created by the editorial team for use in the Swedish labour market, with the concepts all connected to each other directly or indirectly. Depending on your needs you might be interested in different parts of the schema. If you work with job seekers or employers the recommended types to use is the Occupation Field type together with SSYK-4 and Occupation Names. The Occupation collections and Keywords might also be useful. If you are working with official labour market statistics you are more likely to use the SSYK or ISCO types.
 
-Some types in the Occupation schema comes from “[Svensk standard för yrkesklassificering][SSYK at SCB]" (Swedish Standard Classification of Occupations), or SSYK. Another standard integrated in the schema is “[International Standard Classification of Occupation][ISCO occupations]”, or ISCO. The current version used is SSYK-2012 and ISCO-08. All the concepts in the SSYK and ISCO types have external-standard codes. If you are using the taxonomy for statistical reasons for example, these codes come in handy. **Very important to note is that the SSYK and ISCO codes are not to be used as unique ID numbers for specific concepts since they are not fixed**. When the external standard gets updated the SSYK and ISCO codes are moved around according to the new version of the standard. **Always use the Concept ID as identification for specific concepts. This is guaranteed to not change over time**. 
+Most types in the Occupation schema comes from “[Svensk standard för yrkesklassificering][SSYK at SCB]" (Swedish Standard Classification of Occupations), or SSYK, which is based on “[International Standard Classification of Occupation][ISCO occupations]”, or ISCO. The current version used is SSYK-2012 and ISCO-08. All the concepts in the SSYK and ISCO types have external-standard codes. If you are using the taxonomy for statistical reasons for example, these codes come in handy. **Very important to note is that the SSYK and ISCO codes are not to be used as unique ID numbers for specific concepts since they are not fixed**. When the external standard gets updated the SSYK and ISCO codes are moved around according to the new version of the standard. **Always use the Concept ID as identification for specific concepts. This is guaranteed to not change over time**. 
 
-The external standard types at the topmost level in the schema (SSYK-1 and ISCO-1) contain general areas of work, like “Yrken med social inriktning”. Since the concepts at this level covers very broad areas of the labour market, there aren’t that many in each type. The third top level type, Occupation Field, is also very broad. This type isn’t an external standard but a collection of nonspecific occupation areas created specifically for the job seeking market. 
+The external standard types at the topmost level in the schema (SSYK-1 and ISCO-1) contain general areas of work, like "Yrken inom administration och kundtjänst". Since the concepts at this level covers very broad areas of the labour market, there aren’t that many in each type. The third top level type, Occupation Field, is also very broad. This type isn’t an external standard but a collection of nonspecific occupation areas created specifically for the job seeking market. 
 
 The lower you get in the taxonomy, the more detailed concepts you’ll find with Occupation Name at the bottom. This type contains more than 3000 concepts, collected by the editorial team often by suggestions from employers and industry organizations. In this level you’ll find concepts like “Stödpedagog”. 
 
@@ -111,7 +111,7 @@ This schema only has one type. This type contains descriptions of different form
 <a name="eType"></a>
 ### Schema: Employment type
 
-This schema only contain one type. It lists different types of employment, like “Sommarjobb / feriejobb” och “Behovsanställning”.
+This schema only contain one type. It lists different types of employment, like “Säsongsanställning” och “Behovsanställning”.
 
 <a name="driving"></a>
 ### Schema: Driving licence
@@ -128,7 +128,7 @@ This schema only contains the two concepts “Heltid” and “Deltid”.
 <a name="sun"></a>
 ### Schema: SUN
 
-DEN NYA SUN ÄR FÖRHOPPNINGSVIS FÄRDIG i september. Redaktionen säger: skippa nuvarande versionen och tryck in den nya när den kommer ut
+INFORMATION ABOUT SUN HERE!
 
 <a name="sni"></a>
 ### Schema: SNI
