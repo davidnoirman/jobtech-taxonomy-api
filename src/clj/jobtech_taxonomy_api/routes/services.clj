@@ -16,37 +16,19 @@
     [spec-tools.core :as st]
     [spec-tools.data-spec :as ds]))
 
-(sp/def ::name string?)
-(sp/def ::street string?)
-(sp/def ::city #{:tre :hki})
-(sp/def ::address (sp/keys :req-un [::street ::city]))
-(sp/def ::user (sp/keys :req-un [::id ::name ::address]))
-(sp/def ::age pos-int?)
+(sp/def ::date inst?)
+(sp/def ::version string?)
 
 ;; define a data structure
-(def person
-  {::age ::age
-   :boss boolean?
-   (ds/req :name) string?
-   (ds/opt :description) string?
-   :languages #{keyword?}
-   :aliases [(ds/or {:maps {:alias string?}
-                     :strings string?})]})
+(def versions
+  {::version ::version
+   ::date ::date})
 
 ;; create spec from data
-(def person-spec
+(def versions-spec
   (ds/spec
-    {:name ::person
-     :spec person}))
-
-;; example data
-(def some-person
-  {::age 63
-   :boss true
-   :name "Liisa"
-   :languages #{:clj :cljs}
-   :aliases [{:alias "Lissu"} "Liisu"]
-   :description "Liisa is a valid boss"})
+   {:name ::versions  ;; set a sensible name of the response model
+    :spec versions})) ;; point to the spec def
 
 ;;; List currently defined specs in this ns:
 ;; (keys (st/registry #"jobtech-taxonomy-api-with-spec.routes.services.*"))
@@ -54,7 +36,7 @@
 ;; (sp/valid? person-spec some-person)
 
 (defn service-routes []
-  ["/api"
+  ["/v1/taxonomy/public"
    {:coercion spec-coercion/coercion
     :muuntaja formats/instance
     :swagger {:id ::api}}
@@ -64,14 +46,13 @@
     ["/swagger.json"
      {:get (swagger/create-swagger-handler)}]
 
-    ["/api-docs/*"
+    ["/swagger-ui/*"
      {:get (swagger-ui/create-swagger-ui-handler
-             {:url "/api/swagger.json"
-;;             {:url "/test.json"
+             {:url "/v1/taxonomy/public/swagger.json" ;; FIXME can this be excluded?
               :config {:validator-url nil}})}]]
 
-   ["/tst"
-    {:get {:responses {200 {:body person-spec}}
+   ["/versions"
+    {:get {:responses {200 {:body versions-spec}}
            :handler (fn [{{{:keys [_]} :multipart} :parameters}]
                       {:status 200
-                       :body some-person})}}]])
+                       :body nil})}}]])
