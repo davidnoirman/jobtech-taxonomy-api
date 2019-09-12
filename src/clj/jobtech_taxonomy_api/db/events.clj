@@ -341,8 +341,8 @@ Like replaced-by will return nil."
 (defn get-deprecated-concepts-replaced-by-from-version [from-version to-version]
   (let [db (get-db)
         deprecated-concepts (if to-version
-                              (d/q show-deprecated-replaced-by-query db (dec from-version) to-version)
-                              (d/q show-deprecated-replaced-by-query db (dec from-version) (ffirst (d/q show-latest-version-id db)))
+                              (d/q show-deprecated-replaced-by-query db  from-version to-version)
+                              (d/q show-deprecated-replaced-by-query db  from-version (ffirst (d/q show-latest-version-id db)))
                               )
 
         ]

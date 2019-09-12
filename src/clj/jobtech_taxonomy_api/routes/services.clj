@@ -55,6 +55,10 @@
 (defn authorized-private? [request]
   (= (http/-get-header request "api-key") (middleware/get-token :admin)))
 
+(s/defschema VersionResponse  {:timestamp java.util.Date
+                               :version s/Int
+                               })
+
 (def service-routes
   (api
    {:exceptions
@@ -74,6 +78,8 @@
 
      (GET "/versions" []
        :query-params []
+       ;;:body [versions VersionResponse]
+       :return {:result VersionResponse}
        :responses {200 {:schema [    {:timestamp java.util.Date
                                       :version s/Int
                                       }]}
