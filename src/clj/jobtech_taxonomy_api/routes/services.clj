@@ -105,6 +105,8 @@
                       {preferredLabel :- String nil}
                       {type :- String nil}
                       {deprecated :- Boolean false}
+                      {relationType :-  (s/enum "broader" "related" "occupation_name_affinity" )  nil}
+                      {relatedIds :- (describe [String] "Used together with relationType" ) nil}
                       {offset :- Long nil}
                       {limit :- Long nil}
                       {version :- Long nil}
@@ -114,11 +116,13 @@
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "Get concepts."
        (log/info (str "GET /concepts " "id:" id " preferredLabel:" preferredLabel " type:" type " deprecated:" deprecated " offset:" offset " limit:" limit))
-       (response/ok (concepts/find-concepts id preferredLabel type deprecated offset limit version)))
+       (response/ok (concepts/find-concepts id preferredLabel type deprecated relationType relatedIds  offset limit version)))
 
      (GET "/search" []
-       :query-params [q       :- String
+       :query-params  [q       :- (describe String "String to autocomplete on")
                       {type   :- String nil}
+                       {relationType :-  (s/enum "broader" "related" "occupation_name_affinity" ) nil}
+                       {relatedIds :- (describe [String] "Used together with relationType" ) nil}
                       {offset :- Long nil}
                       {limit  :- Long nil}
                       {version :- Long nil}
@@ -126,8 +130,8 @@
        :responses {200 {:schema search/get-concepts-by-search-schema}
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary      "Autocomplete from query string"
-       (log/info (str "GET /search q:" q " type:" type " offset:" offset " limit:" limit  " version: " version))
-       (response/ok (search/get-concepts-by-search q type offset limit version)))
+       (log/info (str "GET /search q:" q " type:" type "relationType:" relationType "relatedIds:" relatedIds  " offset:" offset " limit:" limit  " version: " version))
+       (response/ok (search/get-concepts-by-search q type relationType relatedIds offset limit version)))
 
      ;; "this is the replaced by endpoint"
      (GET "/replaced-by-changes" []
@@ -147,6 +151,12 @@
        :summary "Return a list of all taxonomy types."
        (log/info (str "GET /concept/types version: " version ))
        (response/ok (get-all-taxonomy-types version)))
+
+     (GET "/relation/types" []
+       :responses {200 {:schema s/Any}
+                   500 {:schema {:type s/Str, :message s/Str}}}
+       :summary "Relation graphs."
+       (response/ok (get-relation-types)))
 
      (POST "/parse-text"    []
        :query-params [text :- String]
@@ -228,8 +238,4 @@
        :summary "Relation graphs."
        (response/ok (get-relation-graph-from-concept (keyword relation-type) id)))
 
-     (GET "/relation/types" []
-       :responses {200 {:schema s/Any}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Relation graphs."
-       (response/ok (get-relation-types))))))
+     )))
