@@ -43,8 +43,8 @@
    :limit limit
    }
   )
-
-(defn fetch-concepts [q type offset limit version]
+;; relation related-ids
+(defn fetch-concepts [q type relation related-ids offset limit version]
 
   (cond-> initial-concept-query
 
@@ -59,6 +59,16 @@
         (update :args conj type)
         (update :where conj '[?c :concept/type ?type])
         )
+
+    (and relation related-ids)
+    (->
+     (update :in conj '?relation '[?related-ids ...])
+     (update :args conj relation related-ids)
+     (update :where conj '[?cr :concept/id ?related-ids]
+                         '[?r :relation/concept-1 ?c]
+                         '[?r :relation/concept-2 ?cr]
+                         '[?r :relation/type ?relation])
+     )
 
     offset
     (assoc :offset offset)
@@ -79,6 +89,31 @@
     (s/optional-key :preferredLabel) s/Str}])
 
 
-(defn get-concepts-by-search [q type offset limit version]
-  (parse-find-concept-datomic-result (d/q (fetch-concepts q type offset limit version)))
+(defn get-concepts-by-search [q type relation related-ids offset limit version]
+  (parse-find-concept-datomic-result (d/q (fetch-concepts q type relation related-ids offset limit version)))
+  )
+
+
+(comment
+
+  (def s-query
+    '[:find (pull ?c [:concept/id
+                      :concept/type
+                      :concept/preferred-label
+                      ])
+      :in $ [?cr-id ...] ?rt
+      :where
+
+      [?cr :concept/id ?cr-id]
+      [?r :relation/concept-1 ?c]
+      [?r :relation/concept-2 ?cr]
+      [?r :relation/type ?rt]
+      ])
+
+  [
+   (not [?c :concept/deprecated true])
+   [?c :concept/preferred-label ?preferred-label]
+   [(.matches ^String ?preferred-label ?q)]
+   ]
+
   )
