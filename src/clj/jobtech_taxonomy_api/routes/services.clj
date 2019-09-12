@@ -106,7 +106,7 @@
                       {type :- String nil}
                       {deprecated :- Boolean false}
                       {relationType :-  (s/enum "broader" "related" "occupation_name_affinity" )  nil}
-                      {relatedIds :- [String] nil}
+                      {relatedIds :- (describe [String] "Used together with relationType" ) nil}
                       {offset :- Long nil}
                       {limit :- Long nil}
                       {version :- Long nil}
@@ -122,7 +122,7 @@
        :query-params  [q       :- (describe String "String to autocomplete on")
                       {type   :- String nil}
                        {relationType :-  (s/enum "broader" "related" "occupation_name_affinity" ) nil}
-                      {relatedIds :- [String] nil}
+                       {relatedIds :- (describe [String] "Used together with relationType" ) nil}
                       {offset :- Long nil}
                       {limit  :- Long nil}
                       {version :- Long nil}
