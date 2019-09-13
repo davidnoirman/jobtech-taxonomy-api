@@ -119,6 +119,22 @@
 
 
 
+;; /search
+
+(sp/def ::search-result
+  (ds/spec
+   {:name ::search-result
+    :spec (sp/keys :req [::id ::type ::preferredLabel])}))
+
+(sp/def ::search-results
+  (ds/spec
+   {:name ::search-results
+    :spec (sp/coll-of ::search-result )}))
+
+(def search-spec ::search-results)
+
+
+
 ;;;; handy debug tools...
 ;;  (sp/valid? versions-spec example-version-response)
 ;;  (sp/valid? events-spec example-events-responseE)

@@ -10,6 +10,7 @@
     [jobtech-taxonomy-api.db.versions :as v]
     [jobtech-taxonomy-api.db.concepts :as concepts]
     [jobtech-taxonomy-api.db.events :as events]
+    [jobtech-taxonomy-api.db.search :as search]
     [jobtech-taxonomy-api.types :as types]
     [clojure.tools.logging :as log]
     [clojure.spec.alpha :as s]
@@ -64,5 +65,18 @@
                       (log/info (str "GET /concepts " "id:" id " preferredLabel:" preferredLabel " type:" type " deprecated:" deprecated " offset:" offset " limit:" limit))
                        {:status 200
                         :body (vec (map types/map->nsmap (concepts/find-concepts id preferredLabel type deprecated offset limit version)))})}}]
+
+   ["/search"
+    {
+     :summary      "Autocomplete from query string"
+     :parameters {:query {:q string?, :type string?, :offset int?,
+                          :limit int?, :version int?}}
+     ;;:parameters {:query types/search-params} ;; FIXME: for optional params
+     :get {:responses {200 {:body types/search-spec}
+                       500 {:body types/error-spec}}
+           :handler (fn [{{{:keys [q type offset limit version]} :query} :parameters}]
+                      (log/info (str "GET /search q:" q " type:" type " offset:" offset " limit:" limit  " version: " version))
+                       {:status 200
+                        :body (vec (map types/map->nsmap (search/get-concepts-by-search q type offset limit version)))})}}]
 
    ])
