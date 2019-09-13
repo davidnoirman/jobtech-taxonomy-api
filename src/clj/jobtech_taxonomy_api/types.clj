@@ -9,8 +9,7 @@
   "Apply our nice namespace to the supplied structure."
   [m]
   (reduce-kv (fn [acc k v]
-               (let [new-kw (if (and (keyword? k)
-                                     (not (qualified-keyword? k)))
+               (let [new-kw (if (keyword? k)
                               (keyword (str "jobtech-taxonomy-api.types") (name k))
                               k)
                      new-v (if (= (type v) clojure.lang.PersistentArrayMap )
@@ -140,11 +139,15 @@
 
 ;; /replaced-by-changes
 
+(sp/def ::concept
+  (ds/spec
+   {:name ::concept
+    :spec ::concept-with-replace}))
+
 (sp/def ::replaced-by-change
   (ds/spec
    {:name ::replaced-by-change
-    :spec {::version int?
-           ::concept ::concept-with-replace}}))
+    :spec (sp/keys :req [::version ::concept])}))
 
 (sp/def ::replaced-by-changes
   (ds/spec
@@ -153,10 +156,24 @@
 
 (def replaced-by-changes-spec ::replaced-by-changes)
 
-(def example-replaced-by-changes-spec
-  [#:jobtech-taxonomy-api.types{:concept #:jobtech-taxonomy-api.types{:id "XSoL_LLU_PYV", :type "occupation_name", :definition "Eventproducent", :preferredLabel "Eventproducent", :deprecated true, :replacedBy [ #:jobtech-taxonomy-api.types{:id "FcaP_vhz_Cuy", :definition "Producent: kultur, media, film", :type "occupation_name", :preferredLabel "Producent: kultur, media, film"}]}, :version 2}])
+;; /concept/types
 
-;; :replacedBy gör om värdet från () till {}. Kolla map.
+(sp/def ::concept-types
+  (ds/spec
+   {:name ::concept-types
+    :spec (sp/coll-of string? )}))
+
+(def concept-types-spec ::concept-types)
+
+
+;; /parse-text
+
+(sp/def ::concepts-without-replace
+  (ds/spec
+   {:name ::concepts-without-replace
+    :spec (sp/coll-of ::concept-without-replace )}))
+
+(def parse-text-spec ::concepts-without-replace)
 
 ;;;; handy debug tools...
 ;;  (sp/valid? versions-spec example-version-response)
