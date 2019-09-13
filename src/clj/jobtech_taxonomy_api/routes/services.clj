@@ -79,4 +79,18 @@
                        {:status 200
                         :body (vec (map types/map->nsmap (search/get-concepts-by-search q type offset limit version)))})}}]
 
+   ["/replaced-by-changes"
+    {
+     :summary      "Show the history of concepts being replaced from a given version."
+     :parameters {:query {:fromVersion int?, :toVersion int?}}
+     ;;:parameters {:query types/search-params} ;; FIXME: for optional params
+     :get {:responses {200 {:body types/replaced-by-changes-spec}
+                       500 {:body types/error-spec}}
+           :handler (fn [{{{:keys [fromVersion toVersion]} :query} :parameters}]
+                      (log/info (str "GET /replaced-by-changes from-version: " fromVersion " toVersion: " toVersion))
+                       {:status 200
+                        :body (vec (map types/map->nsmap (events/get-deprecated-concepts-replaced-by-from-version fromVersion toVersion)))})}}]
+
    ])
+
+;;  (s/explain types/events-spec (vec (map types/map->nsmap (events/get-all-events-from-version-with-pagination 1 2 0 10))))

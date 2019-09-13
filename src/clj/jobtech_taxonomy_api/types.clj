@@ -4,6 +4,7 @@
     [spec-tools.core :as st]
     [spec-tools.data-spec :as ds]))
 
+
 (defn map->nsmap
   "Apply our nice namespace to the supplied structure."
   [m]
@@ -14,7 +15,11 @@
                               k)
                      new-v (if (= (type v) clojure.lang.PersistentArrayMap )
                              (map->nsmap v)
-                             v)]
+                             (if (or (= (type v) clojure.lang.PersistentList )
+                                     (= (type v) clojure.lang.PersistentVector )
+                                     (= (type v) clojure.lang.LazySeq ))
+                               (map map->nsmap v)
+                               v))]
                  (assoc acc new-kw new-v)))
              {} m))
 
@@ -68,7 +73,7 @@
 (sp/def ::concept-without-replace
   (ds/spec
    {:name ::concept-without-replace
-    :spec (sp/keys :req [::id ::type] :opt [::deprecated ::preferredLabel])}))
+    :spec (sp/keys :req [::id ::type] :opt [::definition ::deprecated ::preferredLabel])}))
 
 (sp/def ::event
   (ds/spec
@@ -108,7 +113,7 @@
 (sp/def ::concept-with-replace
   (ds/spec
    {:name ::concept-with-replace
-    :spec (sp/keys :req [::id ::type ::definition ::preferredLabel] :opt [::deprecated ::replacedBy])}))
+    :spec (sp/keys :req [::id ::type ::preferredLabel] :opt [::definition ::deprecated ::replacedBy])}))
 
 (sp/def ::concepts
   (ds/spec
@@ -133,11 +138,30 @@
 
 (def search-spec ::search-results)
 
+;; /replaced-by-changes
 
+(sp/def ::replaced-by-change
+  (ds/spec
+   {:name ::replaced-by-change
+    :spec {::version int?
+           ::concept ::concept-with-replace}}))
+
+(sp/def ::replaced-by-changes
+  (ds/spec
+   {:name ::replaced-by-changes
+    :spec (sp/coll-of ::replaced-by-change )}))
+
+(def replaced-by-changes-spec ::replaced-by-changes)
+
+(def example-replaced-by-changes-spec
+  [#:jobtech-taxonomy-api.types{:concept #:jobtech-taxonomy-api.types{:id "XSoL_LLU_PYV", :type "occupation_name", :definition "Eventproducent", :preferredLabel "Eventproducent", :deprecated true, :replacedBy [ #:jobtech-taxonomy-api.types{:id "FcaP_vhz_Cuy", :definition "Producent: kultur, media, film", :type "occupation_name", :preferredLabel "Producent: kultur, media, film"}]}, :version 2}])
+
+;; :replacedBy gör om värdet från () till {}. Kolla map.
 
 ;;;; handy debug tools...
 ;;  (sp/valid? versions-spec example-version-response)
-;;  (sp/valid? events-spec example-events-responseE)
+;;  (sp/valid? events-spec example-events-response)
+;;  (sp/valid? replaced-by-changes-spec example-replaced-by-changes-spec)
 ;;  (sp/explain versions-spec example-version-response)
 ;;  (sp/explain events-spec example-events-response)
 ;;  (sp/conform versions-spec example-version-response)
