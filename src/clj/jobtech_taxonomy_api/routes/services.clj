@@ -8,6 +8,7 @@
     [reitit.ring.middleware.parameters :as parameters]
     [jobtech-taxonomy-api.middleware.formats :as formats]
     [jobtech-taxonomy-api.db.versions :as v]
+    [jobtech-taxonomy-api.db.concepts :as concepts]
     [jobtech-taxonomy-api.db.events :as events]
     [jobtech-taxonomy-api.types :as types]
     [clojure.tools.logging :as log]
@@ -49,4 +50,19 @@
                        (log/info (str "GET /changes fromVersion:" fromVersion " toVersion: " toVersion  " offset: " offset " limit: " limit))
                        {:status 200
                        :body (vec (map types/map->nsmap (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit)))})}}]
+
+
+   ["/concepts"
+    {
+     :summary      "Get concepts."
+     :parameters {:query {:id string?, :preferredLabel string?, :type string?,
+                          :deprecated boolean?, :offset int?, :limit int?, :version int?}}
+     ;;:parameters {:query types/concepts-params} ;; FIXME: for optional params
+     :get {:responses {200 {:body types/concepts-spec}
+                       500 {:body types/error-spec}}
+           :handler (fn [{{{:keys [id preferredLabel type deprecated offset limit version]} :query} :parameters}]
+                      (log/info (str "GET /concepts " "id:" id " preferredLabel:" preferredLabel " type:" type " deprecated:" deprecated " offset:" offset " limit:" limit))
+                       {:status 200
+                        :body (vec (map types/map->nsmap (concepts/find-concepts id preferredLabel type deprecated offset limit version)))})}}]
+
    ])

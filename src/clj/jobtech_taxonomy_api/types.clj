@@ -35,6 +35,16 @@
 (def error-spec ::error)
 
 
+;;;; Output response types
+
+;; General fundamentals
+(sp/def ::id (st/spec string?))
+(sp/def ::type (st/spec string?))
+(sp/def ::deprecated (st/spec boolean?))
+(sp/def ::preferredLabel (st/spec string?))
+(sp/def ::definition (st/spec string?))
+
+
 ;; /versions
 (sp/def ::ver
   (ds/spec
@@ -54,15 +64,10 @@
    {::timestamp #inst "2019-08-15T10:39:56.547-00:00", ::version 2}])
 
 
-;; /concept
-(sp/def ::id (st/spec string?))
-(sp/def ::type (st/spec string?))
-(sp/def ::deprecated (st/spec boolean?))
-(sp/def ::preferredLabel (st/spec string?))
-
-(sp/def ::concept
+;; /changes
+(sp/def ::concept-without-replace
   (ds/spec
-   {:name ::concept
+   {:name ::concept-without-replace
     :spec (sp/keys :req [::id ::type] :opt [::deprecated ::preferredLabel])}))
 
 (sp/def ::event
@@ -70,7 +75,7 @@
    {:name ::event
     :spec {::eventType (st/spec string?)
            ::version (st/spec int?)
-           ::concept ::concept}}))
+           ::concept ::concept-without-replace}}))
 
 (sp/def ::events
   (ds/spec
@@ -93,6 +98,27 @@
                                                                       :preferredLabel "3 månader – upp till 6 månader"}}])
 
 
+;; /concepts
+
+(sp/def ::replacedBy
+  (ds/spec
+   {:name ::replacedBy
+    :spec (sp/coll-of ::concept-without-replace )}))
+
+(sp/def ::concept-with-replace
+  (ds/spec
+   {:name ::concept-with-replace
+    :spec (sp/keys :req [::id ::type ::definition ::preferredLabel] :opt [::deprecated ::replacedBy])}))
+
+(sp/def ::concepts
+  (ds/spec
+   {:name ::concepts
+    :spec (sp/coll-of ::concept-with-replace )}))
+
+(def concepts-spec ::concepts)
+
+
+
 ;;;; handy debug tools...
 ;;  (sp/valid? versions-spec example-version-response)
 ;;  (sp/valid? events-spec example-events-responseE)
@@ -103,3 +129,5 @@
 ;;  (sp/get-spec ::ver)
 ;;  (sp/get-spec events-spec)
 ;;  (keys (st/registry #"jobtech-taxonomy-api.types.*"))
+;;  (require '[spec-tools.json-schema :as jsc])
+;;  (jsc/transform events-spec)

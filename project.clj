@@ -32,7 +32,8 @@
                  [ring/ring-core "1.7.1"]
                  [ring/ring-defaults "0.3.2"]
                  [selmer "1.12.14"]
-                 [metosin/ring-swagger "0.26.2"]]
+                 [metosin/ring-swagger "0.26.2"]
+                 [jobtech-taxonomy-database "0.1.0-SNAPSHOT"]]
 
 ;;  :dependencies [
 ;;                 [buddy "2.0.0"]
@@ -51,7 +52,6 @@
 ;;                 [jobtech-nlp-stava "0.1.0"]
 ;;                 [jobtech-nlp-stop-words "0.1.0"]
 ;;                 [jobtech-nlp-tokeniser "0.1.0"]
-;;                 [jobtech-taxonomy-database "0.1.0-SNAPSHOT"]
 ;;                 [luminus-jetty "0.1.7"]
 ;;                 [luminus-immutant "0.2.4"]
 ;;                 [luminus-transit "0.1.1"]
