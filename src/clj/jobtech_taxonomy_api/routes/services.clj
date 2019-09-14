@@ -85,8 +85,8 @@
    ["/changes"
     {
      :summary      "Show the history from a given version."
-     :parameters {:query {:fromVersion int?, :toVersion int?, :offset int?, :limit int?}}
-     ;;:parameters {:query types/changes-params} ;; FIXME: for optional params
+     :parameters {:query {(ds/opt :fromVersion) int?, :toVersion int?, :offset int?, :limit int?}}
+
      :get {:responses {200 {:body types/events-spec}
                        500 {:body types/error-spec}}
            :handler (fn [{{{:keys [fromVersion toVersion offset limit]} :query} :parameters}]
