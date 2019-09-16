@@ -31,7 +31,7 @@
 ;; Status:
 ;;   - conclude integration of relation and relation-ids (nils are passed to db-functions in the mean time)
 ;;     - how to express request parameters as drop-down choice lists
-;;   - refine auth-merge of develop (remove below auth functions)
+;;   - refine auth-merge of develop (remove below auth functions), and apikey.clj
 ;;   - catch exceptions and format error messages
 ;;   - adjust tests
 
@@ -51,16 +51,6 @@
   "Middleware used on routes requiring token authentication"
   [handler]
   (wrap-authentication handler token-backend))
-
-;; (s/def ::fromVersion int?)
-;; (s/def ::toVersion int?)
-;; (s/def ::offset  int?)
-;; (s/def ::limit  int?)
-;; ;;(s/def ::changes-params (ds/spec {:name ::changes-params :spec (s/keys :opt [::fromVersion ::toVersion ::offset ::limit])}))
-;; ;;(def changes-params ::changes-params)
-;; ;;(s/def ::relation (ds/spec {:name ::relation :spec (s/keys :opt [::related ::occupation_name_affinity ::broader])}))
-;; (s/def ::relationX (ds/spec {:name ::relationY :spec string?}))
-;; (def relation ::relationX)
 
 (defn service-routes []
   ["/v1/taxonomy"
@@ -85,7 +75,7 @@
     {:swagger {:tags ["Public"]
                :auth-rules authenticated?}
 
-     :middleware [cors/cors]} ;; activate buddy auth by adding: token-auth auth
+     :middleware [cors/cors auth]}
 
     ["/versions"
      {:summary "Show the available versions."
@@ -127,7 +117,6 @@
       :summary      "Autocomplete from query string"
       :parameters {:query {:q string?, (ds/opt :type) string?, (ds/opt :relation) string?, (ds/opt :related-ids) string?, (ds/opt :offset) int?,
                            (ds/opt :limit) int?, (ds/opt :version) int?}}
-      ;;:parameters {:query types/search-params} ;; FIXME: for optional params
       :get {:responses {200 {:body types/search-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [q type relation relation-ids offset limit version]} :query} :parameters}]
@@ -139,7 +128,6 @@
      {
       :summary      "Show the history of concepts being replaced from a given version."
       :parameters {:query {:fromVersion int?, (ds/opt :toVersion) int?}}
-      ;;:parameters {:query types/search-params} ;; FIXME: for optional params
       :get {:responses {200 {:body types/replaced-by-changes-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [fromVersion toVersion]} :query} :parameters}]
@@ -151,7 +139,6 @@
      {
       :summary "Return a list of all taxonomy types."
       :parameters {:query {(ds/opt :version) int?}}
-      ;;:parameters {:query types/types-params} ;; FIXME: for optional params
       :get {:responses {200 {:body types/concept-types-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [version]} :query} :parameters}]
@@ -173,12 +160,9 @@
      {
       :summary "Finds all concepts in a text."
       :parameters {:query {:text string?}}
-      ;;:parameters {:query types/types-params} ;; FIXME: for optional params
       :post {:responses {200 {:body types/parse-text-spec}
                          500 {:body types/error-spec}}
              :handler (fn [{{{:keys [text]} :query} :parameters}]
                         (log/info (str "GET /parse-text text: " text ))
                         {:status 200
-                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]
-
-    ]])
+                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]]])

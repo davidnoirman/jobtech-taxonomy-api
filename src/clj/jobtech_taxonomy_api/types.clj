@@ -54,11 +54,6 @@
 
 (def versions-spec ::versions)
 
-(def example-version-response
-  [{::timestamp #inst "2019-08-15T10:39:20.814-00:00", ::version 1}
-   {::timestamp #inst "2019-08-15T10:39:56.547-00:00", ::version 2}])
-
-
 ;; /changes
 (sp/def ::concept-without-replace
   (ds/spec
@@ -79,20 +74,6 @@
 
 (def events-spec ::events)
 
-
-(def example-events-response
-  [#:jobtech-taxonomy-api.types{:eventType "UPDATED",
-                                :version 2,
-                                :concept #:jobtech-taxonomy-api.types{:id "a7uU_j21_mkL",
-                                                                      :type "employment_duration",
-                                                                      :preferredLabel "Tillsvidare"}}
-   #:jobtech-taxonomy-api.types{:eventType "UPDATED",
-                                :version 2,
-                                :concept #:jobtech-taxonomy-api.types{:id "Sy9J_aRd_ALx",
-                                                                      :type "employment_duration",
-                                                                      :preferredLabel "3 månader – upp till 6 månader"}}])
-
-
 ;; /concepts
 
 (sp/def ::replacedBy
@@ -111,8 +92,6 @@
     :spec (sp/coll-of ::concept-with-replace )}))
 
 (def concepts-spec ::concepts)
-
-
 
 ;; /search
 
@@ -173,17 +152,3 @@
     :spec (sp/coll-of ::concept-without-replace )}))
 
 (def parse-text-spec ::concepts-without-replace)
-
-;;;; handy debug tools...
-;;  (sp/valid? versions-spec example-version-response)
-;;  (sp/valid? events-spec example-events-response)
-;;  (sp/valid? replaced-by-changes-spec example-replaced-by-changes-spec)
-;;  (sp/explain versions-spec example-version-response)
-;;  (sp/explain events-spec example-events-response)
-;;  (sp/conform versions-spec example-version-response)
-;;  (sp/conform events-spec example-events-response)
-;;  (sp/get-spec ::ver)
-;;  (sp/get-spec events-spec)
-;;  (keys (st/registry #"jobtech-taxonomy-api.types.*"))
-;;  (require '[spec-tools.json-schema :as jsc])
-;;  (jsc/transform events-spec)
