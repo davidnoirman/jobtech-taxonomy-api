@@ -12,8 +12,8 @@
             [datomic.client.api :as d]
             [mount.core :as mount]))
 
-(def header-auth-user  { :key "api-key", :val (middleware/get-token :user)})
-(def header-auth-admin { :key "api-key", :val (middleware/get-token :admin)})
+(defn header-auth-user [] { :key "api-key", :val (middleware/get-token :user)})
+(defn header-auth-admin [] { :key "api-key", :val (middleware/get-token :admin)})
 
 (defmacro with-properties [property-map & body]
   "Run a badly simulated closure with a system property. Not thread safe."

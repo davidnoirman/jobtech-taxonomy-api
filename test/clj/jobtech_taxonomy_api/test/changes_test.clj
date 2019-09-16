@@ -14,7 +14,7 @@
     (concept/assert-concept "skill" "cykla" "cykla")
     (let [[status body] (util/send-request-to-json-service
                          :get "/v0/taxonomy/public/changes"
-                         :headers [util/header-auth-user]
+                         :headers [(util/header-auth-user)]
                          :query-params [{:key "fromDateTime", :val "2019-05-21%2009%3A46%3A08"}])
           an-event (first body)
           found-concept (first (db-concepts/find-concepts nil "cykla" "skill" false 0 1 nil))]
