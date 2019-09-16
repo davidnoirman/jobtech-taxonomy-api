@@ -24,6 +24,7 @@
     [jobtech-taxonomy-api.db.information-extraction :as ie]
     [clojure.tools.logging :as log]
     [clojure.spec.alpha :as s]
+    [spec-tools.data-spec :as ds]
     ))
 
 ;;
@@ -49,6 +50,14 @@
   "Middleware used on routes requiring token authentication"
   [handler]
   (wrap-authentication handler token-backend))
+
+;;;; Input parameter types
+(s/def ::fromVersion int?)
+(s/def ::toVersion int?)
+(s/def ::offset  int?)
+(s/def ::limit  int?)
+(s/def ::changes-params (ds/spec {:name ::changes-params :spec (s/keys :opt [::fromVersion ::toVersion ::offset ::limit])}))
+(def changes-params ::changes-params)
 
 (defn service-routes []
   ["/v1/taxonomy"
@@ -85,7 +94,7 @@
    ["/changes"
     {
      :summary      "Show the history from a given version."
-     :parameters {:query {(ds/opt :fromVersion) int?, :toVersion int?, :offset int?, :limit int?}}
+     :parameters {:query {:fromVersion int?, (ds/opt :toVersion) int?, (ds/opt :offset) int?, (ds/opt :limit) int?}}
 
      :get {:responses {200 {:body types/events-spec}
                        500 {:body types/error-spec}}
@@ -98,8 +107,8 @@
    ["/concepts"
     {
      :summary      "Get concepts."
-     :parameters {:query {:id string?, :preferredLabel string?, :type string?,
-                          :deprecated boolean?, :offset int?, :limit int?, :version int?}}
+     :parameters {:query {(ds/opt :id) string?, (ds/opt :preferredLabel) string?, (ds/opt :type) string?,
+                          (ds/opt :deprecated) boolean?, (ds/opt :offset) int?, (ds/opt :limit) int?, (ds/opt :version) int?}}
      ;;:parameters {:query types/concepts-params} ;; FIXME: for optional params
      :get {:responses {200 {:body types/concepts-spec}
                        500 {:body types/error-spec}}
@@ -111,8 +120,8 @@
    ["/search"
     {
      :summary      "Autocomplete from query string"
-     :parameters {:query {:q string?, :type string?, :offset int?,
-                          :limit int?, :version int?}}
+     :parameters {:query {:q string?, (ds/opt :type) string?, (ds/opt :offset) int?,
+                          (ds/opt :limit) int?, (ds/opt :version) int?}}
      ;;:parameters {:query types/search-params} ;; FIXME: for optional params
      :get {:responses {200 {:body types/search-spec}
                        500 {:body types/error-spec}}
@@ -124,7 +133,7 @@
    ["/replaced-by-changes"
     {
      :summary      "Show the history of concepts being replaced from a given version."
-     :parameters {:query {:fromVersion int?, :toVersion int?}}
+     :parameters {:query {:fromVersion int?, (ds/opt :toVersion) int?}}
      ;;:parameters {:query types/search-params} ;; FIXME: for optional params
      :get {:responses {200 {:body types/replaced-by-changes-spec}
                        500 {:body types/error-spec}}
@@ -136,7 +145,7 @@
    ["/concept/types"
     {
      :summary "Return a list of all taxonomy types."
-     :parameters {:query {:version int?}}
+     :parameters {:query {(ds/opt :version) int?}}
      ;;:parameters {:query types/types-params} ;; FIXME: for optional params
      :get {:responses {200 {:body types/concept-types-spec}
                        500 {:body types/error-spec}}
@@ -150,7 +159,7 @@
      :summary "Finds all concepts in a text."
      :parameters {:query {:text string?}}
      ;;:parameters {:query types/types-params} ;; FIXME: for optional params
-     :get {:responses {200 {:body types/parse-text-spec}
+     :post {:responses {200 {:body types/parse-text-spec}
                        500 {:body types/error-spec}}
            :handler (fn [{{{:keys [text]} :query} :parameters}]
                       (log/info (str "GET /parse-text text: " text ))

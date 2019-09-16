@@ -23,15 +23,6 @@
              {} m))
 
 
-;;;; Input parameter types
-(sp/def ::fromVersion int?)
-(sp/def ::toVersion int?)
-(sp/def ::offset  int?)
-(sp/def ::limit  int?)
-(sp/def ::changes-params (sp/keys :opt [::fromVersion ::toVersion ::offset ::limit]))
-(def changes-params ::changes-params)
-
-
 ;; Error message
 (sp/def ::error (ds/spec {:name (st/spec string?)
                           :spec {::type (st/spec string?)
