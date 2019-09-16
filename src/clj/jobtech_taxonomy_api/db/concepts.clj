@@ -49,7 +49,7 @@
    }
   )
 
-(defn fetch-concepts [id preferred-label type deprecated offset limit db]
+(defn fetch-concepts [id preferred-label type deprecated relation related-ids offset limit db]
 
   (cond-> initial-concept-query
 
@@ -80,6 +80,16 @@
         (update :where conj '[?c :concept/deprecated ?deprecated])
         )
 
+    (and relation related-ids)
+    (->
+     (update :in conj '?relation '[?related-ids ...])
+     (update :args conj relation related-ids)
+     (update :where conj '[?cr :concept/id ?related-ids]
+                         '[?r :relation/concept-1 ?c]
+                         '[?r :relation/concept-2 ?cr]
+                         '[?r :relation/type ?relation])
+     )
+
     offset
     (assoc :offset offset)
 
@@ -92,23 +102,23 @@
   )
 
 (defn find-concepts-by-db
-  ([id preferred-label type deprecated offset limit db]
-   (let [ result (d/q (fetch-concepts id preferred-label type deprecated offset limit db))
+  ([id preferred-label type deprecated relation related-ids offset limit db]
+   (let [ result (d/q (fetch-concepts id preferred-label type deprecated relation related-ids offset limit db))
          parsed-result (parse-find-concept-datomic-result result)]
      parsed-result
      ))
   )
 
 (defn find-concepts
-  ([id preferred-label type deprecated offset limit version]
-   (find-concepts-by-db id preferred-label type deprecated offset limit (get-db version))
+  ([id preferred-label type deprecated relation related-ids offset limit version]
+   (find-concepts-by-db id preferred-label type deprecated relation related-ids offset limit (get-db version))
    )
   )
 
 ;;"TODO expose this as a private end point for the editor"
 (defn find-concepts-including-unpublished
-  ([id preferred-label type deprecated offset limit]
-   (find-concepts-by-db id preferred-label type deprecated offset limit (get-db))
+  ([id preferred-label type deprecated relation related-ids offset limit]
+   (find-concepts-by-db id preferred-label type deprecated relation related-ids offset limit (get-db))
    )
   ([id]
    (find-concepts-by-db id nil nil nil nil nil (get-db))
@@ -150,9 +160,24 @@
          [result new-concept]))
 
 (defn assert-concept "" [type desc preferrerd-label]
-  (let [existing (find-concepts-including-unpublished nil preferrerd-label type nil nil nil)]
+  (let [existing (find-concepts-including-unpublished nil preferrerd-label type nil nil nil nil nil)]
     (if (> (count existing) 0)
       [false nil]
       (let [[result new-concept] (assert-concept-part type desc preferrerd-label)
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
         [result timestamp (api-util/rename-concept-keys-for-api new-concept)]))))
+
+
+(comment
+
+  ;; When we want to get typed data, use the dynamic pattern input
+  ;; dynamic pattern input
+  (d/q '[:find [(pull ?e pattern) ...]
+         :in $ ?artist pattern
+         :where [?e :release/artists ?artist]]
+       db
+       led-zeppelin
+       [:release/name])
+
+
+  )

@@ -156,6 +156,14 @@
 
 (def concept-types-spec ::concept-types)
 
+;; /relation/types
+
+(sp/def ::relation-types
+  (ds/spec
+   {:name ::relation-types
+    :spec (sp/coll-of string? )}))
+
+(def relation-types-spec ::relation-types)
 
 ;; /parse-text
 

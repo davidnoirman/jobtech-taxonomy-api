@@ -20,9 +20,8 @@
                      :on-error on-error}))
 
 ;; Define a in-memory relation between tokens and users:
-(def hardcoded-tokens {:2f904e245c1f5 :admin
-             :45c1f5e3f05d0 :user
-             :111 :mupp})
+;; TODO use the api-key service
+(def hardcoded-tokens {})
 
 (defn get-tokens-from-system-env []
   (get-in env [:jobtech-taxonomy-api :auth-tokens])
