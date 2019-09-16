@@ -160,7 +160,7 @@
          [result new-concept]))
 
 (defn assert-concept "" [type desc preferrerd-label]
-  (let [existing (find-concepts-including-unpublished nil preferrerd-label type nil nil nil)]
+  (let [existing (find-concepts-including-unpublished nil preferrerd-label type nil nil nil nil nil)]
     (if (> (count existing) 0)
       [false nil]
       (let [[result new-concept] (assert-concept-part type desc preferrerd-label)
