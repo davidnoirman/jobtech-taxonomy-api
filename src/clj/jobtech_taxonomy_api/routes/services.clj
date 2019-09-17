@@ -181,7 +181,7 @@
        :responses {200 {:schema {:message s/Str}}
                    404 {:schema {:message s/Str}}
                    500 {:schema {:type s/Str, :message s/Str}}}
-       (log/info "GET /concept/types")
+       (log/info "DELETE /concept")
        (if (retract-concept id)
          (response/ok { :message "OK" })
          (response/not-found! { :message "Not found" } )))
