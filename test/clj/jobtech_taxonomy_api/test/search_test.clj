@@ -14,7 +14,7 @@
     (concept/assert-concept "skill" "cyklade" "cykla")
     (let [[status body] (util/send-request-to-json-service
                           :get "/v0/taxonomy/public/search"
-                          :headers [util/header-auth-user]
+                          :headers [(util/header-auth-user)]
                           :query-params [{:key "q", :val "cykla"}])
-          found-concept (first (concept/find-concepts nil "cykla" nil nil nil nil nil))]
+          found-concept (first (concept/find-concepts nil "cykla" nil nil nil nil nil nil nil))]
       (test/is (= "cykla" (get found-concept :preferredLabel))))))
