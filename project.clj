@@ -51,6 +51,11 @@
   :test-paths ["test/clj"]
   :resource-paths ["resources"]
   :target-path "target/%s/"
+
+  :repositories [["snapshots" {:url "https://repo.clojars.org"
+                               :username "batfish"
+                               :password :env}]]
+
   :main ^:skip-aot jobtech-taxonomy-api.core
   :cljfmt {}
 
