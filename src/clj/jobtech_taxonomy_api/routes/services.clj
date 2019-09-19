@@ -24,6 +24,7 @@
    [jobtech-taxonomy-api.db.information-extraction :as ie]
    [clojure.tools.logging :as log]
    [clojure.spec.alpha :as s]
+   [spec-tools.core :as st]
    [spec-tools.data-spec :as ds]
    ))
 
@@ -34,6 +35,12 @@
 ;;   - refine auth-merge of develop (remove below auth functions), and apikey.clj
 ;;   - catch exceptions and format error messages
 ;;   - adjust tests
+
+
+(defmacro par [type desc]
+  `(st/spec {:spec ~type :description ~desc}))
+
+;; :parameters {:query {(ds/opt :text) (st/spec {:spec string? :description "Substring to search forX."})}}
 
 (defn auth
   "Middleware used in routes that require authentication. If request is not
@@ -88,7 +95,10 @@
     ["/changes"
      {
       :summary      "Show the history from a given version."
-      :parameters {:query {:fromVersion int?, (ds/opt :toVersion) int?, (ds/opt :offset) int?, (ds/opt :limit) int?}}
+      :parameters {:query {:fromVersion (par int? "Changes from this version, exclusive"),
+                           (ds/opt :toVersion) (par int? "Changes to this version, inclusive"),
+                           (ds/opt :offset) (par int? "Return list offset"),
+                           (ds/opt :limit) (par int? "Return list limit")}}
 
       :get {:responses {200 {:body types/events-spec}
                         500 {:body types/error-spec}}
@@ -100,10 +110,16 @@
 
     ["/concepts"
      {
-      :summary      "Get concepts."
-      :parameters {:query {(ds/opt :id) string?, (ds/opt :preferredLabel) string?, (ds/opt :type) string?,
-                           (ds/opt :deprecated) boolean?, (ds/opt :relation) string?, (ds/opt :related-ids) string?,
-                           (ds/opt :offset) int?, (ds/opt :limit) int?, (ds/opt :version) int?}}
+      :summary      "Get concepts. Supply at least one search parameter."
+      :parameters {:query {(ds/opt :id) (par string? "ID of concept"),
+                           (ds/opt :preferredLabel) (par string? "Textual name of concept"),
+                           (ds/opt :type) (par string? "Restrict to concept type"),
+                           (ds/opt :deprecated) (par boolean? "Restrict to deprecation state"),
+                           (ds/opt :relation) (par string? "Relation type"),
+                           (ds/opt :related-ids) (par string? "Restrict to these relation IDs (white space separated list)"),
+                           (ds/opt :offset) (par int? "Return list offset"),
+                           (ds/opt :limit) (par int? "Return list limit"),
+                           (ds/opt :version) (par int? "Version to use")}}
       :get {:responses {200 {:body types/concepts-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [id preferredLabel type deprecated relation related-ids offset limit version]} :query} :parameters}]
@@ -115,19 +131,29 @@
     ["/search"
      {
       :summary      "Autocomplete from query string"
-      :parameters {:query {:q string?, (ds/opt :type) string?, (ds/opt :relation) string?, (ds/opt :related-ids) string?, (ds/opt :offset) int?,
-                           (ds/opt :limit) int?, (ds/opt :version) int?}}
+      :parameters {:query {:q (par string? "Substring to search for"),
+                           (ds/opt :type) (par string? "Type to search for"),
+                           (ds/opt :relation) (par string? "Relation to search for"),
+                           (ds/opt :related-ids) (par string? "List of relation IDs to search for"),
+                           (ds/opt :offset) (par int? "Return list offset"),
+                           (ds/opt :limit) (par int? "Return list limit"),
+                           (ds/opt :version) (par int? "Version to search for")}}
       :get {:responses {200 {:body types/search-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [q type relation relation-ids offset limit version]} :query} :parameters}]
-                       (log/info (str "GET /search q:" q " type:" type " offset:" offset " limit:" limit  " version: " version))
+            :handler (fn [{{{:keys [q type relation relation-ids offset limit version]}
+                            :query} :parameters}]
+                       (log/info (str "GET /search q:" q " type:" type " offset:"
+                                      offset " limit:" limit  " version: " version))
                        {:status 200
-                        :body (vec (map types/map->nsmap (search/get-concepts-by-search q type nil nil offset limit version)))})}}]
+                        :body (vec (map types/map->nsmap
+                                        (search/get-concepts-by-search
+                                         q type nil nil offset limit version)))})}}]
 
     ["/replaced-by-changes"
      {
       :summary      "Show the history of concepts being replaced from a given version."
-      :parameters {:query {:fromVersion int?, (ds/opt :toVersion) int?}}
+      :parameters {:query {:fromVersion (par int? "From taxonomy version"),
+                           (ds/opt :toVersion) (par int? "To taxonomy version (default: latest version)")}}
       :get {:responses {200 {:body types/replaced-by-changes-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [fromVersion toVersion]} :query} :parameters}]
@@ -138,7 +164,7 @@
     ["/concept/types"
      {
       :summary "Return a list of all taxonomy types."
-      :parameters {:query {(ds/opt :version) int?}}
+      :parameters {:query {(ds/opt :version) (par int? "Taxonomy version (default: latest version)")}}
       :get {:responses {200 {:body types/concept-types-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [version]} :query} :parameters}]
@@ -159,7 +185,7 @@
     ["/parse-text"
      {
       :summary "Finds all concepts in a text."
-      :parameters {:query {:text string?}}
+      :parameters {:query {:text (par string? "Substring to search for")}}
       :post {:responses {200 {:body types/parse-text-spec}
                          500 {:body types/error-spec}}
              :handler (fn [{{{:keys [text]} :query} :parameters}]
