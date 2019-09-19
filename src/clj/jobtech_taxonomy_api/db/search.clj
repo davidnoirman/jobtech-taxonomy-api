@@ -94,21 +94,98 @@
   )
 
 
+
+(def s-query
+  '[:find
+
+    (pull ?r [{:relation/concept-1 [:concept/id
+                                    :concept/type
+                                    :concept/preferred-label
+                                    ]}
+              {:relation/concept-2 [:concept/id
+                                    :concept/type
+                                    :concept/preferred-label
+                                    ]}
+              :relation/type
+              ])
+
+    :in $ ?id
+    :where
+
+    [?c :concept/id ?id]
+    [?r :relation/concept-1 ?c]
+
+    ])
+
+
+
+(def d-query
+  '[:find (pull ?c [:concept/id
+                    :concept/type
+                    :concept/preferred-label
+                    ])
+    (sum  ?broader-relation-weight)
+    (sum ?related-relation-weight)
+
+    :with ?uniqueness
+    :in $ ?id
+    :where
+    [?c :concept/id ?id]
+
+    (or-join [?c ?uniqueness ?related-relation-weight ?broader-relation-weight]
+             (and
+              [?broader-relation :relation/concept-1 ?c]
+              [?broader-relation :relation/type "broader"]
+              [(identity ?broader-relation) ?uniqueness]
+              [(ground 1) ?broader-relation-weight]
+              [(ground 0) ?related-relation-weight])
+             (and
+              [?related-relation :relation/concept-1 ?c]
+              [?related-relation :relation/type "related"]
+              [(identity ?related-relation) ?uniqueness]
+              [(ground 1) ?related-relation-weight]
+              [(ground 0) ?broader-relation-weight])
+             (and
+              [(identity ?c) ?uniqueness]
+              [(ground 0) ?broader-relation-weight]
+              [(ground 0) ?related-relation-weight]))
+    ])
+
+
+
+
 (comment
 
-  (def s-query
-    '[:find (pull ?c [:concept/id
-                      :concept/type
-                      :concept/preferred-label
-                      ])
-      :in $ [?cr-id ...] ?rt
-      :where
 
-      [?cr :concept/id ?cr-id]
-      [?r :relation/concept-1 ?c]
-      [?r :relation/concept-2 ?cr]
-      [?r :relation/type ?rt]
-      ])
+
+  [:find (sum ?comment-weight) (sum ?affirmation-weight) ?text ?time ?source-identifier ?q
+   :with ?uniqueness
+   :where
+   [?q :question/text ?text]
+   [?q :question/time ?time]
+   [?q :question/source-identifier ?source-identifier]
+   (or-join [?q ?uniqueness ?comment-weight ?affirmation-weight]
+            (and
+             [?comment :comment/question ?q]
+             [(identity ?comment) ?uniqueness]
+             [(ground 1) ?comment-weight]
+             [(ground 0) ?affirmation-weight])
+            (and
+             [?affirmation :affirmation/question ?q]
+             [(identity ?affirmation) ?uniqueness]
+             [(ground 1) ?affirmation-weight]
+             [(ground 0) ?comment-weight])
+            (and
+             [(identity ?q) ?uniqueness]
+             [(ground 0) ?comment-weight]
+             [(ground 0) ?affirmation-weight]))]
+
+
+
+
+
+
+
 
   [
    (not [?c :concept/deprecated true])
