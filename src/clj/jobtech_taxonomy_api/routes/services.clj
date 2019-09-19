@@ -79,8 +79,7 @@
              :config {:validator-url nil}})}]]
 
    ["/public"
-    {:swagger {:tags ["Public"]
-               :auth-rules authenticated?}
+    {:swagger {:tags ["Public"]}
 
      :middleware [cors/cors auth]}
 
