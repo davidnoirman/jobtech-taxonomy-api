@@ -60,15 +60,15 @@
 (defn handle-narrower-relation [relation]
 
   (if (= relation "narrower")
-    ['[?cr :concept/id ?related-ids]
-     '[?r :relation/concept-1 ?cr]
-     '[?r :relation/concept-2 ?c]
-     '[?r :relation/type ?relation]]
+    '(     '[?cr :concept/id ?related-ids]
+           '[?r :relation/concept-1 ?cr]
+           '[?r :relation/concept-2 ?c]
+           '[?r :relation/type ?relation])
 
-    ['[?cr :concept/id ?related-ids]
-     '[?r :relation/concept-1 ?c]
-     '[?r :relation/concept-2 ?cr]
-     '[?r :relation/type ?relation]]
+    '( '[?cr :concept/id ?related-ids]
+           '[?r :relation/concept-1 ?c]
+           '[?r :relation/concept-2 ?cr]
+           '[?r :relation/type ?relation])
     )
   )
 
@@ -103,11 +103,35 @@
         (update :where conj '[?c :concept/deprecated ?deprecated])
         )
 
-    (and relation related-ids)
+    (and relation related-ids (not= "narrower" relation))
     (->
      (update :in conj '?relation '[?related-ids ...])
      (update :args conj relation related-ids)
-     (update :where conj (handle-narrower-relation relation))
+
+     )
+
+    (and relation related-ids (= "narrower" relation))
+    (->
+     (update :in conj '?relation '[?related-ids ...])
+     (update :args conj "broader" related-ids)
+
+     )
+
+
+    (and relation related-ids (= "narrower" relation))
+    (->
+     (update :where conj  '[?cr :concept/id ?related-ids]
+                          '[?r :relation/concept-1 ?cr]
+                          '[?r :relation/concept-2 ?c]
+                          '[?r :relation/type ?relation])
+     )
+
+    (and relation related-ids (not= "narrower" relation))
+    (->
+     (update :where conj  '[?cr :concept/id ?related-ids]
+             '[?r :relation/concept-1 ?c]
+             '[?r :relation/concept-2 ?cr]
+             '[?r :relation/type ?relation])
      )
 
     true
