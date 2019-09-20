@@ -126,29 +126,44 @@
                     ])
     (sum  ?broader-relation-weight)
     (sum ?related-relation-weight)
+    (sum  ?occupation-name-affinity-relation-weight)
 
     :with ?uniqueness
     :in $ ?id
     :where
     [?c :concept/id ?id]
 
-    (or-join [?c ?uniqueness ?related-relation-weight ?broader-relation-weight]
+    (or-join [?c ?uniqueness ?related-relation-weight ?broader-relation-weight ?occupation-name-affinity-relation-weight]
              (and
               [?broader-relation :relation/concept-1 ?c]
               [?broader-relation :relation/type "broader"]
               [(identity ?broader-relation) ?uniqueness]
               [(ground 1) ?broader-relation-weight]
-              [(ground 0) ?related-relation-weight])
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?occupation-name-affinity-relation-weight]
+              )
              (and
               [?related-relation :relation/concept-1 ?c]
               [?related-relation :relation/type "related"]
               [(identity ?related-relation) ?uniqueness]
               [(ground 1) ?related-relation-weight]
-              [(ground 0) ?broader-relation-weight])
+              [(ground 0) ?broader-relation-weight]
+              [(ground 0) ?occupation-name-affinity-relation-weight]
+              )
+             (and
+              [?related-relation :relation/concept-1 ?c]
+              [?related-relation :relation/type "occupation_name_affinity"]
+              [(identity ?related-relation) ?uniqueness]
+              [(ground 1) ?occupation-name-affinity-relation-weight]
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?broader-relation-weight]
+              )
              (and
               [(identity ?c) ?uniqueness]
               [(ground 0) ?broader-relation-weight]
-              [(ground 0) ?related-relation-weight]))
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?occupation-name-affinity-relation-weight]
+              ))
     ])
 
 
