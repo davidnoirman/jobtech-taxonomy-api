@@ -23,10 +23,18 @@
     )
   )
 
+(defn move-relations-into-concept [[concept broader narrower related affinity]]
+  (merge {:relations {:broader broader
+                      :narrower narrower
+                              :related related
+                              :affinity affinity
+                      }}
+         concept)
+  )
 
 (defn parse-find-concept-datomic-result [result]
   (->> result
-       (map first)
+       (map move-relations-into-concept)
        (map rename-concept-keys-for-api)
        )
   )

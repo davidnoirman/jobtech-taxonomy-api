@@ -20,21 +20,21 @@
       (test/is (= status 200)))))
 
 (test/deftest ^:integration-unauthorized-access-private unauthorized-access-private
-  (test/testing "unauthorized access to /v0/taxonomy/private/relation/types"
-    (let [[status body] (util/send-request-to-json-service :get "/v0/taxonomy/private/relation/types")]
+  (test/testing "unauthorized access to /v0/taxonomy/private/relation/graph/broader"
+    (let [[status body] (util/send-request-to-json-service :get "/v0/taxonomy/concept/relation/types")]
       (test/is (and (= "unauthorized" (:error body))
                (= status 401))))))
 
 (test/deftest ^:integration-authorized-access-private authorized-access-private
-  (test/testing "authorized access to /v0/taxonomy/private/relation/types"
+  (test/testing "authorized access to /v0/taxonomy/private/relation/graph/broader"
     (let [[status body] (util/send-request-to-json-service
-                         :get "/v0/taxonomy/private/relation/types"
+                         :get "/v0/taxonomy/private/relation/graph/broader"
                          :headers [(util/header-auth-admin)])]
       (test/is (= status 200)))))
 
 (test/deftest ^:integration-authenticated-and-unauthorized-access-private authenticated-and-unauthorized-access-private
-  (test/testing "authenticated and unauthorized access to /v0/taxonomy/private/relation/types"
+  (test/testing "authenticated and unauthorized access to /v0/taxonomy/private/relation/graph/broader"
     (let [[status body] (util/send-request-to-json-service
-                         :get "/v0/taxonomy/private/relation/types"
+                         :get "/v0/taxonomy/private/relation/graph/broader"
                          :headers [(util/header-auth-user)])]
       (test/is (= status 401)))))
