@@ -10,7 +10,6 @@
    [buddy.auth.middleware :refer [wrap-authentication]]
    [buddy.auth :refer [authenticated?]]
    [buddy.auth.http :as http]
-   [buddy.auth.backends :refer [jws]]
    [environ.core :refer [env]]
    [ring.util.http-response :as resp]
    [jobtech-taxonomy-api.middleware.formats :as formats]
@@ -28,19 +27,15 @@
    [spec-tools.data-spec :as ds]
    ))
 
-;;
 ;; Status:
 ;;   - conclude integration of relation and relation-ids (nils are passed to db-functions in the mean time)
 ;;     - how to express request parameters as drop-down choice lists
 ;;   - refine auth-merge of develop (remove below auth functions), and apikey.clj
-;;   - catch exceptions and format error messages
 ;;   - adjust tests
 
-
 (defmacro par [type desc]
+  "Use this to make parameter declarations somewhat tidier."
   `(st/spec {:spec ~type :description ~desc}))
-
-;; :parameters {:query {(ds/opt :text) (st/spec {:spec string? :description "Substring to search forX."})}}
 
 (defn auth
   "Middleware used in routes that require authentication. If request is not
@@ -49,15 +44,7 @@
   (fn [request]
     (if (authenticated? request)
       (handler request)
-      (resp/unauthorized {:error "Not authorized"}))))
-
-(def token-backend
-  (jws {:secret (env :api-key) :options {:alg :hs512}}))
-
-(defn token-auth
-  "Middleware used on routes requiring token authentication"
-  [handler]
-  (wrap-authentication handler token-backend))
+      (resp/unauthorized (types/map->nsmap {:error "Not authorized"})))))
 
 (defn service-routes []
   ["/v1/taxonomy"
@@ -85,24 +72,29 @@
 
     ["/versions"
      {:summary "Show the available versions."
-      :get {:responses {200 {:body types/versions-spec}}
+      :get {:responses {200 {:body types/versions-spec}
+                        401 {:body types/unauthorized-spec}
+                        500 {:body types/error-spec}}
             :handler (fn [{{{:keys [_]} :query} :parameters}]
                        {:status 200
                         :body (map types/map->nsmap (v/get-all-versions))})}}]
-
 
     ["/changes"
      {
       :summary      "Show the history from a given version."
       :parameters {:query {:fromVersion (par int? "Changes from this version, exclusive"),
                            (ds/opt :toVersion) (par int? "Changes to this version, inclusive"),
-                           (ds/opt :offset) (par int? "Return list offset"),
+                           (ds/opt :offset) (par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (par int? "Return list limit")}}
 
       :get {:responses {200 {:body types/events-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [fromVersion toVersion offset limit]} :query} :parameters}]
-                       (log/info (str "GET /changes fromVersion:" fromVersion " toVersion: " toVersion  " offset: " offset " limit: " limit))
+                       (log/info (str "GET /changes"
+                                      " fromVersion:" fromVersion
+                                      " toVersion: " toVersion
+                                      " offset: " offset
+                                      " limit: " limit))
                        {:status 200
                         :body (vec (map types/map->nsmap (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit)))})}}]
 
@@ -116,14 +108,20 @@
                            (ds/opt :deprecated) (par boolean? "Restrict to deprecation state"),
                            (ds/opt :relation) (par string? "Relation type"),
                            (ds/opt :related-ids) (par string? "Restrict to these relation IDs (white space separated list)"),
-                           (ds/opt :offset) (par int? "Return list offset"),
+                           (ds/opt :offset) (par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (par int? "Return list limit"),
                            (ds/opt :version) (par int? "Version to use")}}
       :get {:responses {200 {:body types/concepts-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [id preferredLabel type deprecated relation related-ids offset limit version]} :query} :parameters}]
-                       (log/info (str "GET /concepts " "id:" id " preferredLabel:" preferredLabel " type:" type
-                                      " deprecated:" deprecated " offset:" offset " limit:" limit))
+            :handler (fn [{{{:keys [id preferredLabel type deprecated relation
+                                    related-ids offset limit version]} :query} :parameters}]
+                       (log/info (str "GET /concepts "
+                                      "id:" id
+                                      " preferredLabel:" preferredLabel
+                                      " type:" type
+                                      " deprecated:" deprecated
+                                      " offset:" offset
+                                      " limit:" limit))
                        {:status 200
                         :body (vec (map types/map->nsmap (concepts/find-concepts id preferredLabel type deprecated nil nil offset limit version)))})}}]
 
@@ -134,15 +132,19 @@
                            (ds/opt :type) (par string? "Type to search for"),
                            (ds/opt :relation) (par string? "Relation to search for"),
                            (ds/opt :related-ids) (par string? "List of relation IDs to search for"),
-                           (ds/opt :offset) (par int? "Return list offset"),
+                           (ds/opt :offset) (par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (par int? "Return list limit"),
                            (ds/opt :version) (par int? "Version to search for")}}
       :get {:responses {200 {:body types/search-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [q type relation relation-ids offset limit version]}
                             :query} :parameters}]
-                       (log/info (str "GET /search q:" q " type:" type " offset:"
-                                      offset " limit:" limit  " version: " version))
+                       (log/info (str "GET /search"
+                                      " q:" q
+                                      " type:" type
+                                      " offset:" offset
+                                      " limit:" limit
+                                      " version: " version))
                        {:status 200
                         :body (vec (map types/map->nsmap
                                         (search/get-concepts-by-search
@@ -156,7 +158,9 @@
       :get {:responses {200 {:body types/replaced-by-changes-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [fromVersion toVersion]} :query} :parameters}]
-                       (log/info (str "GET /replaced-by-changes from-version: " fromVersion " toVersion: " toVersion))
+                       (log/info (str "GET /replaced-by-changes"
+                                      " from-version: " fromVersion
+                                      " toVersion: " toVersion))
                        {:status 200
                         :body (vec (map types/map->nsmap (events/get-deprecated-concepts-replaced-by-from-version fromVersion toVersion)))})}}]
 

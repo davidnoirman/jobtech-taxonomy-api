@@ -24,10 +24,13 @@
 
 
 ;; Error message
-(sp/def ::error (ds/spec {:name (st/spec string?)
-                          :spec {::type (st/spec string?)
-                                 ::message (st/spec string?)}}))
+(sp/def ::error (ds/spec {:name "error"
+                          :spec {::message (st/spec string?)}}))
 (def error-spec ::error)
+
+(sp/def ::unauthorized (ds/spec {:name "unauthorized"
+                                 :spec {::error (st/spec string?)}}))
+(def unauthorized-spec ::unauthorized)
 
 
 ;;;; Output response types
@@ -58,7 +61,8 @@
 (sp/def ::concept-without-replace
   (ds/spec
    {:name ::concept-without-replace
-    :spec (sp/keys :req [::id ::type] :opt [::definition ::deprecated ::preferredLabel])}))
+    :spec (sp/keys :req [::id ::type]
+                   :opt [::definition ::deprecated ::preferredLabel])}))
 
 (sp/def ::event
   (ds/spec
@@ -84,7 +88,8 @@
 (sp/def ::concept-with-replace
   (ds/spec
    {:name ::concept-with-replace
-    :spec (sp/keys :req [::id ::type ::preferredLabel] :opt [::definition ::deprecated ::replacedBy])}))
+    :spec (sp/keys :req [::id ::type ::preferredLabel]
+                   :opt [::definition ::deprecated ::replacedBy])}))
 
 (sp/def ::concepts
   (ds/spec
