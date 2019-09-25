@@ -105,7 +105,7 @@
                       {preferredLabel :- String nil}
                       {type :- String nil}
                       {deprecated :- Boolean false}
-                      {relationType :-  (s/enum "broader" "related" "occupation_name_affinity" )  nil}
+                      {relationType :-  (s/enum "broader" "narrower" "related" "occupation_name_affinity" )  nil}
                       {relatedIds :- (describe [String] "Used together with relationType" ) nil}
                       {offset :- Long nil}
                       {limit :- Long nil}

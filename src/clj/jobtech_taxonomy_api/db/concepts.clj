@@ -15,6 +15,8 @@
    https://grishaev.me/en/datomic-query/ "
   )
 
+
+
 (def initial-concept-query
   '{:find [(pull ?c [:concept/id
                      :concept/type
@@ -27,7 +29,13 @@
                                             :concept/preferred-label
                                             :concept/deprecated
                                             ]}
-                     ])]
+                     ])
+           (sum  ?broader-relation-weight)
+           (sum ?narrower-relation-weight)
+           (sum ?related-relation-weight)
+           (sum  ?occupation-name-affinity-relation-weight)
+           ]
+    :with [ ?uniqueness]
     :in [$]
     :args []
     :where []
@@ -47,6 +55,21 @@
    :offset offset
    :limit limit
    }
+  )
+
+(defn handle-narrower-relation [relation]
+
+  (if (= relation "narrower")
+    '(     '[?cr :concept/id ?related-ids]
+           '[?r :relation/concept-1 ?cr]
+           '[?r :relation/concept-2 ?c]
+           '[?r :relation/type ?relation])
+
+    '( '[?cr :concept/id ?related-ids]
+           '[?r :relation/concept-1 ?c]
+           '[?r :relation/concept-2 ?cr]
+           '[?r :relation/type ?relation])
+    )
   )
 
 (defn fetch-concepts [id preferred-label type deprecated relation related-ids offset limit db]
@@ -80,15 +103,88 @@
         (update :where conj '[?c :concept/deprecated ?deprecated])
         )
 
-    (and relation related-ids)
+    (and relation related-ids (not= "narrower" relation))
     (->
      (update :in conj '?relation '[?related-ids ...])
      (update :args conj relation related-ids)
-     (update :where conj '[?cr :concept/id ?related-ids]
-                         '[?r :relation/concept-1 ?c]
-                         '[?r :relation/concept-2 ?cr]
-                         '[?r :relation/type ?relation])
+
      )
+
+    (and relation related-ids (= "narrower" relation))
+    (->
+     (update :in conj '?relation '[?related-ids ...])
+     (update :args conj "broader" related-ids)
+
+     )
+
+
+    (and relation related-ids (= "narrower" relation))
+    (->
+     (update :where conj  '[?cr :concept/id ?related-ids]
+                          '[?r :relation/concept-1 ?cr]
+                          '[?r :relation/concept-2 ?c]
+                          '[?r :relation/type ?relation])
+     )
+
+    (and relation related-ids (not= "narrower" relation))
+    (->
+     (update :where conj  '[?cr :concept/id ?related-ids]
+             '[?r :relation/concept-1 ?c]
+             '[?r :relation/concept-2 ?cr]
+             '[?r :relation/type ?relation])
+     )
+
+    true
+    (-> (update :where conj
+                '(or-join [?c
+                           ?uniqueness
+                           ?related-relation-weight
+                           ?broader-relation-weight
+                           ?narrower-relation-weight
+                           ?occupation-name-affinity-relation-weight]
+             (and
+              [?broader-relation :relation/concept-1 ?c]
+              [?broader-relation :relation/type "broader"]
+              [(identity ?broader-relation) ?uniqueness]
+              [(ground 1) ?broader-relation-weight]
+              [(ground 0) ?narrower-relation-weight]
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?occupation-name-affinity-relation-weight]
+              )
+             (and
+              [?narrower-relation :relation/concept-2 ?c]
+              [?narrower-relation :relation/type "broader"]
+              [(identity ?narrower-relation) ?uniqueness]
+              [(ground 1) ?narrower-relation-weight]
+              [(ground 0) ?broader-relation-weight]
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?occupation-name-affinity-relation-weight]
+              )
+             (and
+              [?related-relation :relation/concept-1 ?c]
+              [?related-relation :relation/type "related"]
+              [(identity ?related-relation) ?uniqueness]
+              [(ground 1) ?related-relation-weight]
+              [(ground 0) ?narrower-relation-weight]
+              [(ground 0) ?broader-relation-weight]
+              [(ground 0) ?occupation-name-affinity-relation-weight]
+              )
+             (and
+              [?related-relation :relation/concept-1 ?c]
+              [?related-relation :relation/type "occupation_name_affinity"]
+              [(identity ?related-relation) ?uniqueness]
+              [(ground 1) ?occupation-name-affinity-relation-weight]
+              [(ground 0) ?narrower-relation-weight]
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?broader-relation-weight]
+              )
+             (and
+              [(identity ?c) ?uniqueness]
+              [(ground 0) ?broader-relation-weight]
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?occupation-name-affinity-relation-weight]
+              [(ground 0) ?narrower-relation-weight]
+              ))))
 
     offset
     (assoc :offset offset)
@@ -134,11 +230,21 @@
    }
   )
 
+(def number-of-relations-schema
+
+  {:broader s/Num
+   :narrower s/Num
+   :related s/Num
+   :affinity s/Num
+   }
+  )
+
 (def concept-schema
   {:id s/Str
    :type s/Str
    :definition s/Str
    :preferredLabel s/Str
+   :relations number-of-relations-schema
    (s/optional-key :deprecated) s/Bool
    (s/optional-key :replacedBy)  [replaced-by-concept-schema]
    }
