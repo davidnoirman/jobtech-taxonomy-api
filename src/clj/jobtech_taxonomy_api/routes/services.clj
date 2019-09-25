@@ -98,7 +98,6 @@
                        {:status 200
                         :body (vec (map types/map->nsmap (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit)))})}}]
 
-
     ["/concepts"
      {
       :summary      "Get concepts. Supply at least one search parameter."
@@ -106,8 +105,8 @@
                            (ds/opt :preferredLabel) (par string? "Textual name of concept"),
                            (ds/opt :type) (par string? "Restrict to concept type"),
                            (ds/opt :deprecated) (par boolean? "Restrict to deprecation state"),
-                           (ds/opt :relation) (par string? "Relation type"),
-                           (ds/opt :related-ids) (par string? "Restrict to these relation IDs (white space separated list)"),
+                           (ds/opt :relation) (par string? "Relation type"), ;; TODO: add dropdown:  "broader" "narrower" "related" "occupation_name_affinity"
+                           (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)"),
                            (ds/opt :offset) (par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (par int? "Return list limit"),
                            (ds/opt :version) (par int? "Version to use")}}
