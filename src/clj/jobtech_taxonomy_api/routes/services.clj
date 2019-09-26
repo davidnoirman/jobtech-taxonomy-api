@@ -25,6 +25,8 @@
 
 (import java.util.Date)
 
+(def relations-spec (s/enum "broader" "narrower" "related" "occupation_name_affinity" ) )
+
 (def date? (partial instance? Date))
 
 (def date-validator
@@ -105,7 +107,7 @@
                       {preferredLabel :- String nil}
                       {type :- String nil}
                       {deprecated :- Boolean false}
-                      {relationType :-  (s/enum "broader" "narrower" "related" "occupation_name_affinity" )  nil}
+                      {relationType :- relations-spec nil}
                       {relatedIds :- (describe [String] "Used together with relationType" ) nil}
                       {offset :- Long nil}
                       {limit :- Long nil}
@@ -121,7 +123,7 @@
      (GET "/search" []
        :query-params  [q       :- (describe String "String to autocomplete on")
                       {type   :- String nil}
-                       {relationType :-  (s/enum "broader" "related" "occupation_name_affinity" ) nil}
+                       {relationType :- relations-spec nil}
                        {relatedIds :- (describe [String] "Used together with relationType" ) nil}
                       {offset :- Long nil}
                       {limit  :- Long nil}

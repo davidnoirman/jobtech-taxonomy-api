@@ -39,6 +39,13 @@
        )
   )
 
+(defn parse-seach-concept-datomic-result [result]
+  (->> result
+       (map first)
+       (map rename-concept-keys-for-api)
+       )
+  )
+
 (defn pagination
   [coll offset limit]
   (cond
