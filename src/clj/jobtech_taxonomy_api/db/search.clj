@@ -5,6 +5,7 @@
    [datomic.client.api :as d]
    [jobtech-taxonomy-api.db.database-connection :refer :all]
    [jobtech-taxonomy-api.db.api-util :refer :all]
+   [jobtech-taxonomy-api.db.concepts :as concepts]
    [clojure.set :as set]
    )
   )
@@ -61,14 +62,7 @@
         )
 
     (and relation related-ids)
-    (->
-     (update :in conj '?relation '[?related-ids ...])
-     (update :args conj relation related-ids)
-     (update :where conj '[?cr :concept/id ?related-ids]
-                         '[?r :relation/concept-1 ?c]
-                         '[?r :relation/concept-2 ?cr]
-                         '[?r :relation/type ?relation])
-     )
+    (concepts/handle-relations relation related-ids)
 
     offset
     (assoc :offset offset)
@@ -86,11 +80,12 @@
   "The response schema for the query below."
   [{:id s/Str
     :type s/Str
-    (s/optional-key :preferredLabel) s/Str}])
+    (s/optional-key :preferredLabel) s/Str}
+   ])
 
 
 (defn get-concepts-by-search [q type relation related-ids offset limit version]
-  (parse-find-concept-datomic-result (d/q (fetch-concepts q type relation related-ids offset limit version)))
+  (parse-seach-concept-datomic-result (d/q (fetch-concepts q type relation related-ids offset limit version)))
   )
 
 
@@ -194,13 +189,6 @@
              [(identity ?q) ?uniqueness]
              [(ground 0) ?comment-weight]
              [(ground 0) ?affirmation-weight]))]
-
-
-
-
-
-
-
 
   [
    (not [?c :concept/deprecated true])
