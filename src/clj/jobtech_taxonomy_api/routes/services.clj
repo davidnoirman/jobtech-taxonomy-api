@@ -105,7 +105,7 @@
                            (ds/opt :preferredLabel) (par string? "Textual name of concept"),
                            (ds/opt :type) (par string? "Restrict to concept type"),
                            (ds/opt :deprecated) (par boolean? "Restrict to deprecation state"),
-                           (ds/opt :relation) (par #{:broader :narrower :related :occupation_name_affinity} "Relation type"),
+                           (ds/opt :relation) (par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type"),
                            (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)"),
                            (ds/opt :offset) (par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (par int? "Return list limit"),
@@ -122,7 +122,7 @@
                                       " offset:" offset
                                       " limit:" limit))
                        {:status 200
-                        :body (vec (map types/map->nsmap (concepts/find-concepts id preferredLabel type deprecated relation related-ids offset limit version)))})}}]
+                        :body (vec (map types/map->nsmap (concepts/find-concepts id preferredLabel type deprecated relation (list related-ids) offset limit version)))})}}]
 
     ["/search"
      {
