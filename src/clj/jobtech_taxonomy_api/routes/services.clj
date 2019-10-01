@@ -166,9 +166,6 @@
                    500 {:schema {:type s/Str, :message s/Str}}}
        :summary "Finds all concepts in a text."
        {:body (ie/parse-text text)})
-
-
-
      )
 
 

@@ -216,7 +216,7 @@
    (find-concepts-by-db id preferred-label type deprecated relation related-ids offset limit (get-db))
    )
   ([id]
-   (find-concepts-by-db id nil nil nil nil nil (get-db))
+   (find-concepts-by-db id nil nil nil nil nil nil nil (get-db))
    )
   )
 
@@ -243,7 +243,7 @@
    :type s/Str
    :definition s/Str
    :preferredLabel s/Str
-   :relations number-of-relations-schema
+   (s/optional-key :relations) number-of-relations-schema
    (s/optional-key :deprecated) s/Bool
    (s/optional-key :replacedBy)  [replaced-by-concept-schema]
    }
