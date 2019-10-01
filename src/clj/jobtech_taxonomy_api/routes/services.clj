@@ -28,8 +28,6 @@
    ))
 
 ;; Status:
-;;   - conclude integration of relation and relation-ids (nils are passed to db-functions in the mean time)
-;;     - how to express request parameters as drop-down choice lists
 ;;   - refine auth-merge of develop (remove below auth functions), and apikey.clj
 ;;   - adjust tests
 
