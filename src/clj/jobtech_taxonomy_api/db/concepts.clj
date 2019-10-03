@@ -16,27 +16,28 @@
   )
 
 
+(def concept-pull-pattern [:concept/id
+                           :concept/type
+                           :concept/definition
+                           :concept/preferred-label
+                           :concept/deprecated
+                           {:concept/replaced-by [:concept/id
+                                                  :concept/definition
+                                                  :concept/type
+                                                  :concept/preferred-label
+                                                  :concept/deprecated
+                                                  ]}
+                           ])
 
 (def initial-concept-query
-  '{:find [(pull ?c [:concept/id
-                     :concept/type
-                     :concept/definition
-                     :concept/preferred-label
-                     :concept/deprecated
-                     {:concept/replaced-by [:concept/id
-                                            :concept/definition
-                                            :concept/type
-                                            :concept/preferred-label
-                                            :concept/deprecated
-                                            ]}
-                     ])
+  '{:find [(pull ?c pull-pattern)
            (sum  ?broader-relation-weight)
            (sum ?narrower-relation-weight)
            (sum ?related-relation-weight)
            (sum  ?occupation-name-affinity-relation-weight)
            ]
     :with [ ?uniqueness]
-    :in [$]
+    :in [$ pull-pattern]
     :args []
     :where []
     :offset 0
@@ -57,20 +58,6 @@
    }
   )
 
-(defn handle-narrower-relation [relation]
-
-  (if (= relation "narrower")
-    '(     '[?cr :concept/id ?related-ids]
-           '[?r :relation/concept-1 ?cr]
-           '[?r :relation/concept-2 ?c]
-           '[?r :relation/type ?relation])
-
-    '( '[?cr :concept/id ?related-ids]
-           '[?r :relation/concept-1 ?c]
-           '[?r :relation/concept-2 ?cr]
-           '[?r :relation/type ?relation])
-    )
-  )
 
 
 (defn handle-relations [query relation related-ids]
@@ -98,13 +85,31 @@
     )
   )
 
+(defn handle-extra-where-attribute [query [key value]]
+  #_(let [attribute-name (str "?" (name key))]
 
-(defn fetch-concepts [id preferred-label type deprecated relation related-ids offset limit db]
+    (-> query (update :in conj attribute-name )
+        (update :args conj value)
+        (update :where conj ['?c key value])
+        ))
+
+  (update query :where conj ['?c key value])
+  )
+
+(defn handle-extra-where-attributes [query extra-where-attributes]
+  (reduce handle-extra-where-attribute query extra-where-attributes)
+  )
+
+
+(defn fetch-concepts [{:keys [id preferred-label type deprecated relation related-ids offset limit db pull-pattern extra-where-attributes]}]
 
   (cond-> initial-concept-query
 
     true
-    (update :args conj db)
+    (->
+     (update :args conj db)
+     (update :args conj pull-pattern)
+     )
 
     id
     (-> (update :in conj '?id)
@@ -123,6 +128,9 @@
         (update :args conj type)
         (update :where conj '[?c :concept/type ?type])
         )
+
+    (not-empty extra-where-attributes)
+    (handle-extra-where-attributes extra-where-attributes)
 
     deprecated
     (-> (update :in conj '?deprecated)
@@ -197,18 +205,31 @@
   )
 
 (defn find-concepts-by-db
-  ([id preferred-label type deprecated relation related-ids offset limit db]
-   (let [ result (d/q (fetch-concepts id preferred-label type deprecated relation related-ids offset limit db))
+  ([args]
+   (let [ result (d/q (fetch-concepts args))
          parsed-result (parse-find-concept-datomic-result result)]
      parsed-result
      ))
   )
 
+;;add extra-concept-fields to pull pattern
+
+(defn add-find-concepts-args [args]
+  (let [pull-pattern (if (:extra-pull-fields args)
+                      (concat concept-pull-pattern (:extra-pull-fields args))
+                      concept-pull-pattern
+                      )]
+    (-> args
+        (assoc :db (get-db (:version args)))
+        (assoc :pull-pattern pull-pattern)
+        )))
+
 (defn find-concepts
-  ([id preferred-label type deprecated relation related-ids offset limit version]
-   (find-concepts-by-db id preferred-label type deprecated relation related-ids offset limit (get-db version))
+  ([args]
+   (find-concepts-by-db (add-find-concepts-args args))
    )
   )
+
 
 ;;"TODO expose this as a private end point for the editor"
 (defn find-concepts-including-unpublished
