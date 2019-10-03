@@ -216,7 +216,7 @@
    (find-concepts-by-db id preferred-label type deprecated relation related-ids offset limit (get-db))
    )
   ([id]
-   (find-concepts-by-db id nil nil nil nil nil (get-db))
+   (find-concepts-by-db id nil nil nil nil nil nil nil (get-db))
    )
   )
 
