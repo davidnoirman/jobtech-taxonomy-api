@@ -237,4 +237,70 @@
              :handler (fn [{{{:keys [text]} :query} :parameters}]
                         (log/info (str "GET /parse-text text: " text ))
                         {:status 200
-                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]]])
+                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]]
+
+
+   ["/private"
+    {:swagger {:tags ["Private"]}
+     :middleware [cors/cors auth]}
+
+
+    ["/delete-concept"
+     {
+      :summary      "Retract the concept with the given ID."
+      :parameters {:query {:id (par string? "ID of concept")}}
+      :delete {:responses {200 {:body types/ok-spec}
+                           404 {:body types/error-spec}
+                           500 {:body types/error-spec}}
+               :handler (fn [{{{:keys [id]} :query} :parameters}]
+                          (log/info "DELETE /concept")
+                          (if (core/retract-concept id)
+                            {:status 200 :body (types/map->nsmap {:message "ok"}) }
+                            {:status 404 :body (types/map->nsmap {:error "not found"}) }))}}]
+
+    ["/concept"
+     {
+      :summary      "Assert a new concept."
+      :parameters {:query {(ds/opt :type) (par string? "Concept type"),
+                           (ds/opt :definition) (par string? "Definition"),
+                           (ds/opt :preferredLabel) (par string? "Preferred label")}}
+      :post {:responses {200 {:body types/ok-concept-spec}
+                         409 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [type definition preferredLabel]} :query} :parameters}]
+                        (log/info "POST /concept")
+                        (let [[result timestamp new-concept] (concepts/assert-concept type definition preferredLabel)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
+                            {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]
+
+    ["/replace-concept"
+     {
+      :summary      "Replace old concept with a new concept."
+      :parameters {:query {:old-concept-id (par string? "Old concept ID"),
+                           :new-concept-id (par string? "New concept ID")}}
+      :post {:responses {200 {:body types/ok-spec}
+                         404 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [old-concept-id new-concept-id]} :query} :parameters}]
+                        (log/info "POST /concept")
+                        (if (core/replace-deprecated-concept old-concept-id new-concept-id)
+                          {:status 200 :body (types/map->nsmap {:message "ok"}) }
+                          {:status 404 :body (types/map->nsmap {:error "not found"}) }))}}]
+
+    ["/versions"
+     {
+       :summary "Creates a new version tag in the database."
+      :parameters {:query {:new-version-id (par int? "New version ID")}}
+      :post {:responses {200 {:body types/ok-spec}
+                         406 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [new-version-id]} :query} :parameters}]
+                        (log/info (str "POST /versions" new-version-id))
+                        (let [result (v/create-new-version new-version-id)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap {:message "A new version of the Taxonomy was created."}) }
+                            {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")}) }
+                            )))}}]
+
+    ]])

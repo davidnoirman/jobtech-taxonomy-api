@@ -23,16 +23,6 @@
              {} m))
 
 
-;; Error message
-(sp/def ::error (ds/spec {:name "error"
-                          :spec {::message (st/spec string?)}}))
-(def error-spec ::error)
-
-(sp/def ::unauthorized (ds/spec {:name "unauthorized"
-                                 :spec {::error (st/spec string?)}}))
-(def unauthorized-spec ::unauthorized)
-
-
 ;;;; Output response types
 
 ;; General fundamentals
@@ -157,3 +147,24 @@
     :spec (sp/coll-of ::concept-without-replace )}))
 
 (def parse-text-spec ::concepts-without-replace)
+
+
+
+
+;; Error message
+(sp/def ::err (ds/spec {:name "error"
+                        :spec {::error (st/spec string?)}}))
+(def error-spec ::err)
+
+(sp/def ::ok (ds/spec {:name "ok"
+                       :spec {::message (st/spec string?)}}))
+(def ok-spec ::ok)
+
+(sp/def ::ok-concept (ds/spec {:name "ok"
+                               :spec {::time inst?
+                                      ::concept ::concept-without-replace}}))
+(def ok-concept-spec ::ok-concept)
+
+(sp/def ::unauthorized (ds/spec {:name "unauthorized"
+                                 :spec {::error (st/spec string?)}}))
+(def unauthorized-spec ::unauthorized)
