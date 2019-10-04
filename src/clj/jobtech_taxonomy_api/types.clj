@@ -170,23 +170,6 @@
 (def unauthorized-spec ::unauthorized)
 
 
-(def person
-  {(ds/req :name) string?
-   (ds/opt :age) int?
-   (ds/req :friend) person
-   }
-  )
-
-(def person-spec
-  (ds/spec
-   {:name ::Person
-    :spec person
-    :type ::Person
-    :nested? true
-    }
-   )
-  )
-
 (declare koncept-spec)
 
 (sp/def :concept/id (st/spec string?))
@@ -194,7 +177,6 @@
 (sp/def :concept/deprecated (st/spec boolean?))
 (sp/def :concept/preferredLabel (st/spec string?))
 (sp/def :concept/definition (st/spec string?))
-
 
 (def koncept
   {(ds/req :id) :concept/id
@@ -205,8 +187,6 @@
    (ds/opt :replacedBy) koncept-spec
    }
   )
-
-
 
 (def koncept-spec
   (ds/spec

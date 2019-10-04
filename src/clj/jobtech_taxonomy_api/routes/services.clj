@@ -134,51 +134,68 @@
 
                                                           )))})}}]
 
-     ["/concepts/ssyk"
-     {
-      :summary      "Get SSYK. Supply at least one search parameter."
-      :parameters {:query {(ds/opt :id) (par string? "ID of concept")
-                           (ds/opt :preferredLabel) (par string? "Textual name of concept")
-                           (ds/opt :type) (par #{"ssyk_level_1" "ssyk_level_2" "ssyk_level_3" "ssyk_level_4" } "Restrict to concept type")
-                           (ds/opt :deprecated) (par boolean? "Restrict to deprecation state")
-                           (ds/opt :relation) (par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type")
-                           (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)")
+    (map #(let [kwnam %
+                nam (str (name kwnam))]
 
-                           (ds/opt :ssyk2012) (par string? "SSYK 2012 Code")
-                           (ds/opt :offset) (par int? "Return list offset (from 0)")
-                           (ds/opt :limit) (par int? "Return list limit")
-                           (ds/opt :version) (par int? "Version to use")}}
-      :get {:responses {200 {:body types/concepts-spec}
-                        500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [id preferredLabel type deprecated relation
-                                    related-ids offset limit version ssyk2012]} :query} :parameters}]
-                       (log/info (str "GET /concepts "
-                                      "id:" id
-                                      " preferredLabel:" preferredLabel
-                                      " type:" type
-                                      " deprecated:" deprecated
-                                      " offset:" offset
-                                      " limit:" limit))
-                       {:status 200
-                        :body (vec (map types/map->nsmap
-                                        (concepts/find-concepts (cond-> {:id id
-                                                                         :preferredLabel preferredLabel
-                                                                         :type type
-                                                                         :deprecated deprecated
-                                                                         :relation relation
-                                                                         :related-ids (list related-ids)
-                                                                         :offset offset
-                                                                         :limit limit
-                                                                         :version version
-                                                                         :extra-where-attributes []
-                                                                         :extra-pull-fields [:concept.external-standard/ssyk-2012]}
-                                                                  ssyk2012
-                                                                  (update :extra-where-attributes concat {:concept.external-standard/ssyk-2012 ssyk2012})
+            [(str "/concepts/" nam)
+             {
+              :summary      (str "Get " nam ". Supply at least one search parameter.")
+              :parameters {:query {(ds/opt :id) (par string? "ID of concept")
+                                   (ds/opt :preferredLabel) (par string? "Textual name of concept")
+                                   (ds/opt :type) (par string? "Restrict to concept type"),
+                                   ;;(ds/opt :type) (par #{"ssyk_level_1" "ssyk_level_2" "ssyk_level_3" "ssyk_level_4" } "Restrict to concept type")
+                                   (ds/opt :deprecated) (par boolean? "Restrict to deprecation state")
+                                   (ds/opt :relation) (par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type")
+                                   (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)")
 
-                                                                  )
-                                                                )
-                                        ))})}}]
+                                   (ds/opt :code) (par string? nam)
+                                   (ds/opt :offset) (par int? "Return list offset (from 0)")
+                                   (ds/opt :limit) (par int? "Return list limit")
+                                   (ds/opt :version) (par int? "Version to use")}}
+              :get {:responses {200 {:body types/concepts-spec}
+                                500 {:body types/error-spec}}
+                    :handler (fn [{{{:keys [id preferredLabel type deprecated relation
+                                            related-ids offset limit version code]} :query} :parameters}]
+                               (log/info (str "GET /concepts "
+                                              "id:" id
+                                              " preferredLabel:" preferredLabel
+                                              " type:" type
+                                              " deprecated:" deprecated
+                                              " offset:" offset
+                                              " code: " code
+                                              " limit:" limit))
+                               {:status 200
+                                :body (vec (map types/map->nsmap
+                                                (concepts/find-concepts (cond-> {:id id
+                                                                                 :preferredLabel preferredLabel
+                                                                                 :type type
+                                                                                 :deprecated deprecated
+                                                                                 :relation relation
+                                                                                 :related-ids (list related-ids)
+                                                                                 :offset offset
+                                                                                 :limit limit
+                                                                                 :version version
+                                                                                 :extra-where-attributes []
+                                                                                 :extra-pull-fields [kwnam]}
+                                                                          code
+                                                                          (update :extra-where-attributes concat {kwnam code})
 
+                                                                          )
+                                                                        )
+                                                ))})}}]
+
+
+            )
+         [:concept.external-standard/ssyk-2012
+          :concept.external-standard/eures-code
+          :concept.external-standard/driving-licence-code
+          :concept.external-standard/nuts-level-3-code
+          :concept.external-standard/country-code
+          :concept.external-database.ams-taxonomy-67/id
+          :concept.external-standard/isco-08
+          :concept.external-standard/sun-education-field-code-2020
+          :concept.external-standard/sun-education-level-code-2020
+          :concept.external-standard/sni-level-code])
 
     ["/search"
      {
@@ -302,7 +319,7 @@
 
     ["/versions"
      {
-       :summary "Creates a new version tag in the database."
+      :summary "Creates a new version tag in the database."
       :parameters {:query {:new-version-id (par int? "New version ID")}}
       :post {:responses {200 {:body types/ok-spec}
                          406 {:body types/error-spec}
