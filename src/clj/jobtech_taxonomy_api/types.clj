@@ -168,3 +168,50 @@
 (sp/def ::unauthorized (ds/spec {:name "unauthorized"
                                  :spec {::error (st/spec string?)}}))
 (def unauthorized-spec ::unauthorized)
+
+
+(def person
+  {(ds/req :name) string?
+   (ds/opt :age) int?
+   (ds/req :friend) person
+   }
+  )
+
+(def person-spec
+  (ds/spec
+   {:name ::Person
+    :spec person
+    :type ::Person
+    :nested? true
+    }
+   )
+  )
+
+(declare koncept-spec)
+
+(sp/def :concept/id (st/spec string?))
+(sp/def :concept/type (st/spec string?))
+(sp/def :concept/deprecated (st/spec boolean?))
+(sp/def :concept/preferredLabel (st/spec string?))
+(sp/def :concept/definition (st/spec string?))
+
+
+(def koncept
+  {(ds/req :id) :concept/id
+   (ds/req :type) :concept/type
+   (ds/req :preferredLabel) :concept/preferredLabel
+   (ds/opt :definition) :concept/definition
+   (ds/opt :deprecated) :concept/deprecated
+   (ds/opt :replacedBy) koncept-spec
+   }
+  )
+
+
+
+(def koncept-spec
+  (ds/spec
+   {:name :taxonomy/Koncept
+    :spec koncept
+    }
+   )
+  )

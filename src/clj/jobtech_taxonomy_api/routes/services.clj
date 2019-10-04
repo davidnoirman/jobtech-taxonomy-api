@@ -120,11 +120,23 @@
                                       " offset:" offset
                                       " limit:" limit))
                        {:status 200
-                        :body (vec (map types/map->nsmap (concepts/find-concepts id preferredLabel type deprecated relation (list related-ids) offset limit version)))})}}]
+                        :body (vec (map types/map->nsmap (concepts/find-concepts
+                                                          {:id id
+                                                           :preferredLabel preferredLabel
+                                                           :type type
+                                                           :deprecated deprecated
+                                                           :relation relation
+                                                           :related-ids (list related-ids)
+                                                           :offset offset
+                                                           :limit limit
+                                                           :version version
+                                                           }
+
+                                                          )))})}}]
 
      ["/concepts/ssyk"
      {
-      :summary      "Get concepts. Supply at least one search parameter."
+      :summary      "Get SSYK. Supply at least one search parameter."
       :parameters {:query {(ds/opt :id) (par string? "ID of concept")
                            (ds/opt :preferredLabel) (par string? "Textual name of concept")
                            (ds/opt :type) (par #{"ssyk_level_1" "ssyk_level_2" "ssyk_level_3" "ssyk_level_4" } "Restrict to concept type")
