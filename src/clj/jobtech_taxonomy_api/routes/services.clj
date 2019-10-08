@@ -148,7 +148,7 @@
                                    (ds/opt :relation) (par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type")
                                    (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)")
 
-                                   (ds/opt :code) (par string? nam)
+                                   :code (par string? nam)
                                    (ds/opt :offset) (par int? "Return list offset (from 0)")
                                    (ds/opt :limit) (par int? "Return list limit")
                                    (ds/opt :version) (par int? "Version to use")}}
