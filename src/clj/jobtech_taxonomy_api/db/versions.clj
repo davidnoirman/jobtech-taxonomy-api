@@ -5,7 +5,7 @@
    [datomic.client.api :as d]
    [jobtech-taxonomy-api.db.database-connection :refer :all]
    [jobtech-taxonomy-api.db.api-util :refer :all]
-   [jobtech-taxonomy-api.types :as types]
+   [taxonomy :as types]
    [clojure.set :as set]
    )
   )

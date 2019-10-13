@@ -19,7 +19,7 @@
    [jobtech-taxonomy-api.db.events :as events]
    [jobtech-taxonomy-api.db.search :as search]
    [jobtech-taxonomy-api.db.core :as core]
-   [jobtech-taxonomy-api.types :as types]
+   [taxonomy :as types]
    [jobtech-taxonomy-api.db.information-extraction :as ie]
    [clojure.tools.logging :as log]
    [clojure.spec.alpha :as s]
@@ -152,7 +152,7 @@
                                    (ds/opt :offset) (par int? "Return list offset (from 0)")
                                    (ds/opt :limit) (par int? "Return list limit")
                                    (ds/opt :version) (par int? "Version to use")}}
-              :get {:responses {200 {:body types/concepts-spec}
+              :get {:responses {200 {:body (keyword types/taxonomy-namespace (str "concepts-" nam))}
                                 500 {:body types/error-spec}}
                     :handler (fn [{{{:keys [id preferredLabel type deprecated relation
                                             related-ids offset limit version code]} :query} :parameters}]
@@ -186,16 +186,7 @@
 
 
             )
-         [:concept.external-standard/ssyk-2012
-          :concept.external-standard/eures-code
-          :concept.external-standard/driving-licence-code
-          :concept.external-standard/nuts-level-3-code
-          :concept.external-standard/country-code
-          :concept.external-database.ams-taxonomy-67/id
-          :concept.external-standard/isco-08
-          :concept.external-standard/sun-education-field-code-2020
-          :concept.external-standard/sun-education-level-code-2020
-          :concept.external-standard/sni-level-code])
+         types/taxonomy-extra-attributes)
 
     ["/search"
      {

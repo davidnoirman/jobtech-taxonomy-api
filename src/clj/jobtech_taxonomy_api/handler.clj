@@ -1,5 +1,6 @@
 (ns jobtech-taxonomy-api.handler
   (:require
+   [taxonomy :as types]
    [jobtech-taxonomy-api.middleware :as middleware]
    [jobtech-taxonomy-api.routes.services :refer [service-routes]]
    [reitit.swagger-ui :as swagger-ui]
@@ -17,7 +18,8 @@
    [reitit.coercion :as compile-coercion]))
 
 (mount/defstate init-app
-  :start ((or (:init defaults) (fn [])))
+  :start ((do (types/generate-concept-types)
+              (or (:init defaults) (fn []))))
   :stop  ((or (:stop defaults) (fn []))))
 
 
