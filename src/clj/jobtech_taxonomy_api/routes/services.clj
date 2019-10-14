@@ -14,6 +14,7 @@
    [ring.util.http-response :as resp]
    [jobtech-taxonomy-api.middleware.formats :as formats]
    [jobtech-taxonomy-api.middleware.cors :as cors]
+   [jobtech-taxonomy-api.middleware :as middleware]
    [jobtech-taxonomy-api.db.versions :as v]
    [jobtech-taxonomy-api.db.concepts :as concepts]
    [jobtech-taxonomy-api.db.events :as events]
@@ -41,6 +42,13 @@
   [handler]
   (fn [request]
     (if (authenticated? request)
+      (handler request)
+      (resp/unauthorized (types/map->nsmap {:error "Not authorized"})))))
+
+(defn authorized-private?
+  [handler]
+  (fn [request]
+    (if (= (http/-get-header request "api-key") (middleware/get-token :admin))
       (handler request)
       (resp/unauthorized (types/map->nsmap {:error "Not authorized"})))))
 
@@ -265,8 +273,7 @@
 
    ["/private"
     {:swagger {:tags ["Private"]}
-     :middleware [cors/cors auth]}
-
+     :middleware [cors/cors auth authorized-private?]}
 
     ["/delete-concept"
      {
@@ -325,5 +332,4 @@
                             {:status 200 :body (types/map->nsmap {:message "A new version of the Taxonomy was created."}) }
                             {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")}) }
                             )))}}]
-
     ]])
