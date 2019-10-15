@@ -264,7 +264,7 @@
    :type s/Str
    :definition s/Str
    :preferredLabel s/Str
-   :relations number-of-relations-schema
+   (s/optional-key :relations) number-of-relations-schema
    (s/optional-key :deprecated) s/Bool
    (s/optional-key :replacedBy)  [replaced-by-concept-schema]
    }

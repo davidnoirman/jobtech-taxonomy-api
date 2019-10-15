@@ -29,8 +29,8 @@
    ))
 
 ;; Status:
-;;   - refine auth-merge of develop (remove below auth functions), and apikey.clj
 ;;   - adjust tests
+;;   - fixa replacedBy-modell i /changes, /replaced-by-changes, /search, /private/concept
 
 (defmacro par [type desc]
   "Use this to make parameter declarations somewhat tidier."
