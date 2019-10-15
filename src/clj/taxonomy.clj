@@ -94,12 +94,12 @@
 (def concepts-spec-ssyk-2012 ::concepts-ssyk-2012)
 
 ;; eures
-(sp/def ::eures (st/spec string?))
+(sp/def ::eures-code (st/spec string?))
 
 (sp/def ::concept-without-replace-eures-code
   (st/spec
    {:name ::concept-without-replace-eures-code
-    :spec (sp/keys :req [::id ::type ::eures]
+    :spec (sp/keys :req [::id ::type ::eures-code]
                    :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
 
  (sp/def ::replacedBy-eures-code
@@ -110,7 +110,7 @@
  (sp/def ::concept-with-replace-eures-code
    (ds/spec
     {:name ::concept-with-replace-eures-code
-     :spec (sp/keys :req [::id ::type ::eures ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::eures-code ::preferredLabel]
                     :opt [::definition ::deprecated ::replacedBy-eures-code ::concept-relations])}))
 
  (sp/def ::concepts-eures-code
@@ -148,12 +148,12 @@
  (def concepts-spec-driving-licence-code ::concepts-driving-licence-code)
 
 ;; nuts-level-3
-(sp/def ::nuts-level-3 (st/spec string?))
+(sp/def ::nuts-level-3-code (st/spec string?))
 
 (sp/def ::concept-without-replace-nuts-level-3-code
   (st/spec
    {:name ::concept-without-replace-nuts-level-3-code
-    :spec (sp/keys :req [::id ::nuts-level-3 ::type]
+    :spec (sp/keys :req [::id ::nuts-level-3-code ::type]
                    :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
 
  (sp/def ::replacedBy-nuts-level-3-code
@@ -164,7 +164,7 @@
  (sp/def ::concept-with-replace-nuts-level-3-code
    (ds/spec
     {:name ::concept-with-replace-nuts-level-3-code
-     :spec (sp/keys :req [::id ::type ::nuts-level-3 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::nuts-level-3-code ::preferredLabel]
                     :opt [::definition ::deprecated ::replacedBy-nuts-level-3-code ::concept-relations])}))
 
  (sp/def ::concepts-nuts-level-3-code
@@ -358,9 +358,9 @@
 (def versions-spec ::versions)
 
 ;; /changes
-(sp/def ::concept-without-replace
+(sp/def ::concept
   (st/spec
-   {:name ::concept-without-replace
+   {:name ::concept
     :spec (sp/keys :req [::id ::type]
                    :opt [::definition ::deprecated ::preferredLabel])}))
 
@@ -369,7 +369,7 @@
    {:name ::event
     :spec (sp/keys :req [::eventType
                          ::version
-                         ::concept-without-replace])}))
+                         ::concept])}))
 
 (sp/def ::events
   (ds/spec
@@ -383,7 +383,7 @@
 (sp/def ::replacedBy
   (ds/spec
    {:name ::replacedBy
-    :spec (sp/coll-of ::concept-without-replace )}))
+    :spec (sp/coll-of ::concept )}))
 
 (sp/def ::concept-with-replace
   (ds/spec
@@ -454,7 +454,7 @@
 (sp/def ::concepts-without-replace
   (ds/spec
    {:name ::concepts-without-replace
-    :spec (sp/coll-of ::concept-without-replace )}))
+    :spec (sp/coll-of ::concept )}))
 
 (def parse-text-spec ::concepts-without-replace)
 
@@ -472,7 +472,7 @@
 
 (sp/def ::ok-concept (ds/spec {:name "ok"
                                :spec {::time inst?
-                                      ::concept ::concept-without-replace}}))
+                                      ::concept ::concept }}))
 (def ok-concept-spec ::ok-concept)
 
 (sp/def ::unauthorized (ds/spec {:name "unauthorized"
