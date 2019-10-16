@@ -1,240 +1,335 @@
 (ns jobtech-taxonomy-api.routes.services
-  (:refer-clojure :exclude [type])
   (:require
-   [ring.util.http-response :as response]
-   [ring.middleware.json :refer [wrap-json-response]]
-   [compojure.api.sweet :refer :all]
-   [schema.core :as s]
-   [compojure.api.meta :refer [restructure-param]]
-   [compojure.api.exception :as ex]
+   [reitit.swagger :as swagger]
+   [reitit.swagger-ui :as swagger-ui]
+   [reitit.coercion.spec :as spec-coercion]
+   [reitit.ring.middleware.muuntaja :as muuntaja]
+   [reitit.ring.middleware.multipart :as multipart]
+   [reitit.ring.middleware.parameters :as parameters]
    [buddy.auth.accessrules :refer [restrict]]
+   [buddy.auth.middleware :refer [wrap-authentication]]
    [buddy.auth :refer [authenticated?]]
    [buddy.auth.http :as http]
-   [clojure.data.json :as json]
-   [clj-time [format :as f]]
-   [clj-time.coerce :as c]
-   [jobtech-taxonomy-api.db.core :refer :all]
+   [environ.core :refer [env]]
+   [ring.util.http-response :as resp]
+   [jobtech-taxonomy-api.middleware.formats :as formats]
+   [jobtech-taxonomy-api.middleware.cors :as cors]
    [jobtech-taxonomy-api.middleware :as middleware]
-   [jobtech-taxonomy-api.db.concepts :as concepts]
-   [jobtech-taxonomy-api.db.search :as search]
-   [jobtech-taxonomy-api.db.events :as events]
-   [jobtech-taxonomy-api.db.information-extraction :as ie]
    [jobtech-taxonomy-api.db.versions :as v]
+   [jobtech-taxonomy-api.db.concepts :as concepts]
+   [jobtech-taxonomy-api.db.events :as events]
+   [jobtech-taxonomy-api.db.search :as search]
+   [jobtech-taxonomy-api.db.core :as core]
+   [taxonomy :as types]
+   [jobtech-taxonomy-api.db.information-extraction :as ie]
    [clojure.tools.logging :as log]
-   [clojure.pprint :as pp]))
+   [clojure.spec.alpha :as s]
+   [spec-tools.core :as st]
+   [spec-tools.data-spec :as ds]
+   ))
 
-(import java.util.Date)
+;; Status:
+;;   - adjust tests
+;;   - fixa replacedBy-modell i /changes, /replaced-by-changes, /search, /private/concept
 
-(def relations-spec (s/enum "broader" "narrower" "related" "occupation_name_affinity" ) )
+(defmacro par [type desc]
+  "Use this to make parameter declarations somewhat tidier."
+  `(st/spec {:spec ~type :description ~desc}))
 
-(def date? (partial instance? Date))
+(defn auth
+  "Middleware used in routes that require authentication. If request is not
+   authenticated a 401 not authorized response will be returned"
+  [handler]
+  (fn [request]
+    (if (authenticated? request)
+      (handler request)
+      (resp/unauthorized (types/map->nsmap {:error "Not authorized"})))))
 
-(def date-validator
-  {:message "must be a Date"
-   :optional true
-   :validate date?})
+(defn authorized-private?
+  [handler]
+  (fn [request]
+    (if (= (http/-get-header request "api-key") (middleware/get-token :admin))
+      (handler request)
+      (resp/unauthorized (types/map->nsmap {:error "Not authorized"})))))
 
-(defn access-error [_ _]
-  (response/unauthorized {:error "unauthorized"}))
+(defn service-routes []
+  ["/v1/taxonomy"
+   {:coercion spec-coercion/coercion
+    :muuntaja formats/instance
+    :swagger {:id ::api
+              :info {:version "0.10.0"
+                     :title "Jobtech Taxonomy"
+                     :description "Jobtech taxonomy services"}
+              :securityDefinitions {:api_key {:type "apiKey" :name "api-key" :in "header"}}}}
 
-(defn wrap-restricted [handler rule]
-  (restrict handler {:handler  rule
-                     :on-error access-error}))
+   [ "" {:no-doc true}
+    ["/swagger.json"
+     {:get (swagger/create-swagger-handler)}]
 
-(defmethod restructure-param :auth-rules
-  [_ rule acc]
-  (update-in acc [:middleware] conj [wrap-restricted rule]))
+    ["/swagger-ui*"
+     {:get (swagger-ui/create-swagger-ui-handler
+            {:url "/v1/taxonomy/swagger.json"
+             :config {:validator-url nil}})}]]
 
-(defmethod restructure-param :current-user
-  [_ binding acc]
-  (update-in acc [:letks] into [binding `(:identity ~'+compojure-api-request+)]))
+   ["/public"
+    {:swagger {:tags ["Public"]}
 
-(defn custom-handler [f type]
-  (fn [^Exception e data request]
-    (log/log type (.getMessage e))
-    (f {:message (.getMessage e), :type type})))
+     :middleware [cors/cors auth]}
 
-(defn authorized-private? [request]
-  (= (http/-get-header request "api-key") (middleware/get-token :admin)))
+    ["/versions"
+     {:summary "Show the available versions."
+      :get {:responses {200 {:body types/versions-spec}
+                        401 {:body types/unauthorized-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [_]} :query} :parameters}]
+                       {:status 200
+                        :body (map types/map->nsmap (v/get-all-versions))})}}]
 
-(s/defschema VersionResponse  {:timestamp java.util.Date
-                               :version s/Int
-                               })
+    ["/changes"
+     {
+      :summary      "Show the history from a given version."
+      :parameters {:query {:fromVersion (par int? "Changes from this version, exclusive"),
+                           (ds/opt :toVersion) (par int? "Changes to this version, inclusive"),
+                           (ds/opt :offset) (par int? "Return list offset (from 0)"),
+                           (ds/opt :limit) (par int? "Return list limit")}}
 
-(def service-routes
-  (api
-   {:exceptions
-    {:handlers
-     {::ex/default (custom-handler response/internal-server-error :fatal)}}
-    :swagger {:ui "/v0/taxonomy/swagger-ui"
-              :spec "/v0/taxonomy/swagger.json"
-              :data {:info {:version "0.9.0"
-                            :title "Jobtech Taxonomy"
-                            :description "Jobtech taxonomy services"}
-                     ;; API header config found here: https://gist.github.com/Deraen/ef7f65d7ec26f048e2bb
-                     :securityDefinitions {:api_key {:type "apiKey" :name "api-key" :in "header"}}}}}
+      :get {:responses {200 {:body types/events-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [fromVersion toVersion offset limit]} :query} :parameters}]
+                       (log/info (str "GET /changes"
+                                      " fromVersion:" fromVersion
+                                      " toVersion: " toVersion
+                                      " offset: " offset
+                                      " limit: " limit))
+                       {:status 200
+                        :body (vec (map types/map->nsmap (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit)))})}}]
 
-   (context "/v0/taxonomy/public" []
-     :tags ["public"]
-     :auth-rules authenticated?
+    ["/concepts"
+     {
+      :summary      "Get concepts. Supply at least one search parameter."
+      :parameters {:query {(ds/opt :id) (par string? "ID of concept"),
+                           (ds/opt :preferredLabel) (par string? "Textual name of concept"),
+                           (ds/opt :type) (par string? "Restrict to concept type"),
+                           (ds/opt :deprecated) (par boolean? "Restrict to deprecation state"),
+                           (ds/opt :relation) (par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type"),
+                           (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)"),
+                           (ds/opt :offset) (par int? "Return list offset (from 0)"),
+                           (ds/opt :limit) (par int? "Return list limit"),
+                           (ds/opt :version) (par int? "Version to use")}}
+      :get {:responses {200 {:body types/concepts-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [id preferredLabel type deprecated relation
+                                    related-ids offset limit version]} :query} :parameters}]
+                       (log/info (str "GET /concepts "
+                                      "id:" id
+                                      " preferredLabel:" preferredLabel
+                                      " type:" type
+                                      " deprecated:" deprecated
+                                      " offset:" offset
+                                      " limit:" limit))
+                       {:status 200
+                        :body (vec (map types/map->nsmap (concepts/find-concepts
+                                                          {:id id
+                                                           :preferredLabel preferredLabel
+                                                           :type type
+                                                           :deprecated deprecated
+                                                           :relation relation
+                                                           :related-ids (list related-ids)
+                                                           :offset offset
+                                                           :limit limit
+                                                           :version version
+                                                           }
 
-     (GET "/versions" []
-       :query-params []
-       ;;:body [versions VersionResponse]
-       :return {:result VersionResponse}
-       :responses {200 {:schema [    {:timestamp java.util.Date
-                                      :version s/Int
-                                      }]}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Return a list of all Taxonomy versions."
-       (log/info "GET /versions")
-       (response/ok (v/get-all-versions))
-       )
+                                                          )))})}}]
 
-     (GET "/changes" []
-       :query-params [fromVersion :- Long
-                      {toVersion :- Long nil}
-                      {offset       :- Long nil}
-                      {limit        :- Long nil}]
-       :responses {200 {:schema events/show-changes-schema}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary      "Show the history from a given version."
-       (log/info (str "GET /changes fromVersion:" fromVersion " toVersion " toVersion  " offset: " offset " limit: " limit))
-       (response/ok (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit)))
+    (map #(let [kwnam %
+                nam (str (name kwnam))]
 
-     (GET "/concepts"    []
-       :query-params [{id :- String nil}
-                      {preferredLabel :- String nil}
-                      {type :- String nil}
-                      {deprecated :- Boolean false}
-                      {relationType :- relations-spec nil}
-                      {relatedIds :- (describe [String] "Used together with relationType" ) nil}
-                      {offset :- Long nil}
-                      {limit :- Long nil}
-                      {version :- Long nil}
-                      ]
+            [(str "/concepts/" nam)
+             {
+              :summary      (str "Get " nam ". Supply at least one search parameter.")
+              :parameters {:query {(ds/opt :id) (par string? "ID of concept")
+                                   (ds/opt :preferredLabel) (par string? "Textual name of concept")
+                                   (ds/opt :type) (par string? "Restrict to concept type"),
+                                   ;;(ds/opt :type) (par #{"ssyk_level_1" "ssyk_level_2" "ssyk_level_3" "ssyk_level_4" } "Restrict to concept type")
+                                   (ds/opt :deprecated) (par boolean? "Restrict to deprecation state")
+                                   (ds/opt :relation) (par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type")
+                                   (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)")
 
-       :responses {200 {:schema concepts/find-concepts-schema}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary      "Get concepts."
-       (log/info (str "GET /concepts " "id:" id " preferredLabel:" preferredLabel " type:" type " deprecated:" deprecated " offset:" offset " limit:" limit))
-       (response/ok (concepts/find-concepts id preferredLabel type deprecated relationType relatedIds  offset limit version)))
+                                   (ds/opt :code) (par string? nam)
+                                   (ds/opt :offset) (par int? "Return list offset (from 0)")
+                                   (ds/opt :limit) (par int? "Return list limit")
+                                   (ds/opt :version) (par int? "Version to use")}}
+              :get {:responses {200 {:body (keyword types/taxonomy-namespace (str "concepts-" nam))}
+                                500 {:body types/error-spec}}
+                    :handler (fn [{{{:keys [id preferredLabel type deprecated relation
+                                            related-ids offset limit version code]} :query} :parameters}]
+                               (log/info (str "GET /concepts "
+                                              "id:" id
+                                              " preferredLabel:" preferredLabel
+                                              " type:" type
+                                              " deprecated:" deprecated
+                                              " offset:" offset
+                                              " code: " code
+                                              " limit:" limit))
+                               {:status 200
+                                :body (vec (map types/map->nsmap
+                                                (concepts/find-concepts (cond-> {:id id
+                                                                                 :preferredLabel preferredLabel
+                                                                                 :type type
+                                                                                 :deprecated deprecated
+                                                                                 :relation relation
+                                                                                 :related-ids (list related-ids)
+                                                                                 :offset offset
+                                                                                 :limit limit
+                                                                                 :version version
+                                                                                 :extra-where-attributes []
+                                                                                 :extra-pull-fields [kwnam]}
+                                                                          code
+                                                                          (update :extra-where-attributes concat {kwnam code})
 
-     (GET "/search" []
-       :query-params  [q       :- (describe String "String to autocomplete on")
-                      {type   :- String nil}
-                       {relationType :- relations-spec nil}
-                       {relatedIds :- (describe [String] "Used together with relationType" ) nil}
-                      {offset :- Long nil}
-                      {limit  :- Long nil}
-                      {version :- Long nil}
-                      ]
-       :responses {200 {:schema search/get-concepts-by-search-schema}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary      "Autocomplete from query string"
-       (log/info (str "GET /search q:" q " type:" type "relationType:" relationType "relatedIds:" relatedIds  " offset:" offset " limit:" limit  " version: " version))
-       (response/ok (search/get-concepts-by-search q type relationType relatedIds offset limit version)))
+                                                                          (nil? code)
+                                                                          (update :extra-where-attributes concat {kwnam '_})
 
-     ;; "this is the replaced by endpoint"
-     (GET "/replaced-by-changes" []
-       :query-params [fromVersion :- Long
-                      {toVersion :- Long nil}
-                      ]
-       :responses {200 {:schema s/Any} ;; show-concept-events-schema} TODO FIXME
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary      "Show the history of concepts being replaced from a given version."
-       (log/info (str "GET /replaced-by-changes from-version: " fromVersion " toVersion: " toVersion))
-       (response/ok (events/get-deprecated-concepts-replaced-by-from-version fromVersion toVersion)))
-
-     (GET "/concept/types"    []
-       :query-params [{version :- Long nil}]
-       :responses {200 {:schema [ s/Str ]}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Return a list of all taxonomy types."
-       (log/info (str "GET /concept/types version: " version ))
-       (response/ok (get-all-taxonomy-types version)))
-
-     (GET "/relation/types" []
-       :responses {200 {:schema s/Any}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Relation graphs."
-       (response/ok (get-relation-types)))
-
-     (POST "/parse-text"    []
-       :query-params [text :- String]
-       :responses {200 {:schema [ s/Any]}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Finds all concepts in a text."
-       {:body (ie/parse-text text)})
-     )
+                                                                          )
+                                                                        )
+                                                ))})}}]
 
 
-   (context "/v0/taxonomy/private" []
-     :tags ["private"]
-     ;;:auth-rules {:or [swagger-ui-user? (fn [req] (and (authenticated? req) (authorized-private? req)))]}
-     :auth-rules {:and [authenticated? authorized-private?]}
+            )
+         types/taxonomy-extra-attributes)
 
-     (DELETE "/concept"    []
-       :query-params [id :- String]
-       :summary      "Retract the concept with the given ID."
-       :responses {200 {:schema {:message s/Str}}
-                   404 {:schema {:message s/Str}}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       (log/info "DELETE /concept")
-       (if (retract-concept id)
-         (response/ok { :message "OK" })
-         (response/not-found! { :message "Not found" } )))
+    ["/search"
+     {
+      :summary      "Autocomplete from query string"
+      :parameters {:query {:q (par string? "Substring to search for"),
+                           (ds/opt :type) (par string? "Type to search for"),
+                           (ds/opt :relation) (par string? "Relation to search for"),
+                           (ds/opt :related-ids) (par string? "List of relation IDs to search for"),
+                           (ds/opt :offset) (par int? "Return list offset (from 0)"),
+                           (ds/opt :limit) (par int? "Return list limit"),
+                           (ds/opt :version) (par int? "Version to search for")}}
+      :get {:responses {200 {:body types/search-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [q type relation relation-ids offset limit version]}
+                            :query} :parameters}]
+                       (log/info (str "GET /search"
+                                      " q:" q
+                                      " type:" type
+                                      " offset:" offset
+                                      " limit:" limit
+                                      " version: " version))
+                       {:status 200
+                        :body (vec (map types/map->nsmap
+                                        (search/get-concepts-by-search
+                                         q type nil nil offset limit version)))})}}]
 
-     ;; alternativeTerms (optional - kolla om/hur det görs)
-     (POST "/concept"    []
-       :query-params [type :- String
-                      definition :- String
-                      preferredLabel :- String]
-       :summary      "Assert a new concept."
-       :responses {200 {:schema {:message s/Str :timestamp Date :concept concepts/concept-schema }}
-                   409 {:schema {:message s/Str}}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       (log/info "POST /concept")
-       (let [[result timestamp new-concept] (concepts/assert-concept type definition preferredLabel)]
-         (if result
-           (response/ok {:timestamp timestamp :message "OK" :concept new-concept})
-           (response/conflict { :message "Can't create new concept since it is in conflict with existing concept." } ))))
+    ["/replaced-by-changes"
+     {
+      :summary      "Show the history of concepts being replaced from a given version."
+      :parameters {:query {:fromVersion (par int? "From taxonomy version"),
+                           (ds/opt :toVersion) (par int? "To taxonomy version (default: latest version)")}}
+      :get {:responses {200 {:body types/replaced-by-changes-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [fromVersion toVersion]} :query} :parameters}]
+                       (log/info (str "GET /replaced-by-changes"
+                                      " from-version: " fromVersion
+                                      " toVersion: " toVersion))
+                       {:status 200
+                        :body (vec (map types/map->nsmap (events/get-deprecated-concepts-replaced-by-from-version fromVersion toVersion)))})}}]
 
-     (POST "/replace-concept"    []
-       :query-params [old-concept-id :- String
-                      new-concept-id :- String]
-       :summary      "Replace old concept with a new concept."
-       {:body (replace-deprecated-concept old-concept-id new-concept-id)})
+    ["/concept/types"
+     {
+      :summary "Return a list of all taxonomy types."
+      :parameters {:query {(ds/opt :version) (par int? "Taxonomy version (default: latest version)")}}
+      :get {:responses {200 {:body types/concept-types-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [version]} :query} :parameters}]
+                       (log/info (str "GET /concept/types version: " version ))
+                       {:status 200
+                        :body (vec (core/get-all-taxonomy-types version))})}}]
 
-     (POST "/versions" []
-       :query-params [new-version-id :- Long]
-       :responses {200 {:schema  {:timestamp java.util.Date
-                                  :version s/Int
-                                  :message s/Str
-                                  }}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Creates a new version tag in the database."
-       (log/info (str "POST /versions" new-version-id))
+    ["/relation/types"
+     {
+      :summary "Relation types. Type 'narrower' is not listed here, as it exists as the inverse of 'broader'."
+      :get {:responses {200 {:body types/relation-types-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys []} :query} :parameters}]
+                       (log/info (str "GET /relation/types"))
+                       {:status 200
+                        :body (vec (core/get-relation-types))})}}]
 
-       (let [result (v/create-new-version new-version-id)]
-         (if result
-           (response/ok (merge result {:message "A new version of the Taxonomy was created."}))
-           (response/unprocessable-entity! {:message (str new-version-id " is not the next valid version id!")})
-           )))
+    ["/parse-text"
+     {
+      :summary "Finds all concepts in a text."
+      :parameters {:query {:text (par string? "Substring to search for")}}
+      :post {:responses {200 {:body types/parse-text-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [text]} :query} :parameters}]
+                        (log/info (str "GET /parse-text text: " text ))
+                        {:status 200
+                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]]
 
-     (GET "/relation/graph/:relation-type" []
-       :path-params [relation-type :- String]
-       :responses {200 {:schema s/Any}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Relation graphs."
-       (response/ok (get-relation-graph (keyword relation-type))))
 
-     (GET "/relation/graph/:relation-type/:id" []
-       :path-params [relation-type :- String
-                     id :- String]
-       :responses {200 {:schema s/Any}
-                   500 {:schema {:type s/Str, :message s/Str}}}
-       :summary "Relation graphs."
-       (response/ok (get-relation-graph-from-concept (keyword relation-type) id)))
+   ["/private"
+    {:swagger {:tags ["Private"]}
+     :middleware [cors/cors auth authorized-private?]}
 
-     )))
+    ["/delete-concept"
+     {
+      :summary      "Retract the concept with the given ID."
+      :parameters {:query {:id (par string? "ID of concept")}}
+      :delete {:responses {200 {:body types/ok-spec}
+                           404 {:body types/error-spec}
+                           500 {:body types/error-spec}}
+               :handler (fn [{{{:keys [id]} :query} :parameters}]
+                          (log/info "DELETE /concept")
+                          (if (core/retract-concept id)
+                            {:status 200 :body (types/map->nsmap {:message "ok"}) }
+                            {:status 404 :body (types/map->nsmap {:error "not found"}) }))}}]
+
+    ["/concept"
+     {
+      :summary      "Assert a new concept."
+      :parameters {:query {(ds/opt :type) (par string? "Concept type"),
+                           (ds/opt :definition) (par string? "Definition"),
+                           (ds/opt :preferredLabel) (par string? "Preferred label")}}
+      :post {:responses {200 {:body types/ok-concept-spec}
+                         409 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [type definition preferredLabel]} :query} :parameters}]
+                        (log/info "POST /concept")
+                        (let [[result timestamp new-concept] (concepts/assert-concept type definition preferredLabel)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
+                            {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]
+
+    ["/replace-concept"
+     {
+      :summary      "Replace old concept with a new concept."
+      :parameters {:query {:old-concept-id (par string? "Old concept ID"),
+                           :new-concept-id (par string? "New concept ID")}}
+      :post {:responses {200 {:body types/ok-spec}
+                         404 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [old-concept-id new-concept-id]} :query} :parameters}]
+                        (log/info "POST /concept")
+                        (if (core/replace-deprecated-concept old-concept-id new-concept-id)
+                          {:status 200 :body (types/map->nsmap {:message "ok"}) }
+                          {:status 404 :body (types/map->nsmap {:error "not found"}) }))}}]
+
+    ["/versions"
+     {
+      :summary "Creates a new version tag in the database."
+      :parameters {:query {:new-version-id (par int? "New version ID")}}
+      :post {:responses {200 {:body types/ok-spec}
+                         406 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [new-version-id]} :query} :parameters}]
+                        (log/info (str "POST /versions" new-version-id))
+                        (let [result (v/create-new-version new-version-id)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap {:message "A new version of the Taxonomy was created."}) }
+                            {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")}) }
+                            )))}}]
+    ]])

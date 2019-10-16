@@ -324,10 +324,11 @@ Like replaced-by will return nil."
  )
 
 (defn transform-deprecated-concept-replaced-by-result [[deprecated-concept transaction-id]]
-  (let [{:keys [:concept/id :concept/preferred-label :concept/definition :concept/deprecated :concept/replaced-by]}  deprecated-concept
+  (let [{:keys [:concept/id :concept/preferred-label :concept/definition :concept/deprecated :concept/replaced-by :concept/type]}  deprecated-concept
         ]
     {:transaction-id transaction-id
      :concept {:id id
+               :type type
                :definition definition
                :preferredLabel preferred-label
                :deprecated deprecated
