@@ -42,15 +42,15 @@
   [handler]
   (fn [request]
     (let [api-key (http/-get-header request "api-key")]
-      (if (or (= api-key (middleware/get-token :admin))
-              (= api-key (middleware/get-token :user)))
+      (if (or (middleware/authenticate-user api-key)
+              (middleware/authenticate-admin api-key))
         (handler request)
         (resp/unauthorized (types/map->nsmap {:error "Not authorized"}))))))
 
 (defn authorized-private?
   [handler]
   (fn [request]
-    (if (= (http/-get-header request "api-key") (middleware/get-token :admin))
+    (if (middleware/authenticate-admin  (http/-get-header request "api-key"))
       (handler request)
       (resp/unauthorized (types/map->nsmap {:error "Not authorized"})))))
 

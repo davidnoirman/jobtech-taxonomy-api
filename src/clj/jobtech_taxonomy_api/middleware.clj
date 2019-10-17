@@ -21,20 +21,25 @@
 
 ;; Define a in-memory relation between tokens and users:
 ;; TODO use the api-key service
-(def hardcoded-tokens {})
+
 
 (defn get-tokens-from-system-env []
   (get-in env [:jobtech-taxonomy-api :auth-tokens])
   )
 
 (defn get-all-tokens []
-  (merge hardcoded-tokens (get-tokens-from-system-env))
+   (get-tokens-from-system-env)
   )
 
-(defn get-token [token]
-  "i e (get-token :admin)"
-  (let [tokens (get-all-tokens)]
-    (str (clojure.string/replace (first (filter #(= (% tokens) token) (keys tokens))) #":" ""))))
+(defn authenticate-user [api-key]
+  (contains? (set (keys (get-all-tokens)))   (keyword api-key) )
+  )
+
+(defn authenticate-admin [api-key]
+  (contains? (set (map first (filter (fn [[token role]] (= role :admin)  ) (get-all-tokens))))
+             (keyword api-key)
+             )
+  )
 
 ;; Define an authfn, function with the responsibility
 ;; to authenticate the incoming token and return an
