@@ -126,6 +126,7 @@
    :project/dev  {:jvm-opts ["-Dconf=dev-config.edn" ; FIXME: the filed referred here does not exist
                              ~(str "-Djava.library.path=" (System/getenv "HOME") "/.clj-nativedep/jobtech-nlp-stava/0.1.0/linux-amd64")]
                   :dependencies [[expound "0.7.2"]
+                                 [lambdaisland/kaocha "0.0-418"]
                                  [pjstadig/humane-test-output "0.9.0"]
                                  [prone "1.6.1"]
                                  [ring/ring-devel "1.7.1"]

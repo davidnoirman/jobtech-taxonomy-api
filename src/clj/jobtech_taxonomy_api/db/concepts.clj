@@ -108,6 +108,10 @@
     true
     (->
      (update :args conj db)
+     )
+
+    pull-pattern
+    (->
      (update :args conj pull-pattern)
      )
 
@@ -218,28 +222,24 @@
   (let [pull-pattern (if (:extra-pull-fields args)
                       (concat concept-pull-pattern (:extra-pull-fields args))
                       concept-pull-pattern
-                      )]
+                      )
+        db (if (:version args)
+             (get-db (:version args))
+             (get-db))]
     (-> args
-        (assoc :db (get-db (:version args)))
+        (assoc :db db)
         (assoc :pull-pattern pull-pattern)
         )))
 
-(defn find-concepts
-  ([args]
-   (find-concepts-by-db (add-find-concepts-args args))
-   )
-  )
-
+;; this function REQUIRES :version in the arguments
+(defn find-concepts [args]
+  (if (:version args)
+    (find-concepts-by-db (add-find-concepts-args args))
+    nil))
 
 ;;"TODO expose this as a private end point for the editor"
-(defn find-concepts-including-unpublished
-  ([id preferred-label type deprecated relation related-ids offset limit]
-   (find-concepts-by-db id preferred-label type deprecated relation related-ids offset limit (get-db))
-   )
-  ([id]
-   (find-concepts-by-db id nil nil nil nil nil nil nil (get-db))
-   )
-  )
+(defn find-concepts-including-unpublished [args]
+  (find-concepts-by-db (add-find-concepts-args args)))
 
 (def replaced-by-concept-schema
   {:id s/Str
@@ -285,11 +285,11 @@
          result     (d/transact (get-conn) {:tx-data tx})]
          [result new-concept]))
 
-(defn assert-concept "" [type desc preferrerd-label]
-  (let [existing (find-concepts-including-unpublished nil preferrerd-label type nil nil nil nil nil)]
+(defn assert-concept "" [type desc preferred-label]
+  (let [existing (find-concepts-including-unpublished {:preferred-label preferred-label :type type})]
     (if (> (count existing) 0)
       [false nil]
-      (let [[result new-concept] (assert-concept-part type desc preferrerd-label)
+      (let [[result new-concept] (assert-concept-part type desc preferred-label)
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
         [result timestamp (api-util/rename-concept-keys-for-api new-concept)]))))
 

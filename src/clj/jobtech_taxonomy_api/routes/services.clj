@@ -41,9 +41,11 @@
    authenticated a 401 not authorized response will be returned"
   [handler]
   (fn [request]
-    (if (authenticated? request)
-      (handler request)
-      (resp/unauthorized (types/map->nsmap {:error "Not authorized"})))))
+    (let [api-key (http/-get-header request "api-key")]
+      (if (or (= api-key (middleware/get-token :admin))
+              (= api-key (middleware/get-token :user)))
+        (handler request)
+        (resp/unauthorized (types/map->nsmap {:error "Not authorized"}))))))
 
 (defn authorized-private?
   [handler]
@@ -274,6 +276,9 @@
    ["/private"
     {:swagger {:tags ["Private"]}
      :middleware [cors/cors auth authorized-private?]}
+
+    ;; for now used by tests for simple private access. TODO: replace that test call, with call to delete
+    ["/ping" {:get (constantly {:status 200, :body "true"})}]
 
     ["/delete-concept"
      {

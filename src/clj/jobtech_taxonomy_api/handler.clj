@@ -15,7 +15,8 @@
    [reitit.ring.middleware.multipart :as multipart]
    [reitit.ring.middleware.exception :as exception]
    [reitit.ring.coercion :as coercion]
-   [reitit.coercion :as compile-coercion]))
+   [reitit.coercion :as compile-coercion]
+   ))
 
 (mount/defstate init-app
   :start ((do (types/generate-concept-types)
@@ -30,7 +31,7 @@
           ;;:uri (:uri request)
           }})
 
-(mount/defstate app-routes
+(mount/defstate app
   :start
   (ring/ring-handler
    (ring/router
@@ -67,6 +68,3 @@
      {:path "/"})
     (wrap-content-type (wrap-webjars (constantly nil)))
     (ring/create-default-handler))))
-
-(defn app []
-  (middleware/wrap-base #'app-routes))

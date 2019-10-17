@@ -15,7 +15,7 @@
 
 
 (test/deftest ^:integration-concept-types-not-empty concept-types-not-empty
-  (test/testing "access to /v0/taxonomy/public/concept/types"
+  (test/testing "access to /v1/taxonomy/public/concept/types"
     (let [body ["continent"
                 "country"
                 "driving-license"
@@ -48,5 +48,3 @@
 
       (test/is (member? body "skill")
                         ))))
-
-
