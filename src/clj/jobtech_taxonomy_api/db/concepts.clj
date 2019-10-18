@@ -102,16 +102,13 @@
 
 
 (defn fetch-concepts [{:keys [id preferred-label type deprecated relation related-ids offset limit db pull-pattern extra-where-attributes]}]
+  {:pre [pull-pattern]}
 
   (cond-> initial-concept-query
 
     true
     (->
      (update :args conj db)
-     )
-
-    pull-pattern
-    (->
      (update :args conj pull-pattern)
      )
 
