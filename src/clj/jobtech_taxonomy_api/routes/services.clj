@@ -87,6 +87,7 @@
                        {:status 200
                         :body (map types/map->nsmap (v/get-all-versions))})}}]
 
+
     ["/changes"
      {
       :summary      "Show the history from a given version."
@@ -132,7 +133,7 @@
                        {:status 200
                         :body (vec (map types/map->nsmap (concepts/find-concepts
                                                           {:id id
-                                                           :preferredLabel preferredLabel
+                                                           :preferred-label preferredLabel
                                                            :type type
                                                            :deprecated deprecated
                                                            :relation relation
@@ -177,7 +178,7 @@
                                {:status 200
                                 :body (vec (map types/map->nsmap
                                                 (concepts/find-concepts (cond-> {:id id
-                                                                                 :preferredLabel preferredLabel
+                                                                                 :preferred-label preferredLabel
                                                                                  :type type
                                                                                  :deprecated deprecated
                                                                                  :relation relation

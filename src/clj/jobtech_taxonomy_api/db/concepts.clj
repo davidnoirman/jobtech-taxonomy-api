@@ -231,7 +231,8 @@
 (defn find-concepts
   "Supply version: Use nil as value to get the latest published database."
   [args]
-  {:pre [(contains? args :version)]}
+  {:pre [(every? #(contains? args %) [:version :preferred-label])
+         ]}
   (find-concepts-by-db (add-find-concepts-args args)))
 
 ;;"TODO expose this as a private end point for the editor"
