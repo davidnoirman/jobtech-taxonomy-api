@@ -105,7 +105,10 @@
                                       " offset: " offset
                                       " limit: " limit))
                        {:status 200
-                        :body (vec (map types/map->nsmap (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit)))})}}]
+                        :body (let [events (doall (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit))
+                                    ;; This is needed to squeeze /changes :concept into the same namespace as the other's :concept
+                                    renamed (map #(clojure.set/rename-keys % {:concept :changed-concept}) events)]
+                                (vec (map types/map->nsmap renamed )))})}}]
 
     ["/concepts"
      {
@@ -239,7 +242,11 @@
                                       " from-version: " fromVersion
                                       " toVersion: " toVersion))
                        {:status 200
-                        :body (vec (map types/map->nsmap (events/get-deprecated-concepts-replaced-by-from-version fromVersion toVersion)))})}}]
+                        :body (let [events (events/get-deprecated-concepts-replaced-by-from-version fromVersion toVersion)
+                                    ;; This is needed to squeeze :concept into the same namespace as the other's :concept
+                                    renamed (map #(clojure.set/rename-keys % {:concept :concept-with-replace}) events)]
+
+                                (vec (map types/map->nsmap renamed)))})}}]
 
     ["/concept/types"
      {

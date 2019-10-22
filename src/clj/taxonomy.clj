@@ -358,9 +358,9 @@
 (def versions-spec ::versions)
 
 ;; /changes
-(sp/def ::concept
+(sp/def ::changed-concept
   (st/spec
-   {:name ::concept
+   {:name ::changed-concept
     :spec (sp/keys :req [::id ::type]
                    :opt [::definition ::deprecated ::preferredLabel])}))
 
@@ -369,7 +369,7 @@
    {:name ::event
     :spec (sp/keys :req [::eventType
                          ::version
-                         ::concept])}))
+                         ::changed-concept])}))
 
 (sp/def ::events
   (ds/spec
@@ -379,6 +379,12 @@
 (def events-spec ::events)
 
 ;; /concepts
+
+(sp/def ::concept
+  (ds/spec
+   {:name ::concept
+    :spec (sp/keys :req [::id ::type ::preferredLabel]
+                   :opt [::definition ::deprecated])}))
 
 (sp/def ::replacedBy
   (ds/spec
@@ -414,15 +420,10 @@
 
 ;; /replaced-by-changes
 
-(sp/def ::concept
-  (ds/spec
-   {:name ::concept
-    :spec ::concept-with-replace}))
-
 (sp/def ::replaced-by-change
   (ds/spec
    {:name ::replaced-by-change
-    :spec (sp/keys :req [::version ::concept])}))
+    :spec (sp/keys :req [::version ::concept-with-replace])}))
 
 (sp/def ::replaced-by-changes
   (ds/spec
