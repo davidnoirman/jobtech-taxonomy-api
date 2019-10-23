@@ -31,6 +31,11 @@
    (get-tokens-from-system-env)
   )
 
+(defn get-token [token]
+  "i e (get-token :admin)"
+  (let [tokens (get-all-tokens)]
+    (str (clojure.string/replace (first (filter #(= (% tokens) token) (keys tokens))) #":" ""))))
+
 (defn authenticate-user [api-key]
   (contains? (set (keys (get-all-tokens)))   (keyword api-key) )
   )
