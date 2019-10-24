@@ -505,61 +505,88 @@
 
   [
    {:endpoint-name "driving-licence"
-    :extra-attributes [{:query-field-name "driving-licence-code-2013"
-                        :db-field-name :concept.external-standard/driving-licence-code-2013}
-                       {:db-field-name :concept.implicit-driving-licences }
+    :extra-attributes [{:query-field "driving-licence-code-2013"
+                        :where-field :concept.external-standard/driving-licence-code-2013
+                        :pull-expression :concept.external-standard/driving-licence-code-2013
+                        }
+
+                       {:pull-expression {:concept.implicit-driving-licences [:concept/id
+                                                                            :concept.external-standard/driving-licence-code-2013]}
+
+                        }
                        ]
     }
 
    {:endpoint-name "ssyk"
-    :extra-attributes [{:query-field-name "ssyk-2012"
-                        :db-field-name :concept.external-standard/ssyk-2012}]}
+    :extra-attributes [{:query-field "ssyk-2012"
+                        :where-field :concept.external-standard/ssyk-2012
+                        :pull-expression :concept.external-standard/ssyk-2012
+                        }]}
 
    {:endpoint-name "employment-duration"
-    :extra-attributes [{:query-field-name "eures-code"
-                        :db-field-name :concept.external-standard/eures-code}]
+    :extra-attributes [{:query-field "eures-code-2014"
+                        :where-field :concept.external-standard/eures-code-2014
+                        :pull-expression :concept.external-standard/eures-code-2014
+                        }]
     }
 
    {:endpoint-name "region"
-    :extra-attributes [{:query-field-name "nuts-level-3-code-2013"
-                        :db-field-name :concept.external-standard/nuts-level-3-code-2013}
+    :extra-attributes [{:query-field "nuts-level-3-code-2013"
+                        :where-field :concept.external-standard/nuts-level-3-code-2013
+                        :pull-expression :concept.external-standard/nuts-level-3-code-2013
+                        }
 
-                       {:query-field-name "national-nuts-level-3-code-2019"
-                        :db-field-name :concept.external-standard/national-nuts-level-3-code-2019}
+                       {:query-field "national-nuts-level-3-code-2019"
+                        :where-field :concept.external-standard/national-nuts-level-3-code-2019
+                        :pull-expression :concept.external-standard/national-nuts-level-3-code-2019
+                        }
                        ]
     }
 
    {:endpoint-name "country"
     :extra-attributes [
-                       {:query-field-name "iso-3166-1-alpha-2-2013"
-                        :db-field-name :concept.external-standard/iso-3166-1-alpha-2-2013}
+                       {:query-field "iso-3166-1-alpha-2-2013"
+                        :where-field :concept.external-standard/iso-3166-1-alpha-2-2013
+                        :pull-expression :concept.external-standard/iso-3166-1-alpha-2-2013
+                        }
+
+                       {:query-field "iso-3166-1-alpha-3-2013"
+                        :where-field :concept.external-standard/iso-3166-1-alpha-3-2013
+                        :pull-expression :concept.external-standard/iso-3166-1-alpha-3-2013}
                        ]
     }
 
    {:endpoint-name "isco"
-    :extra-attributes [{:query-field-name "isco-08"
-                        :db-field-name :concept.external-standard/isco-08}]
+    :extra-attributes [{:query-field "isco-08"
+                        :where-field :concept.external-standard/isco-08
+                        :pull-expression :concept.external-standard/isco-08
+                        }]
     }
 
    {:endpoint-name "sun-education-field"
-    :extra-attributes [{:query-field-name "sun-education-field-code-2020"
-                        :db-field-name :concept.external-standard/sun-education-field-code-2020}]
+    :extra-attributes [{:query-field "sun-education-field-code-2020"
+                        :where-field :concept.external-standard/sun-education-field-code-2020
+                        :pull-expression :concept.external-standard/sun-education-field-code-2020
+                        }]
     }
 
 
    {:endpoint-name "sun-education-level"
-    :extra-attributes [{:query-field-name "sun-education-level-code-2020"
-                        :db-field-name  :concept.external-standard/sun-education-level-code-2020}]
+    :extra-attributes [{:query-field "sun-education-level-code-2020"
+                        :where-field  :concept.external-standard/sun-education-level-code-2020
+                        :pull-expression :concept.external-standard/sun-education-level-code-2020
+                        }]
     }
 
 
    {:endpoint-name "sni-level"
-    :extra-attributes [{:query-field-name "sni-level-code-2007"
-                        :db-field-name :concept.external-standard/sni-level-code-2007}]
+    :extra-attributes [{:query-field "sni-level-code-2007"
+                        :where-field :concept.external-standard/sni-level-code-2007
+                        :pull-expression :concept.external-standard/sni-level-code-2007
+                        }]
     }
-   ]
 
-  )
+   ])
 
 
 
@@ -593,8 +620,8 @@
   )
 
 (defn add-extra-queries [extra-query-attributes]
-  (let [query-field-names   (filter #(:query-field-name %) extra-query-attributes)]
-    (map #(create-extra-query-spec-field (:query-field-name %)) query-field-names ))
+  (let [query-field-names   (filter #(:query-field %) extra-query-attributes)]
+    (map #(create-extra-query-spec-field (:query-field %)) query-field-names ))
   )
 
 
@@ -623,30 +650,29 @@
 
 ;; (add-extra-queries (:extra-attributes (first taxonomy-extra-attributes )))
 
-(defn get-db-field-names-from-extra-attributes [extra-attributes]
-  (map :db-field-name extra-attributes)
+(defn get-pull-expression-from-extra-attributes [extra-attributes]
+  (map :pull-expression extra-attributes)
   )
 
-(defn get-query-field-names-from-extra-attributes-as-keywords [extra-attributes]
-  (remove nil? (map #(-> % :query-field-name keyword) extra-attributes))
+(defn get-query-fields-from-extra-attributes-as-keywords [extra-attributes]
+  (remove nil? (map #(-> % :query-field keyword) extra-attributes))
   )
+
 
 (defn compose-extra-where-attribute [extra-attribute query-params]
   (let [
-        db-field-name (:db-field-name extra-attribute)
-        field-name (-> extra-attribute :query-field-name keyword)
-        value (if (get query-params  field-name )
-                (field-name query-params)
-                '_
-                )]
+        db-field-name (:where-field extra-attribute)
+        field-name (-> extra-attribute :query-field keyword)
+        value (when (get query-params field-name )
+                (field-name query-params))]
     [db-field-name value])
   )
 
 (defn compose-extra-where-attributes [query-params extra-attributes]
-  (map
-   #(compose-extra-where-attribute % query-params)
-   extra-attributes
-       )
+  (filter second (map
+                #(compose-extra-where-attribute % query-params)
+                (filter :query-field extra-attributes)
+                ))
   )
 
 ;; TODO rename extra-attributes to endpoint-meta-data or something bigger
@@ -657,17 +683,19 @@
     ;    _ (println query-params)
         extra-attributes (:extra-attributes endpoint-meta-data)
         renamed-query-params (clojure.set/rename-keys query-params {:preferredLabel :preferred-label})
+        renamed-query-params-fixed-related-ids (update renamed-query-params :related-ids vector)
+
 
      ;   _ (println renamed-query-params)
 
      ;   _ (println "EXTRA ATTRUBUTES")
     ;    _ (println extra-attributes)
 
-        extra-pull-fields (get-db-field-names-from-extra-attributes extra-attributes)
+        extra-pull-fields (get-pull-expression-from-extra-attributes extra-attributes)
         _ (println "EXTRA PULL FIELDS")
         _ (println extra-pull-fields)
 
-        query-field-names-as-keywords (get-query-field-names-from-extra-attributes-as-keywords extra-attributes)
+        query-field-names-as-keywords (get-query-fields-from-extra-attributes-as-keywords extra-attributes)
 
         _ (println  "QK" query-field-names-as-keywords)
 
@@ -675,7 +703,7 @@
        _  (println "EXTRA WHERE ATTRIBUTES")
        _ (println  extra-where-attributes )
 
-        renamed-query-params-with-extra-pull-fields (assoc renamed-query-params :extra-pull-fields extra-pull-fields)
+        renamed-query-params-with-extra-pull-fields (assoc renamed-query-params-fixed-related-ids :extra-pull-fields extra-pull-fields)
 
  ;       _ (println    renamed-query-params-with-extra-pull-fields)
 
@@ -702,11 +730,13 @@
 
   (let [endpoint-name (:endpoint-name extra-attributes)
         extra-query-attributes (:extra-attributes extra-attributes)
+        extra-queries (add-extra-queries  extra-query-attributes)
+        query (into detailed-enpoint-query-base extra-queries)
         ]
     [(str "/concepts/" endpoint-name)
      {
       :summary      (str "Get " endpoint-name ". Supply at least one search parameter.")
-      :parameters {:query (into detailed-enpoint-query-base (add-extra-queries  extra-query-attributes))}
+      :parameters {:query query}
       :get {:responses {200 #_{:body (keyword taxonomy-namespace (str "concepts-" endpoint-name))
 
                                }
