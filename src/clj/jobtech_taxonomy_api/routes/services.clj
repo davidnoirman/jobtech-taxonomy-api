@@ -140,7 +140,7 @@
                                                            :type type
                                                            :deprecated deprecated
                                                            :relation relation
-                                                           :related-ids (list related-ids)
+                                                           :related-ids (when related-ids (list related-ids))
                                                            :offset offset
                                                            :limit limit
                                                            :version version
