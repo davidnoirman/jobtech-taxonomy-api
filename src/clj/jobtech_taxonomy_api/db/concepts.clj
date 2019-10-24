@@ -44,6 +44,23 @@
     :limit -1
     })
 
+(def relation-pull-pattern [:relation/concept-1
+                            :relation/concept-2
+                            :relation/type
+                            :relation/description
+                            :relation/affinity-percentage
+                           ])
+
+(def initial-relation-query
+  '{:find [(pull ?r pull-pattern) ]
+    ;;:with [ ?uniqueness]
+    :in [$ pull-pattern]
+    :args []
+    :where []
+    :offset 0
+    :limit -1
+    })
+
 
 (defn remap-query
   [{args :args offset :offset limit :limit :as m}]
@@ -215,6 +232,48 @@
     )
   )
 
+(defn fetch-relations [{:keys [concept-1 concept-2 type pull-pattern db offset limit]}]
+  {:pre [pull-pattern]}
+
+  (cond-> initial-relation-query
+
+    true
+    (->
+     (update :args conj db)
+     (update :args conj pull-pattern)
+     )
+
+    type
+    (-> (update :in conj '?type)
+        (update :args conj type)
+        (update :where conj '[?r :relation/type ?type])
+        )
+
+    concept-1
+    (-> (update :in conj '?c1)
+        (update :args conj concept-1)
+        (update :where conj '[?c1e :concept/id ?c1]
+                            '[?r :relation/concept-1 ?c1e])
+        )
+
+    concept-2
+    (-> (update :in conj '?c2)
+        (update :args conj concept-2)
+        (update :where conj '[?c2e :concept/id ?c2]
+                            '[?r :relation/concept-2 ?c2e])
+        )
+
+    offset
+    (assoc :offset offset)
+
+    limit
+    (assoc :limit limit)
+
+    true
+    remap-query
+    )
+  )
+
 (defn find-concepts-by-db
   ([args]
    (let [ result (d/q (fetch-concepts args))
@@ -222,6 +281,9 @@
      parsed-result
      ))
   )
+
+(defn find-relations-by-db [args]
+   (d/q (fetch-relations args)))
 
 ;;add extra-concept-fields to pull pattern
 
@@ -248,6 +310,20 @@
 ;;"TODO expose this as a private end point for the editor"
 (defn find-concepts-including-unpublished [args]
   (find-concepts-by-db (add-find-concepts-args args)))
+
+
+(defn add-find-relations-args [args]
+  (let [pull-pattern relation-pull-pattern
+        db (if (:version args)
+             (get-db (:version args))
+             (get-db))]
+    (-> args
+        (assoc :db db)
+        (assoc :pull-pattern pull-pattern)
+        )))
+
+(defn find-relations-including-unpublished [args]
+  (find-relations-by-db (add-find-relations-args args)))
 
 (def replaced-by-concept-schema
   {:id s/Str
@@ -301,7 +377,14 @@
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
         [result timestamp (api-util/rename-concept-keys-for-api new-concept)]))))
 
-
+(defn assert-relation "" [concept-1 concept-2 type description affinity-percentage]
+  (let [existing (find-relations-including-unpublished {:concept-1 concept-1 :concept-2 concept-2 :type type})]
+    (if (> (count existing) 0)
+      [false nil]
+      ;;(assert-relation-part [{:keys [concept-1 concept-2 type description affinity-percentage]}])
+      [true true]
+      )))
+;; (find-relations-including-unpublished {:concept-0-id "wEu1_84M_7nU" :concept-1-id "j8X2_KhG_6ty" :type "related" :limit 10})
 (comment
 
   ;; When we want to get typed data, use the dynamic pattern input
