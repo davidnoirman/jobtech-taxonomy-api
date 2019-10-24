@@ -377,14 +377,6 @@
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
         [result timestamp (api-util/rename-concept-keys-for-api new-concept)]))))
 
-(defn assert-relation "" [concept-1 concept-2 type description affinity-percentage]
-  (let [existing (find-relations-including-unpublished {:concept-1 concept-1 :concept-2 concept-2 :type type})]
-    (if (> (count existing) 0)
-      [false nil]
-      ;;(assert-relation-part [{:keys [concept-1 concept-2 type description affinity-percentage]}])
-      [true true]
-      )))
-;; (find-relations-including-unpublished {:concept-0-id "wEu1_84M_7nU" :concept-1-id "j8X2_KhG_6ty" :type "related" :limit 10})
 (comment
 
   ;; When we want to get typed data, use the dynamic pattern input
