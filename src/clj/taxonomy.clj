@@ -79,31 +79,37 @@
 (def concepts-spec-ssyk-2012 ::concepts-ssyk)
 
 ;; eures
-(sp/def ::eures-code (st/spec string?))
+(sp/def ::eures-code-2014 (st/spec string?))
 
-(sp/def ::concept-without-replace-eures-code
+(sp/def ::concept-without-replace-employment-duration
   (st/spec
-   {:name ::concept-without-replace-eures-code
-    :spec (sp/keys :req [::id ::type ::eures-code]
+   {:name ::concept-without-replace-employment-duration
+    :spec (sp/keys :req [::id ::type ::eures-code-2014]
                    :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
 
- (sp/def ::replacedBy-eures-code
+(sp/def ::replacedBy-employment-duration
    (ds/spec
-    {:name ::replacedBy-eures-code
-     :spec (sp/coll-of ::concept-without-replace-eures-code )}))
+    {:name ::replacedBy-employment-duration
+     :spec (sp/coll-of ::concept-without-replace-employment-duration )}))
 
- (sp/def ::concept-with-replace-eures-code
+(sp/def ::concept-with-replace-employment-duration
    (ds/spec
-    {:name ::concept-with-replace-eures-code
-     :spec (sp/keys :req [::id ::type ::eures-code ::preferredLabel]
-                    :opt [::definition ::deprecated ::replacedBy-eures-code ::concept-relations])}))
+    {:name ::concept-with-replace-employment-duration
+     :spec (sp/keys :req [::id ::type ::eures-code-2014 ::preferredLabel]
+                    :opt [::definition ::deprecated ::replacedBy-employment-duration ::concept-relations])}))
 
 (sp/def ::concepts-employment-duration
    (ds/spec
-    {:name ::concepts-eures-code
-     :spec (sp/coll-of ::concept-with-replace-eures-code )}))
+    {:name ::concepts-employment-duration
+     :spec (sp/coll-of ::concept-with-replace-employment-duration)}))
 
 (def concepts-spec-eures-code ::concepts-employment-duration)
+
+
+(defn create-spec-for-employment-duration []
+
+  )
+
 
 ;; nuts-level-3
 (sp/def ::nuts-level-3-code (st/spec string?))
