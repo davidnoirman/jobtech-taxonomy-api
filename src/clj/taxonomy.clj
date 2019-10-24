@@ -692,16 +692,16 @@
     ;    _ (println extra-attributes)
 
         extra-pull-fields (get-pull-expression-from-extra-attributes extra-attributes)
-        _ (println "EXTRA PULL FIELDS")
-        _ (println extra-pull-fields)
+  ;;      _ (println "EXTRA PULL FIELDS")
+   ;;     _ (println extra-pull-fields)
 
         query-field-names-as-keywords (get-query-fields-from-extra-attributes-as-keywords extra-attributes)
 
-        _ (println  "QK" query-field-names-as-keywords)
+;;        _ (println  "QK" query-field-names-as-keywords)
 
         extra-where-attributes (compose-extra-where-attributes query-params extra-attributes)
-       _  (println "EXTRA WHERE ATTRIBUTES")
-       _ (println  extra-where-attributes )
+;;       _  (println "EXTRA WHERE ATTRIBUTES")
+;;       _ (println  extra-where-attributes )
 
         renamed-query-params-with-extra-pull-fields (assoc renamed-query-params-fixed-related-ids :extra-pull-fields extra-pull-fields)
 
@@ -737,10 +737,7 @@
      {
       :summary      (str "Get " endpoint-name ". Supply at least one search parameter.")
       :parameters {:query query}
-      :get {:responses {200 #_{:body (keyword taxonomy-namespace (str "concepts-" endpoint-name))
-
-                               }
-                        {:body any?}
+      :get {:responses {200 {:body (keyword taxonomy-namespace (str "concepts-" endpoint-name))}
 
                         500 {:body error-spec}}
             :handler (compose-handler-function extra-attributes  logging-function db-function)
