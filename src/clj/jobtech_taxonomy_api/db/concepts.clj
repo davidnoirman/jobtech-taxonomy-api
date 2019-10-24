@@ -86,13 +86,6 @@
   )
 
 (defn handle-extra-where-attribute [query [key value]]
-  #_(let [attribute-name (str "?" (name key))]
-
-    (-> query (update :in conj attribute-name )
-        (update :args conj value)
-        (update :where conj ['?c key value])
-        ))
-
   (update query :where conj ['?c key value])
   )
 
@@ -231,8 +224,9 @@
 (defn find-concepts
   "Supply version: Use nil as value to get the latest published database."
   [args]
-  {:pre [(every? #(contains? args %) [:version :preferred-label])
-         ]}
+  #_{:pre [(every? #(contains? args %) [:version :preferred-label])
+           ]}
+  (println args) ;; TODO clean println
   (find-concepts-by-db (add-find-concepts-args args)))
 
 ;;"TODO expose this as a private end point for the editor"
