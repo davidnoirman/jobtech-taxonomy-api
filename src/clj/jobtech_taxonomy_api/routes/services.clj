@@ -75,8 +75,8 @@
             {:url "/v1/taxonomy/swagger.json"
              :config {:validator-url nil}})}]]
 
-   ["/public"
-    {:swagger {:tags ["Public"]}
+   ["/main"
+    {:swagger {:tags ["Main"]}
 
      :middleware [cors/cors auth]}
 
@@ -149,30 +149,7 @@
 
 
 
-    ["/search"
-     {
-      :summary      "Autocomplete from query string"
-      :parameters {:query {:q (taxonomy/par string? "Substring to search for"),
-                           (ds/opt :type) (taxonomy/par string? "Type to search for"),
-                           (ds/opt :relation) (taxonomy/par string? "Relation to search for"),
-                           (ds/opt :related-ids) (taxonomy/par string? "List of relation IDs to search for"),
-                           (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
-                           (ds/opt :limit) (taxonomy/par int? "Return list limit"),
-                           (ds/opt :version) (taxonomy/par int? "Version to search for")}}
-      :get {:responses {200 {:body types/search-spec}
-                        500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [q type relation relation-ids offset limit version]}
-                            :query} :parameters}]
-                       (log/info (str "GET /search"
-                                      " q:" q
-                                      " type:" type
-                                      " offset:" offset
-                                      " limit:" limit
-                                      " version: " version))
-                       {:status 200
-                        :body (vec (map types/map->nsmap
-                                        (search/get-concepts-by-search
-                                         q type nil nil offset limit version)))})}}]
+
 
     ["/replaced-by-changes"
      {
@@ -209,23 +186,14 @@
                        {:status 200
                         :body (vec (core/get-relation-types))})}}]
 
-    ["/parse-text"
-     {
-      :summary "Finds all concepts in a text."
-      :parameters {:query {:text (taxonomy/par string? "Substring to search for")}}
-      :post {:responses {200 {:body types/parse-text-spec}
-                         500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [text]} :query} :parameters}]
-                        (log/info (str "GET /parse-text text: " text ))
-                        {:status 200
-                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]]
+    ]
 
 
 
-   ["/detailed"
+   ["/specific"
 
 
-    {:swagger {:tags ["Detailed Concepts"]
+    {:swagger {:tags ["Specific"]
                :description "Exposes concept with detailed information such as codes from external standards."
                }
 
@@ -240,13 +208,57 @@
     ]
 
 
+   ["/suggesters"
+    {:swagger {:tags ["Suggesters"]
+               :description "Help end-users to find relevant concepts from the taxonomy"
+               }
+
+     :middleware [cors/cors auth]}
+
+    ["/autocomplete"
+     {
+      :summary      "Autocomplete from query string"
+      :parameters {:query {:query-string (taxonomy/par string? "String to search for"),
+                           (ds/opt :type) (taxonomy/par string? "Type to search for"),
+                           (ds/opt :relation) (taxonomy/par string? "Relation to search for"),
+                           (ds/opt :related-ids) (taxonomy/par string? "List of relation IDs to search for"),
+                           (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
+                           (ds/opt :limit) (taxonomy/par int? "Return list limit"),
+                           (ds/opt :version) (taxonomy/par int? "Version to search for")}}
+      :get {:responses {200 {:body types/search-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [q type relation relation-ids offset limit version]}
+                            :query} :parameters}]
+                       (log/info (str "GET /search"
+                                      " q:" q
+                                      " type:" type
+                                      " offset:" offset
+                                      " limit:" limit
+                                      " version: " version))
+                       {:status 200
+                        :body (vec (map types/map->nsmap
+                                        (search/get-concepts-by-search
+                                         q type nil nil offset limit version)))})}}]
+
+    ["/parse-text"
+     {
+      :summary "Finds all concepts in a text."
+      :parameters {:query {:text (taxonomy/par string? "Substring to search for")}}
+      :post {:responses {200 {:body types/parse-text-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [text]} :query} :parameters}]
+                        (log/info (str "GET /parse-text text: " text ))
+                        {:status 200
+                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]
+
+    ]
 
    ["/private"
     {:swagger {:tags ["Private"]}
      :middleware [cors/cors auth authorized-private?]}
 
     ;; for now used by tests for simple private access. TODO: replace that test call, with call to delete
-    ["/ping" {:get (constantly {:status 200, :body "true"})}]
+
 
     ["/delete-concept"
      {

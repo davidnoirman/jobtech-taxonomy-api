@@ -69,15 +69,15 @@
 
 
 
-(sp/def ::concept-without-replace-ssyk
+(sp/def ::concept-ssyk-shallow
   (st/spec
-   {:name ::concept-without-replace-ssyk
+   {:name ::concept-ssyk-shallow
     :spec (sp/keys :req [::id ::type ::ssyk-2012]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
 (sp/def ::replaced-by-ssyk
   (ds/spec
-   {:name ::replaced-by-ssyk    :spec (sp/coll-of ::concept-without-replace-ssyk )}))
+   {:name ::replaced-by-ssyk    :spec (sp/coll-of ::concept-ssyk-shallow )}))
 
 (sp/def ::concept-ssyk
   (ds/spec
@@ -95,16 +95,16 @@
 ;; eures
 (sp/def ::eures-code-2014 (st/spec string?))
 
-(sp/def ::concept-without-replace-employment-duration
+(sp/def ::concept-employment-duration-shallow
   (st/spec
-   {:name ::concept-without-replace-employment-duration
+   {:name ::concept-employment-duration-shallow
     :spec (sp/keys :req [::id ::type ::eures-code-2014]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
 (sp/def ::replaced-by-employment-duration
    (ds/spec
     {:name ::replaced-by-employment-duration
-     :spec (sp/coll-of ::concept-without-replace-employment-duration )}))
+     :spec (sp/coll-of ::concept-employment-duration-shallow )}))
 
 (sp/def ::concept-employment-duration
    (ds/spec
@@ -125,16 +125,16 @@
 (sp/def ::national-nuts-level-3-code-2019 (st/spec string?))
 
 
-(sp/def ::concept-without-replace-region
+(sp/def ::concept-region-shallow
   (st/spec
-   {:name ::concept-without-replace-region
+   {:name ::concept-region-shallow
     :spec (sp/keys :req [::id ::nuts-level-3-code-2013 ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations ::national-nuts-level-3-code-2019])}))
 
  (sp/def ::replaced-by-region
    (ds/spec
     {:name ::replaced-by-region
-     :spec (sp/coll-of ::concept-without-replace-region )}))
+     :spec (sp/coll-of ::concept-region-shallow )}))
 
  (sp/def ::concept-region
    (ds/spec
@@ -155,16 +155,16 @@
 (sp/def ::iso-3166-1-alpha-3-2013 (st/spec string?))
 (sp/def ::iso-3166-1-alpha-2-2013 (st/spec string?))
 
-(sp/def ::concept-without-replace-country
+(sp/def ::concept-country-shallow
   (st/spec
-   {:name ::concept-without-replace-country
+   {:name ::concept-country-shallow
     :spec (sp/keys :req [::id  ::iso-3166-1-alpha-3-2013  ::iso-3166-1-alpha-2-2013 ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replaced-by-country
    (ds/spec
     {:name ::replaced-by-country
-     :spec (sp/coll-of ::concept-without-replace-country)}))
+     :spec (sp/coll-of ::concept-country-shallow)}))
 
  (sp/def ::concept-country
    (ds/spec
@@ -181,16 +181,16 @@
 
 ;; id ;; TODO: make completions
 
-(sp/def ::concept-without-replace-id
+(sp/def ::concept-id-shallow
   (st/spec
-   {:name ::concept-without-replace-id
+   {:name ::concept-id-shallow
     :spec (sp/keys :req [::id ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replaced-by-id
    (ds/spec
     {:name ::replaced-by-id
-     :spec (sp/coll-of ::concept-without-replace-id )}))
+     :spec (sp/coll-of ::concept-id-shallow )}))
 
  (sp/def ::concept-id
    (ds/spec
@@ -208,16 +208,16 @@
 ;; isco-08
 (sp/def ::isco-08 (st/spec string?))
 
-(sp/def ::concept-without-replace-isco
+(sp/def ::concept-isco-shallow
   (st/spec
-   {:name ::concept-without-replace-isco
+   {:name ::concept-isco-shallow
     :spec (sp/keys :req [::id ::isco-08 ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replaced-by-isco
    (ds/spec
     {:name ::replaced-by-isco
-     :spec (sp/coll-of ::concept-without-replace-isco)}))
+     :spec (sp/coll-of ::concept-isco-shallow)}))
 
  (sp/def ::concept-isco
    (ds/spec
@@ -235,16 +235,16 @@
 ;; education-field-code-2020
 (sp/def ::sun-education-field-code-2020 (st/spec string?))
 
-(sp/def ::concept-without-replace-sun-education-field
+(sp/def ::concept-sun-education-field-shallow
   (st/spec
-   {:name ::concept-without-replace-sun-education-field
+   {:name ::concept-sun-education-field-shallow
     :spec (sp/keys :req [::id ::sun-education-field-code-2020 ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replaced-by-sun-education-field
    (ds/spec
     {:name ::replaced-by-sun-education-field
-     :spec (sp/coll-of ::concept-without-replace-sun-education-field )}))
+     :spec (sp/coll-of ::concept-sun-education-field-shallow )}))
 
  (sp/def ::concept-sun-education-field
    (ds/spec
@@ -262,43 +262,43 @@
 ;; sun-education-level-code-2020
 (sp/def ::sun-education-level-code-2020 (st/spec string?))
 
-(sp/def ::concept-without-replace-sun-education-level-code-2020
+(sp/def ::concept-sun-education-level-shallow
   (st/spec
-   {:name ::concept-without-replace-sun-education-level-code-2020
+   {:name ::concept-sun-education-level-shallow
     :spec (sp/keys :req [::id ::sun-education-level-code-2020 ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
- (sp/def ::replaced-by-sun-education-level-code-2020
+ (sp/def ::replaced-by-sun-education-level
    (ds/spec
-    {:name ::replaced-by-sun-education-level-code-2020
-     :spec (sp/coll-of ::concept-without-replace-sun-education-level-code-2020 )}))
+    {:name ::replaced-by-sun-education-level
+     :spec (sp/coll-of ::concept-sun-education-level-shallow )}))
 
- (sp/def ::concept-sun-education-level-code-2020
+ (sp/def ::concept-sun-education-level
    (ds/spec
-    {:name ::concept-sun-education-level-code-2020
+    {:name ::concept-sun-education-level
      :spec (sp/keys :req [::id ::type ::sun-education-level-code-2020 ::preferred-label]
-                    :opt [::definition ::deprecated ::replaced-by-sun-education-level-code-2020 ::concept-relations])}))
+                    :opt [::definition ::deprecated ::replaced-by-sun-education-level ::concept-relations])}))
 
  (sp/def ::concepts-sun-education-level
    (ds/spec
-    {:name ::concepts-sun-education-level-code-2020
-     :spec (sp/coll-of ::concept-sun-education-level-code-2020 )}))
+    {:name ::concepts-sun-education-level
+     :spec (sp/coll-of ::concept-sun-education-level)}))
 
  (def concepts-spec-sun-education-level-code-2020 ::concepts-sun-education-level)
 
 ;; sni-level-code
 (sp/def ::sni-level-code-2007 (st/spec string?))
 
-(sp/def ::concept-without-replace-sni-level
+(sp/def ::concept-sni-level-shallow
   (st/spec
-   {:name ::concept-without-replace-sni-level
+   {:name ::concept-sni-level-shallow
     :spec (sp/keys :req [::id ::sni-level-code-2007 ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replaced-by-sni-level
    (ds/spec
     {:name ::replaced-by-sni-level
-     :spec (sp/coll-of ::concept-without-replace-sni-level )}))
+     :spec (sp/coll-of ::concept-sni-level-shallow )}))
 
  (sp/def ::concept-sni-level
    (ds/spec
@@ -312,6 +312,46 @@
      :spec (sp/coll-of ::concept-sni-level )}))
 
  (def concepts-spec-sni-level-code ::concepts-sni-level)
+
+
+
+;; language
+
+
+
+
+;;:pull-expression :concept.external-standard/
+;;}
+
+;; {:query-field "iso-639-3-alpha-3-2007"
+
+(sp/def ::iso-639-3-alpha-2-2007 (st/spec string?))
+(sp/def ::iso-639-3-alpha-3-2007 (st/spec string?))
+
+(sp/def ::concept-language-shallow
+  (st/spec
+   {:name ::concept-language-shallow
+    :spec (sp/keys :req [::id ::iso-639-3-alpha-2-2007 ::iso-639-3-alpha-3-2007 ::type ::preferred-label]
+                   :opt [::definition ::deprecated  ::concept-relations])}))
+
+(sp/def ::replaced-by-language
+  (ds/spec
+   {:name ::replaced-by-language
+    :spec (sp/coll-of ::concept-language-shallow )}))
+
+(sp/def ::concept-language
+  (ds/spec
+   {:name ::concept-language
+    :spec (sp/keys :req [::id ::type  ::iso-639-3-alpha-2-2007 ::iso-639-3-alpha-3-2007 ::preferred-label]
+                   :opt [::definition ::deprecated ::replaced-by-language ::concept-relations])}))
+
+(sp/def ::concepts-language
+  (ds/spec
+   {:name ::concepts-language
+    :spec (sp/coll-of ::concept-language )}))
+
+(def concepts-spec-sni-level-code ::concepts-language)
+
 
 
 
@@ -523,91 +563,104 @@
 
 
 (def taxonomy-extra-attributes
+  (sort-by :endpoint-name
+           [
+            {:endpoint-name "driving-licence"
+             :extra-attributes [{:query-field "driving-licence-code-2013"
+                                 :where-field :concept.external-standard/driving-licence-code-2013
+                                 :pull-expression :concept.external-standard/driving-licence-code-2013
+                                 }
 
-  [
-   {:endpoint-name "driving-licence"
-    :extra-attributes [{:query-field "driving-licence-code-2013"
-                        :where-field :concept.external-standard/driving-licence-code-2013
-                        :pull-expression :concept.external-standard/driving-licence-code-2013
-                        }
+                                {:pull-expression {:concept.implicit-driving-licences [:concept/id
+                                                                                       :concept.external-standard/driving-licence-code-2013]}
 
-                       {:pull-expression {:concept.implicit-driving-licences [:concept/id
-                                                                            :concept.external-standard/driving-licence-code-2013]}
+                                 }
+                                ]
+             }
 
-                        }
-                       ]
-    }
+            {:endpoint-name "ssyk"
+             :extra-attributes [{:query-field "ssyk-2012"
+                                 :where-field :concept.external-standard/ssyk-2012
+                                 :pull-expression :concept.external-standard/ssyk-2012
+                                 }]}
 
-   {:endpoint-name "ssyk"
-    :extra-attributes [{:query-field "ssyk-2012"
-                        :where-field :concept.external-standard/ssyk-2012
-                        :pull-expression :concept.external-standard/ssyk-2012
-                        }]}
+            {:endpoint-name "employment-duration"
+             :extra-attributes [{:query-field "eures-code-2014"
+                                 :where-field :concept.external-standard/eures-code-2014
+                                 :pull-expression :concept.external-standard/eures-code-2014
+                                 }]
+             }
 
-   {:endpoint-name "employment-duration"
-    :extra-attributes [{:query-field "eures-code-2014"
-                        :where-field :concept.external-standard/eures-code-2014
-                        :pull-expression :concept.external-standard/eures-code-2014
-                        }]
-    }
+            {:endpoint-name "region"
+             :extra-attributes [{:query-field "nuts-level-3-code-2013"
+                                 :where-field :concept.external-standard/nuts-level-3-code-2013
+                                 :pull-expression :concept.external-standard/nuts-level-3-code-2013
+                                 }
 
-   {:endpoint-name "region"
-    :extra-attributes [{:query-field "nuts-level-3-code-2013"
-                        :where-field :concept.external-standard/nuts-level-3-code-2013
-                        :pull-expression :concept.external-standard/nuts-level-3-code-2013
-                        }
+                                {:query-field "national-nuts-level-3-code-2019"
+                                 :where-field :concept.external-standard/national-nuts-level-3-code-2019
+                                 :pull-expression :concept.external-standard/national-nuts-level-3-code-2019
+                                 }
+                                ]
+             }
 
-                       {:query-field "national-nuts-level-3-code-2019"
-                        :where-field :concept.external-standard/national-nuts-level-3-code-2019
-                        :pull-expression :concept.external-standard/national-nuts-level-3-code-2019
-                        }
-                       ]
-    }
+            {:endpoint-name "country"
+             :extra-attributes [
+                                {:query-field "iso-3166-1-alpha-2-2013"
+                                 :where-field :concept.external-standard/iso-3166-1-alpha-2-2013
+                                 :pull-expression :concept.external-standard/iso-3166-1-alpha-2-2013
+                                 }
 
-   {:endpoint-name "country"
-    :extra-attributes [
-                       {:query-field "iso-3166-1-alpha-2-2013"
-                        :where-field :concept.external-standard/iso-3166-1-alpha-2-2013
-                        :pull-expression :concept.external-standard/iso-3166-1-alpha-2-2013
-                        }
+                                {:query-field "iso-3166-1-alpha-3-2013"
+                                 :where-field :concept.external-standard/iso-3166-1-alpha-3-2013
+                                 :pull-expression :concept.external-standard/iso-3166-1-alpha-3-2013}
+                                ]
+             }
 
-                       {:query-field "iso-3166-1-alpha-3-2013"
-                        :where-field :concept.external-standard/iso-3166-1-alpha-3-2013
-                        :pull-expression :concept.external-standard/iso-3166-1-alpha-3-2013}
-                       ]
-    }
+            {:endpoint-name "isco"
+             :extra-attributes [{:query-field "isco-08"
+                                 :where-field :concept.external-standard/isco-08
+                                 :pull-expression :concept.external-standard/isco-08
+                                 }]
+             }
 
-   {:endpoint-name "isco"
-    :extra-attributes [{:query-field "isco-08"
-                        :where-field :concept.external-standard/isco-08
-                        :pull-expression :concept.external-standard/isco-08
-                        }]
-    }
-
-   {:endpoint-name "sun-education-field"
-    :extra-attributes [{:query-field "sun-education-field-code-2020"
-                        :where-field :concept.external-standard/sun-education-field-code-2020
-                        :pull-expression :concept.external-standard/sun-education-field-code-2020
-                        }]
-    }
-
-
-   {:endpoint-name "sun-education-level"
-    :extra-attributes [{:query-field "sun-education-level-code-2020"
-                        :where-field  :concept.external-standard/sun-education-level-code-2020
-                        :pull-expression :concept.external-standard/sun-education-level-code-2020
-                        }]
-    }
+            {:endpoint-name "sun-education-field"
+             :extra-attributes [{:query-field "sun-education-field-code-2020"
+                                 :where-field :concept.external-standard/sun-education-field-code-2020
+                                 :pull-expression :concept.external-standard/sun-education-field-code-2020
+                                 }]
+             }
 
 
-   {:endpoint-name "sni-level"
-    :extra-attributes [{:query-field "sni-level-code-2007"
-                        :where-field :concept.external-standard/sni-level-code-2007
-                        :pull-expression :concept.external-standard/sni-level-code-2007
-                        }]
-    }
+            {:endpoint-name "sun-education-level"
+             :extra-attributes [{:query-field "sun-education-level-code-2020"
+                                 :where-field  :concept.external-standard/sun-education-level-code-2020
+                                 :pull-expression :concept.external-standard/sun-education-level-code-2020
+                                 }]
+             }
 
-   ])
+
+            {:endpoint-name "sni-level"
+             :extra-attributes [{:query-field "sni-level-code-2007"
+                                 :where-field :concept.external-standard/sni-level-code-2007
+                                 :pull-expression :concept.external-standard/sni-level-code-2007
+                                 }]
+             }
+
+            {:endpoint-name "language"
+             :extra-attributes [{:query-field "iso-639-3-alpha-2-2007"
+                                 :where-field :concept.external-standard/iso-639-3-alpha-2-2007
+                                 :pull-expression :concept.external-standard/iso-639-3-alpha-2-2007
+                                 }
+
+                                {:query-field "iso-639-3-alpha-3-2007"
+                                 :where-field :concept.external-standard/iso-639-3-alpha-3-2007
+                                 :pull-expression :concept.external-standard/iso-639-3-alpha-3-2007
+                                 }
+                                ]
+             }
+
+            ]))
 
 
 
@@ -621,9 +674,7 @@
 
 
 (def detailed-enpoint-query-base
-
   {
-
    (ds/opt :id) (par string? "ID of concept")
    (ds/opt :preferred-label) (par string? "Textual name of concept")
    (ds/opt :type) (par string? "Restrict to concept type"),
