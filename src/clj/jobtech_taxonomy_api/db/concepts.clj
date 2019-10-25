@@ -283,7 +283,7 @@
       [false nil]
       (let [[result new-concept] (assert-concept-part type desc preferred-label)
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
-        [result timestamp (api-util/rename-concept-keys-for-api new-concept)]))))
+        [result timestamp  new-concept]))))
 
 
 (comment

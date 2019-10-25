@@ -332,7 +332,7 @@ Like replaced-by will return nil."
                :definition definition
                :preferred-label preferred-label
                :deprecated deprecated
-               :replaced-by (map u/transform-replaced-by replaced-by)
+               :replaced-by replaced-by
                }
      }
     )
