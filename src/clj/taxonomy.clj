@@ -194,54 +194,54 @@
 ;; isco-08
 (sp/def ::isco-08 (st/spec string?))
 
-(sp/def ::concept-without-replace-isco-08
+(sp/def ::concept-without-replace-isco
   (st/spec
-   {:name ::concept-without-replace-isco-08
+   {:name ::concept-without-replace-isco
     :spec (sp/keys :req [::id ::isco-08 ::type]
                    :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
 
- (sp/def ::replacedBy-isco-08
+ (sp/def ::replacedBy-isco
    (ds/spec
-    {:name ::replacedBy-isco-08
-     :spec (sp/coll-of ::concept-without-replace-isco-08 )}))
+    {:name ::replacedBy-isco
+     :spec (sp/coll-of ::concept-without-replace-isco)}))
 
- (sp/def ::concept-with-replace-isco-08
+ (sp/def ::concept-with-replace-isco
    (ds/spec
-    {:name ::concept-with-replace-isco-08
+    {:name ::concept-with-replace-isco
      :spec (sp/keys :req [::id ::type ::isco-08 ::preferredLabel]
-                    :opt [::definition ::deprecated ::replacedBy-isco-08 ::concept-relations])}))
+                    :opt [::definition ::deprecated ::replacedBy-isco ::concept-relations])}))
 
  (sp/def ::concepts-isco
    (ds/spec
-    {:name ::concepts-isco-08
-     :spec (sp/coll-of ::concept-with-replace-isco-08 )}))
+    {:name ::concepts-isco
+     :spec (sp/coll-of ::concept-with-replace-isco )}))
 
  (def concepts-spec-isco-08 ::concepts-isco)
 
 ;; education-field-code-2020
-(sp/def ::education-field-code-2020 (st/spec string?))
+(sp/def ::sun-education-field-code-2020 (st/spec string?))
 
-(sp/def ::concept-without-replace-sun-education-field-code-2020
+(sp/def ::concept-without-replace-sun-education-field
   (st/spec
-   {:name ::concept-without-replace-sun-education-field-code-2020
-    :spec (sp/keys :req [::id ::education-field-code-2020 ::type]
+   {:name ::concept-without-replace-sun-education-field
+    :spec (sp/keys :req [::id ::sun-education-field-code-2020 ::type]
                    :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
 
- (sp/def ::replacedBy-sun-education-field-code-2020
+ (sp/def ::replacedBy-sun-education-field
    (ds/spec
-    {:name ::replacedBy-sun-education-field-code-2020
-     :spec (sp/coll-of ::concept-without-replace-sun-education-field-code-2020 )}))
+    {:name ::replacedBy-sun-education-field
+     :spec (sp/coll-of ::concept-without-replace-sun-education-field )}))
 
- (sp/def ::concept-with-replace-sun-education-field-code-2020
+ (sp/def ::concept-with-replace-sun-education-field
    (ds/spec
-    {:name ::concept-with-replace-sun-education-field-code-2020
-     :spec (sp/keys :req [::id ::type ::education-field-code-2020 ::preferredLabel]
-                    :opt [::definition ::deprecated ::replacedBy-sun-education-field-code-2020 ::concept-relations])}))
+    {:name ::concept-with-replace-sun-education-field
+     :spec (sp/keys :req [::id ::type ::sun-education-field-code-2020 ::preferredLabel]
+                    :opt [::definition ::deprecated ::replacedBy-sun-education-field ::concept-relations])}))
 
  (sp/def ::concepts-sun-education-field
    (ds/spec
-    {:name ::concepts-sun-education-field-code-2020
-     :spec (sp/coll-of ::concept-with-replace-sun-education-field-code-2020 )}))
+    {:name ::concepts-sun-education-field
+     :spec (sp/coll-of ::concept-with-replace-sun-education-field )}))
 
  (def concepts-spec-sun-education-field-code-2020 ::concepts-sun-education-field)
 
@@ -273,29 +273,29 @@
  (def concepts-spec-sun-education-level-code-2020 ::concepts-sun-education-level)
 
 ;; sni-level-code
-(sp/def ::sni-level-code (st/spec string?))
+(sp/def ::sni-level-code-2007 (st/spec string?))
 
-(sp/def ::concept-without-replace-sni-level-code
+(sp/def ::concept-without-replace-sni-level
   (st/spec
-   {:name ::concept-without-replace-sni-level-code
-    :spec (sp/keys :req [::id ::sni-level-code ::type]
+   {:name ::concept-without-replace-sni-level
+    :spec (sp/keys :req [::id ::sni-level-code-2007 ::type]
                    :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
 
- (sp/def ::replacedBy-sni-level-code
+ (sp/def ::replacedBy-sni-level
    (ds/spec
-    {:name ::replacedBy-sni-level-code
-     :spec (sp/coll-of ::concept-without-replace-sni-level-code )}))
+    {:name ::replacedBy-sni-level
+     :spec (sp/coll-of ::concept-without-replace-sni-level )}))
 
- (sp/def ::concept-with-replace-sni-level-code
+ (sp/def ::concept-with-replace-sni-level
    (ds/spec
-    {:name ::concept-with-replace-sni-level-code
-     :spec (sp/keys :req [::id ::type ::sni-level-code ::preferredLabel]
-                    :opt [::definition ::deprecated ::replacedBy-sni-level-code ::concept-relations])}))
+    {:name ::concept-with-replace-sni-level
+     :spec (sp/keys :req [::id ::type ::sni-level-code-2007 ::preferredLabel]
+                    :opt [::definition ::deprecated ::replacedBy-sni-level ::concept-relations])}))
 
  (sp/def ::concepts-sni-level
    (ds/spec
-    {:name ::concepts-sni-level-code
-     :spec (sp/coll-of ::concept-with-replace-sni-level-code )}))
+    {:name ::concepts-sni-level
+     :spec (sp/coll-of ::concept-with-replace-sni-level )}))
 
  (def concepts-spec-sni-level-code ::concepts-sni-level)
 
