@@ -258,7 +258,7 @@
    :preferred-label s/Str
    (s/optional-key :relations) number-of-relations-schema
    (s/optional-key :deprecated) s/Bool
-   (s/optional-key :replacedBy)  [replaced-by-concept-schema]
+   (s/optional-key :replaced-by)  [replaced-by-concept-schema]
    }
   )
 

@@ -14,10 +14,10 @@
 
 
 (defn rename-concept-keys-for-api [concept]
-  (let [renamed-concept (set/rename-keys concept {:concept/preferred-label :preferred-label, :concept/id :id, :concept/definition :definition, :concept/type :type :concept/deprecated :deprecated :concept/replaced-by :replacedBy})]
+  (let [renamed-concept (set/rename-keys concept {:concept/preferred-label :preferred-label, :concept/id :id, :concept/definition :definition, :concept/type :type :concept/deprecated :deprecated :concept/replaced-by :replaced-by})]
 
-    (if (:replacedBy renamed-concept)
-      (update renamed-concept :replacedBy #(map transform-replaced-by %))
+    (if (:replaced-by renamed-concept)
+      (update renamed-concept :replaced-by #(map transform-replaced-by %))
       renamed-concept
       )
     )

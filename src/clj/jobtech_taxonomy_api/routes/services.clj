@@ -30,7 +30,7 @@
 
 ;; Status:
 ;;   - adjust tests
-;;   - fixa replacedBy-modell i /changes, /replaced-by-changes, /search, /private/concept
+;;   - fixa replaced-by-modell i /changes, /replaced-by-changes, /search, /private/concept
 
 
 (defn log-info [message]
