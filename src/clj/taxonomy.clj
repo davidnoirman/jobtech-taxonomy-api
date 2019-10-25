@@ -79,16 +79,16 @@
   (ds/spec
    {:name ::replaced-by-ssyk    :spec (sp/coll-of ::concept-without-replace-ssyk )}))
 
-(sp/def ::concept-with-replace-ssyk
+(sp/def ::concept-ssyk
   (ds/spec
-   {:name ::concept-with-replace-ssyk
+   {:name ::concept-ssyk
     :spec (sp/keys :req [::id ::type ::ssyk-2012 ::preferred-label]
                    :opt [::definition ::deprecated ::replaced-by-ssyk ::concept-relations])}))
 
 (sp/def ::concepts-ssyk
   (ds/spec
    {:name ::concepts-ssyk
-    :spec (sp/coll-of ::concept-with-replace-ssyk )}))
+    :spec (sp/coll-of ::concept-ssyk )}))
 
 (def concepts-spec-ssyk-2012 ::concepts-ssyk)
 
@@ -106,16 +106,16 @@
     {:name ::replaced-by-employment-duration
      :spec (sp/coll-of ::concept-without-replace-employment-duration )}))
 
-(sp/def ::concept-with-replace-employment-duration
+(sp/def ::concept-employment-duration
    (ds/spec
-    {:name ::concept-with-replace-employment-duration
+    {:name ::concept-employment-duration
      :spec (sp/keys :req [::id ::type ::eures-code-2014 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-employment-duration ::concept-relations])}))
 
 (sp/def ::concepts-employment-duration
    (ds/spec
     {:name ::concepts-employment-duration
-     :spec (sp/coll-of ::concept-with-replace-employment-duration)}))
+     :spec (sp/coll-of ::concept-employment-duration)}))
 
 (def concepts-spec-eures-code ::concepts-employment-duration)
 
@@ -136,9 +136,9 @@
     {:name ::replaced-by-region
      :spec (sp/coll-of ::concept-without-replace-region )}))
 
- (sp/def ::concept-with-replace-region
+ (sp/def ::concept-region
    (ds/spec
-    {:name ::concept-with-replace-region
+    {:name ::concept-region
      :spec (sp/keys :req [::id ::type ::nuts-level-3-code-2013 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-region ::concept-relations
                           ::national-nuts-level-3-code-2019
@@ -147,7 +147,7 @@
  (sp/def ::concepts-region
    (ds/spec
     {:name ::concepts-region
-     :spec (sp/coll-of ::concept-with-replace-region)}))
+     :spec (sp/coll-of ::concept-region)}))
 
  (def concepts-spec-nuts-level-3-code ::concepts-region)
 
@@ -166,16 +166,16 @@
     {:name ::replaced-by-country
      :spec (sp/coll-of ::concept-without-replace-country)}))
 
- (sp/def ::concept-with-replace-country
+ (sp/def ::concept-country
    (ds/spec
-    {:name ::concept-with-replace-country
+    {:name ::concept-country
      :spec (sp/keys :req [::id ::type  ::iso-3166-1-alpha-3-2013  ::iso-3166-1-alpha-2-2013 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-country ::concept-relations])}))
 
  (sp/def ::concepts-country
    (ds/spec
     {:name ::concepts-country
-     :spec (sp/coll-of ::concept-with-replace-country)}))
+     :spec (sp/coll-of ::concept-country)}))
 
  (def concepts-spec-country-code ::concepts-country)
 
@@ -192,16 +192,16 @@
     {:name ::replaced-by-id
      :spec (sp/coll-of ::concept-without-replace-id )}))
 
- (sp/def ::concept-with-replace-id
+ (sp/def ::concept-id
    (ds/spec
-    {:name ::concept-with-replace-id
+    {:name ::concept-id
      :spec (sp/keys :req [::id ::type ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-id ::concept-relations])}))
 
  (sp/def ::concepts-id
    (ds/spec
     {:name ::concepts-id
-     :spec (sp/coll-of ::concept-with-replace-id )}))
+     :spec (sp/coll-of ::concept-id )}))
 
  (def concepts-spec-id ::concepts-id)
 
@@ -219,16 +219,16 @@
     {:name ::replaced-by-isco
      :spec (sp/coll-of ::concept-without-replace-isco)}))
 
- (sp/def ::concept-with-replace-isco
+ (sp/def ::concept-isco
    (ds/spec
-    {:name ::concept-with-replace-isco
+    {:name ::concept-isco
      :spec (sp/keys :req [::id ::type ::isco-08 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-isco ::concept-relations])}))
 
  (sp/def ::concepts-isco
    (ds/spec
     {:name ::concepts-isco
-     :spec (sp/coll-of ::concept-with-replace-isco )}))
+     :spec (sp/coll-of ::concept-isco )}))
 
  (def concepts-spec-isco-08 ::concepts-isco)
 
@@ -246,16 +246,16 @@
     {:name ::replaced-by-sun-education-field
      :spec (sp/coll-of ::concept-without-replace-sun-education-field )}))
 
- (sp/def ::concept-with-replace-sun-education-field
+ (sp/def ::concept-sun-education-field
    (ds/spec
-    {:name ::concept-with-replace-sun-education-field
+    {:name ::concept-sun-education-field
      :spec (sp/keys :req [::id ::type ::sun-education-field-code-2020 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-sun-education-field ::concept-relations])}))
 
  (sp/def ::concepts-sun-education-field
    (ds/spec
     {:name ::concepts-sun-education-field
-     :spec (sp/coll-of ::concept-with-replace-sun-education-field )}))
+     :spec (sp/coll-of ::concept-sun-education-field )}))
 
  (def concepts-spec-sun-education-field-code-2020 ::concepts-sun-education-field)
 
@@ -273,16 +273,16 @@
     {:name ::replaced-by-sun-education-level-code-2020
      :spec (sp/coll-of ::concept-without-replace-sun-education-level-code-2020 )}))
 
- (sp/def ::concept-with-replace-sun-education-level-code-2020
+ (sp/def ::concept-sun-education-level-code-2020
    (ds/spec
-    {:name ::concept-with-replace-sun-education-level-code-2020
+    {:name ::concept-sun-education-level-code-2020
      :spec (sp/keys :req [::id ::type ::sun-education-level-code-2020 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-sun-education-level-code-2020 ::concept-relations])}))
 
  (sp/def ::concepts-sun-education-level
    (ds/spec
     {:name ::concepts-sun-education-level-code-2020
-     :spec (sp/coll-of ::concept-with-replace-sun-education-level-code-2020 )}))
+     :spec (sp/coll-of ::concept-sun-education-level-code-2020 )}))
 
  (def concepts-spec-sun-education-level-code-2020 ::concepts-sun-education-level)
 
@@ -300,16 +300,16 @@
     {:name ::replaced-by-sni-level
      :spec (sp/coll-of ::concept-without-replace-sni-level )}))
 
- (sp/def ::concept-with-replace-sni-level
+ (sp/def ::concept-sni-level
    (ds/spec
-    {:name ::concept-with-replace-sni-level
+    {:name ::concept-sni-level
      :spec (sp/keys :req [::id ::type ::sni-level-code-2007 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-sni-level ::concept-relations])}))
 
  (sp/def ::concepts-sni-level
    (ds/spec
     {:name ::concepts-sni-level
-     :spec (sp/coll-of ::concept-with-replace-sni-level )}))
+     :spec (sp/coll-of ::concept-sni-level )}))
 
  (def concepts-spec-sni-level-code ::concepts-sni-level)
 
@@ -503,16 +503,16 @@
    {:name ::replaced-by-driving-licence
     :spec (sp/coll-of ::concept-without-replace-driving-licence )}))
 
-(sp/def ::concept-with-replace-driving-licence
+(sp/def ::concept-driving-licence
   (ds/spec
-   {:name ::concept-with-replace-driving-licence
+   {:name ::concept-driving-licence
     :spec (sp/keys :req [::id ::type ::driving-licence-code-2013 ::preferred-label]
                    :opt [::definition ::deprecated ::replaced-by-driving-licence ::concept-relations])}))
 
 (sp/def ::concepts-driving-licence
   (ds/spec
    {:name ::concepts-driving-licence
-    :spec (sp/coll-of ::concept-with-replace-driving-licence )}))
+    :spec (sp/coll-of ::concept-driving-licence )}))
 
 (def concepts-spec-driving-licence-code ::concepts-driving-licence)
 
