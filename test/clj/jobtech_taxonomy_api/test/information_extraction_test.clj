@@ -11,7 +11,7 @@
 
 (defn comp-cpt
   [el1 el2]
-  (compare (:preferredLabel el1) (:preferredLabel el2)))
+  (compare (:preferred-label el1) (:preferred-label el2)))
 
 (test/deftest ^:xyz information-extraction-test0
   (test/testing ""
@@ -19,7 +19,7 @@
                                 "skill" "javaprogrammering" "javaprogrammering")
           new-id (get ent :id)
           analysis (sort comp-cpt (inf-ext/parse-text "java"))
-          correct (sort comp-cpt [{:id new-id, :type "skill", :preferredLabel "javaprogrammering"}])]
+          correct (sort comp-cpt [{:id new-id, :type "skill", :preferred-label "javaprogrammering"}])]
       (test/is (= analysis correct)))))
 
 (test/deftest ^:xyz2 information-extraction-test1
@@ -31,6 +31,6 @@
           new-id-javaprogrammering (get ent-javaprogrammering :id)
           new-id-kodprogrammering (get ent-kodprogrammering :id)
           analysis (sort comp-cpt (inf-ext/parse-text-experiment-with-text-compound-splitting "programmering"))
-          correct (sort comp-cpt [{:id new-id-javaprogrammering, :preferredLabel "javaprogrammering", :type "skill"}
-                                  {:id new-id-kodprogrammering, :preferredLabel "kodprogrammering", :type "skill"}])]
+          correct (sort comp-cpt [{:id new-id-javaprogrammering, :preferred-label "javaprogrammering", :type "skill"}
+                                  {:id new-id-kodprogrammering, :preferred-label "kodprogrammering", :type "skill"}])]
       (test/is (= analysis correct)))))

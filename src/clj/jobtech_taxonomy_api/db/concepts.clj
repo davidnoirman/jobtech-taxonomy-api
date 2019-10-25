@@ -237,7 +237,7 @@
   {:id s/Str
    :type s/Str
    :definition s/Str
-   :preferredLabel s/Str
+   :preferred-label s/Str
    (s/optional-key :deprecated) s/Bool
    }
   )
@@ -255,7 +255,7 @@
   {:id s/Str
    :type s/Str
    :definition s/Str
-   :preferredLabel s/Str
+   :preferred-label s/Str
    (s/optional-key :relations) number-of-relations-schema
    (s/optional-key :deprecated) s/Bool
    (s/optional-key :replacedBy)  [replaced-by-concept-schema]

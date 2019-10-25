@@ -32,9 +32,9 @@
 (sp/def ::id (st/spec string?))
 (sp/def ::type (st/spec string?))
 (sp/def ::deprecated (st/spec boolean?))
-(sp/def ::preferredLabel (st/spec string?))
+(sp/def ::preferred-label (st/spec string?))
 (sp/def ::definition (st/spec string?))
-(sp/def ::eventType (st/spec string?))
+(sp/def ::event-type (st/spec string?))
 (sp/def ::version (st/spec int?))
 
 (sp/def ::broader (st/spec int?))
@@ -50,16 +50,30 @@
    )
   )
 
+
+;; concept
+;; ssyk-concept
+;; ssyk-shallow-concept
+
+
+
+
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; ssyk-2012
 (sp/def ::ssyk-2012 (st/spec string?))
 
+
+
 (sp/def ::concept-without-replace-ssyk-2012
- (st/spec
-  {:name ::concept-without-replace-ssyk-2012
-   :spec (sp/keys :req [::id ::type ::ssyk-2012]
-                  :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+  (st/spec
+   {:name ::concept-without-replace-ssyk-2012
+    :spec (sp/keys :req [::id ::type ::ssyk-2012]
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
 (sp/def ::replacedBy-ssyk-2012
   (ds/spec
@@ -68,7 +82,7 @@
 (sp/def ::concept-with-replace-ssyk-2012
   (ds/spec
    {:name ::concept-with-replace-ssyk-2012
-    :spec (sp/keys :req [::id ::type ::ssyk-2012 ::preferredLabel]
+    :spec (sp/keys :req [::id ::type ::ssyk-2012 ::preferred-label]
                    :opt [::definition ::deprecated ::replacedBy-ssyk-2012 ::concept-relations])}))
 
 (sp/def ::concepts-ssyk
@@ -85,7 +99,7 @@
   (st/spec
    {:name ::concept-without-replace-employment-duration
     :spec (sp/keys :req [::id ::type ::eures-code-2014]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
 (sp/def ::replacedBy-employment-duration
    (ds/spec
@@ -95,7 +109,7 @@
 (sp/def ::concept-with-replace-employment-duration
    (ds/spec
     {:name ::concept-with-replace-employment-duration
-     :spec (sp/keys :req [::id ::type ::eures-code-2014 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::eures-code-2014 ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-employment-duration ::concept-relations])}))
 
 (sp/def ::concepts-employment-duration
@@ -115,7 +129,7 @@
   (st/spec
    {:name ::concept-without-replace-region
     :spec (sp/keys :req [::id ::nuts-level-3-code-2013 ::type]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations ::national-nuts-level-3-code-2019])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations ::national-nuts-level-3-code-2019])}))
 
  (sp/def ::replacedBy-region
    (ds/spec
@@ -125,7 +139,7 @@
  (sp/def ::concept-with-replace-region
    (ds/spec
     {:name ::concept-with-replace-region
-     :spec (sp/keys :req [::id ::type ::nuts-level-3-code-2013 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::nuts-level-3-code-2013 ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-region ::concept-relations
                           ::national-nuts-level-3-code-2019
                           ])}))
@@ -145,7 +159,7 @@
   (st/spec
    {:name ::concept-without-replace-country
     :spec (sp/keys :req [::id  ::iso-3166-1-alpha-3-2013  ::iso-3166-1-alpha-2-2013 ::type]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replacedBy-country
    (ds/spec
@@ -155,7 +169,7 @@
  (sp/def ::concept-with-replace-country
    (ds/spec
     {:name ::concept-with-replace-country
-     :spec (sp/keys :req [::id ::type  ::iso-3166-1-alpha-3-2013  ::iso-3166-1-alpha-2-2013 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type  ::iso-3166-1-alpha-3-2013  ::iso-3166-1-alpha-2-2013 ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-country ::concept-relations])}))
 
  (sp/def ::concepts-country
@@ -171,7 +185,7 @@
   (st/spec
    {:name ::concept-without-replace-id
     :spec (sp/keys :req [::id ::type]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replacedBy-id
    (ds/spec
@@ -181,7 +195,7 @@
  (sp/def ::concept-with-replace-id
    (ds/spec
     {:name ::concept-with-replace-id
-     :spec (sp/keys :req [::id ::type ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-id ::concept-relations])}))
 
  (sp/def ::concepts-id
@@ -198,7 +212,7 @@
   (st/spec
    {:name ::concept-without-replace-isco
     :spec (sp/keys :req [::id ::isco-08 ::type]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replacedBy-isco
    (ds/spec
@@ -208,7 +222,7 @@
  (sp/def ::concept-with-replace-isco
    (ds/spec
     {:name ::concept-with-replace-isco
-     :spec (sp/keys :req [::id ::type ::isco-08 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::isco-08 ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-isco ::concept-relations])}))
 
  (sp/def ::concepts-isco
@@ -225,7 +239,7 @@
   (st/spec
    {:name ::concept-without-replace-sun-education-field
     :spec (sp/keys :req [::id ::sun-education-field-code-2020 ::type]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replacedBy-sun-education-field
    (ds/spec
@@ -235,7 +249,7 @@
  (sp/def ::concept-with-replace-sun-education-field
    (ds/spec
     {:name ::concept-with-replace-sun-education-field
-     :spec (sp/keys :req [::id ::type ::sun-education-field-code-2020 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::sun-education-field-code-2020 ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-sun-education-field ::concept-relations])}))
 
  (sp/def ::concepts-sun-education-field
@@ -252,7 +266,7 @@
   (st/spec
    {:name ::concept-without-replace-sun-education-level-code-2020
     :spec (sp/keys :req [::id ::sun-education-level-code-2020 ::type]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replacedBy-sun-education-level-code-2020
    (ds/spec
@@ -262,7 +276,7 @@
  (sp/def ::concept-with-replace-sun-education-level-code-2020
    (ds/spec
     {:name ::concept-with-replace-sun-education-level-code-2020
-     :spec (sp/keys :req [::id ::type ::sun-education-level-code-2020 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::sun-education-level-code-2020 ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-sun-education-level-code-2020 ::concept-relations])}))
 
  (sp/def ::concepts-sun-education-level
@@ -279,7 +293,7 @@
   (st/spec
    {:name ::concept-without-replace-sni-level
     :spec (sp/keys :req [::id ::sni-level-code-2007 ::type]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replacedBy-sni-level
    (ds/spec
@@ -289,7 +303,7 @@
  (sp/def ::concept-with-replace-sni-level
    (ds/spec
     {:name ::concept-with-replace-sni-level
-     :spec (sp/keys :req [::id ::type ::sni-level-code-2007 ::preferredLabel]
+     :spec (sp/keys :req [::id ::type ::sni-level-code-2007 ::preferred-label]
                     :opt [::definition ::deprecated ::replacedBy-sni-level ::concept-relations])}))
 
  (sp/def ::concepts-sni-level
@@ -326,12 +340,12 @@
   (st/spec
    {:name ::concept
     :spec (sp/keys :req [::id ::type]
-                   :opt [::definition ::deprecated ::preferredLabel])}))
+                   :opt [::definition ::deprecated ::preferred-label])}))
 
 (sp/def ::event
   (ds/spec
    {:name ::event
-    :spec (sp/keys :req [::eventType
+    :spec (sp/keys :req [::event-type
                          ::version
                          ::concept])}))
 
@@ -352,7 +366,7 @@
 (sp/def ::concept-with-replace
   (ds/spec
    {:name ::concept-with-replace
-    :spec (sp/keys :req [::id ::type ::preferredLabel]
+    :spec (sp/keys :req [::id ::type ::preferred-label]
                    :opt [::definition ::deprecated ::replacedBy])}))
 
 (sp/def ::concepts
@@ -367,7 +381,7 @@
 (sp/def ::search-result
   (ds/spec
    {:name ::search-result
-    :spec (sp/keys :req [::id ::type ::preferredLabel])}))
+    :spec (sp/keys :req [::id ::type ::preferred-label])}))
 
 (sp/def ::search-results
   (ds/spec
@@ -449,13 +463,13 @@
 (sp/def :concept/id (st/spec string?))
 (sp/def :concept/type (st/spec string?))
 (sp/def :concept/deprecated (st/spec boolean?))
-(sp/def :concept/preferredLabel (st/spec string?))
+(sp/def :concept/preferred-label (st/spec string?))
 (sp/def :concept/definition (st/spec string?))
 
 (def koncept
   {(ds/req :id) :concept/id
    (ds/req :type) :concept/type
-   (ds/req :preferredLabel) :concept/preferredLabel
+   (ds/req :preferred-label) :concept/preferred-label
    (ds/opt :definition) :concept/definition
    (ds/opt :deprecated) :concept/deprecated
    (ds/opt :replacedBy) koncept-spec
@@ -470,8 +484,9 @@
    )
   )
 
+;; TODO add language
 
-
+;; TODO FIX implicit driving licence spec!!
 
 
 ;; driving-licence
@@ -481,7 +496,7 @@
   (st/spec
    {:name ::concept-without-replace-driving-licence
     :spec (sp/keys :req [::id ::type ::driving-licence-code-2013]
-                   :opt [::definition ::deprecated ::preferredLabel ::concept-relations])}))
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
 (sp/def ::replacedBy-driving-licence
   (ds/spec
@@ -491,7 +506,7 @@
 (sp/def ::concept-with-replace-driving-licence
   (ds/spec
    {:name ::concept-with-replace-driving-licence
-    :spec (sp/keys :req [::id ::type ::driving-licence-code-2013 ::preferredLabel]
+    :spec (sp/keys :req [::id ::type ::driving-licence-code-2013 ::preferred-label]
                    :opt [::definition ::deprecated ::replacedBy-driving-licence ::concept-relations])}))
 
 (sp/def ::concepts-driving-licence
@@ -610,7 +625,7 @@
   {
 
    (ds/opt :id) (par string? "ID of concept")
-   (ds/opt :preferredLabel) (par string? "Textual name of concept")
+   (ds/opt :preferred-label) (par string? "Textual name of concept")
    (ds/opt :type) (par string? "Restrict to concept type"),
    ;;(ds/opt :type) (par #{"ssyk_level_1" "ssyk_level_2" "ssyk_level_3" "ssyk_level_4" } "Restrict to concept type")
    (ds/opt :deprecated) (par boolean? "Restrict to deprecation state")
@@ -639,7 +654,7 @@
 (def test-data-query-map
   {:parameters
    {:query {:id nil
-            :preferredLabel nil
+            :preferred-label nil
             :type nil
             :deprecated nil
             :relation nil
@@ -693,8 +708,8 @@
   (let [query-params (:query (:parameters query-params-map))
     ;    _ (println query-params)
         extra-attributes (:extra-attributes endpoint-meta-data)
-        renamed-query-params (clojure.set/rename-keys query-params {:preferredLabel :preferred-label})
-        renamed-query-params-fixed-related-ids (update renamed-query-params :related-ids vector)
+        ;;    renamed-query-params (clojure.set/rename-keys query-params {:preferred-label :preferred-label})
+        renamed-query-params-fixed-related-ids (update query-params :related-ids vector)
 
 
      ;   _ (println renamed-query-params)

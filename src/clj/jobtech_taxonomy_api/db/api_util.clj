@@ -8,13 +8,13 @@
   (set/rename-keys concept {:concept/id :id
                         :concept/definition :definition
                         :concept/type :type
-                        :concept/preferred-label :preferredLabel
+                        :concept/preferred-label :preferred-label
                         :concept/deprecated :deprecated })
  )
 
 
 (defn rename-concept-keys-for-api [concept]
-  (let [renamed-concept (set/rename-keys concept {:concept/preferred-label :preferredLabel, :concept/id :id, :concept/definition :definition, :concept/type :type :concept/deprecated :deprecated :concept/replaced-by :replacedBy})]
+  (let [renamed-concept (set/rename-keys concept {:concept/preferred-label :preferred-label, :concept/id :id, :concept/definition :definition, :concept/type :type :concept/deprecated :deprecated :concept/replaced-by :replacedBy})]
 
     (if (:replacedBy renamed-concept)
       (update renamed-concept :replacedBy #(map transform-replaced-by %))

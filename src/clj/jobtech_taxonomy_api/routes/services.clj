@@ -113,7 +113,7 @@
      {
       :summary      "Get concepts. Supply at least one search parameter."
       :parameters {:query {(ds/opt :id) (taxonomy/par string? "ID of concept"),
-                           (ds/opt :preferredLabel) (taxonomy/par string? "Textual name of concept"),
+                           (ds/opt :preferred-label) (taxonomy/par string? "Textual name of concept"),
                            (ds/opt :type) (taxonomy/par string? "Restrict to concept type"),
                            (ds/opt :deprecated) (taxonomy/par boolean? "Restrict to deprecation state"),
                            (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type"),
@@ -123,11 +123,11 @@
                            (ds/opt :version) (taxonomy/par int? "Version to use")}}
       :get {:responses {200 {:body types/concepts-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [id preferredLabel type deprecated relation
+            :handler (fn [{{{:keys [id preferred-label type deprecated relation
                                     related-ids offset limit version]} :query} :parameters}]
                        (log/info (str "GET /concepts "
                                       "id:" id
-                                      " preferredLabel:" preferredLabel
+                                      " preferred-label:" preferred-label
                                       " type:" type
                                       " deprecated:" deprecated
                                       " offset:" offset
@@ -135,7 +135,7 @@
                        {:status 200
                         :body (vec (map types/map->nsmap (concepts/find-concepts
                                                           {:id id
-                                                           :preferred-label preferredLabel
+                                                           :preferred-label preferred-label
                                                            :type type
                                                            :deprecated deprecated
                                                            :relation relation
@@ -266,13 +266,13 @@
       :summary      "Assert a new concept."
       :parameters {:query {(ds/opt :type) (taxonomy/par string? "Concept type"),
                            (ds/opt :definition) (taxonomy/par string? "Definition"),
-                           (ds/opt :preferredLabel) (taxonomy/par string? "Preferred label")}}
+                           (ds/opt :preferred-label) (taxonomy/par string? "Preferred label")}}
       :post {:responses {200 {:body types/ok-concept-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [type definition preferredLabel]} :query} :parameters}]
+             :handler (fn [{{{:keys [type definition preferred-label]} :query} :parameters}]
                         (log/info "POST /concept")
-                        (let [[result timestamp new-concept] (concepts/assert-concept type definition preferredLabel)]
+                        (let [[result timestamp new-concept] (concepts/assert-concept type definition preferred-label)]
                           (if result
                             {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]

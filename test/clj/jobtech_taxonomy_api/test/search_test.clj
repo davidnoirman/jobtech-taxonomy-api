@@ -17,4 +17,4 @@
                           :headers [(util/header-auth-user)]
                           :query-params [{:key "q", :val "cykla"}])
           found-concept (first (concept/find-concepts-including-unpublished {:preferred-label "cykla"}))]
-      (test/is (= "cykla" (get found-concept :preferredLabel))))))
+      (test/is (= "cykla" (get found-concept :preferred-label))))))
