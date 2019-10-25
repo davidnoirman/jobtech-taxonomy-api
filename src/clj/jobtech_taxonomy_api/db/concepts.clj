@@ -286,6 +286,7 @@
         [result timestamp  new-concept]))))
 
 
+
 (comment
 
   ;; When we want to get typed data, use the dynamic pattern input

@@ -69,26 +69,26 @@
 
 
 
-(sp/def ::concept-without-replace-ssyk-2012
+(sp/def ::concept-without-replace-ssyk
   (st/spec
-   {:name ::concept-without-replace-ssyk-2012
+   {:name ::concept-without-replace-ssyk
     :spec (sp/keys :req [::id ::type ::ssyk-2012]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
-(sp/def ::replaced-by-ssyk-2012
+(sp/def ::replaced-by-ssyk
   (ds/spec
-   {:name ::replaced-by-ssyk-2012    :spec (sp/coll-of ::concept-without-replace-ssyk-2012 )}))
+   {:name ::replaced-by-ssyk    :spec (sp/coll-of ::concept-without-replace-ssyk )}))
 
-(sp/def ::concept-with-replace-ssyk-2012
+(sp/def ::concept-with-replace-ssyk
   (ds/spec
-   {:name ::concept-with-replace-ssyk-2012
+   {:name ::concept-with-replace-ssyk
     :spec (sp/keys :req [::id ::type ::ssyk-2012 ::preferred-label]
-                   :opt [::definition ::deprecated ::replaced-by-ssyk-2012 ::concept-relations])}))
+                   :opt [::definition ::deprecated ::replaced-by-ssyk ::concept-relations])}))
 
 (sp/def ::concepts-ssyk
   (ds/spec
-   {:name ::concepts-ssyk-2012
-    :spec (sp/coll-of ::concept-with-replace-ssyk-2012 )}))
+   {:name ::concepts-ssyk
+    :spec (sp/coll-of ::concept-with-replace-ssyk )}))
 
 (def concepts-spec-ssyk-2012 ::concepts-ssyk)
 
