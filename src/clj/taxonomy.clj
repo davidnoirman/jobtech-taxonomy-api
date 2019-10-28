@@ -350,16 +350,16 @@
 
 
 ;; /versions
-(sp/def ::ver
+(sp/def ::version-object
   (ds/spec
-   {:name ::ver
+   {:name ::version-object
     :spec {::version int?
            ::timestamp inst?}}))
 
 (sp/def ::versions
   (ds/spec
    {:name ::versions
-    :spec (sp/coll-of ::ver )}))
+    :spec (sp/coll-of ::version-object )}))
 
 (def versions-spec ::versions)
 
