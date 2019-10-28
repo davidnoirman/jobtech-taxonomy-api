@@ -113,13 +113,6 @@
   )
 
 (defn handle-extra-where-attribute [query [key value]]
-  #_(let [attribute-name (str "?" (name key))]
-
-    (-> query (update :in conj attribute-name )
-        (update :args conj value)
-        (update :where conj ['?c key value])
-        ))
-
   (update query :where conj ['?c key value])
   )
 
@@ -303,8 +296,9 @@
 (defn find-concepts
   "Supply version: Use nil as value to get the latest published database."
   [args]
-  {:pre [(every? #(contains? args %) [:version :preferred-label])
-         ]}
+  #_{:pre [(every? #(contains? args %) [:version :preferred-label])
+           ]}
+  (println args) ;; TODO clean println
   (find-concepts-by-db (add-find-concepts-args args)))
 
 ;;"TODO expose this as a private end point for the editor"
@@ -329,7 +323,7 @@
   {:id s/Str
    :type s/Str
    :definition s/Str
-   :preferredLabel s/Str
+   :preferred-label s/Str
    (s/optional-key :deprecated) s/Bool
    }
   )
@@ -347,10 +341,10 @@
   {:id s/Str
    :type s/Str
    :definition s/Str
-   :preferredLabel s/Str
+   :preferred-label s/Str
    (s/optional-key :relations) number-of-relations-schema
    (s/optional-key :deprecated) s/Bool
-   (s/optional-key :replacedBy)  [replaced-by-concept-schema]
+   (s/optional-key :replaced-by)  [replaced-by-concept-schema]
    }
   )
 
@@ -375,7 +369,8 @@
       [false nil]
       (let [[result new-concept] (assert-concept-part type desc preferred-label)
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
-        [result timestamp (api-util/rename-concept-keys-for-api new-concept)]))))
+        [result timestamp  new-concept]))))
+
 
 (comment
 

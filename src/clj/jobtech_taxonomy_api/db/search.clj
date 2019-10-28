@@ -80,7 +80,7 @@
   "The response schema for the query below."
   [{:id s/Str
     :type s/Str
-    (s/optional-key :preferredLabel) s/Str}
+    (s/optional-key :preferred-label) s/Str}
    ])
 
 

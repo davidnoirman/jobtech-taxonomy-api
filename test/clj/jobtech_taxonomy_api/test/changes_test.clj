@@ -20,4 +20,4 @@
           found-concept (first (db-concepts/find-concepts-including-unpublished {:preferred-label "cykla" :type "skill" :deprecated false :offset 0 :limit 1}))]
       (test/is (= "CREATED" (:eventType an-event)))
 
-      (test/is (= "cykla" (get found-concept :preferredLabel))))))
+      (test/is (= "cykla" (get found-concept :preferred-label))))))

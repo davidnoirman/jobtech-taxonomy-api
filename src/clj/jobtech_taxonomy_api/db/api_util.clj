@@ -4,20 +4,20 @@
    )
   )
 
-(defn transform-replaced-by [concept]
+#_(defn transform-replaced-by [concept]
   (set/rename-keys concept {:concept/id :id
                         :concept/definition :definition
                         :concept/type :type
-                        :concept/preferred-label :preferredLabel
+                        :concept/preferred-label :preferred-label
                         :concept/deprecated :deprecated })
  )
 
 
-(defn rename-concept-keys-for-api [concept]
-  (let [renamed-concept (set/rename-keys concept {:concept/preferred-label :preferredLabel, :concept/id :id, :concept/definition :definition, :concept/type :type :concept/deprecated :deprecated :concept/replaced-by :replacedBy})]
+#_(defn rename-concept-keys-for-api [concept]
+  (let [renamed-concept (set/rename-keys concept {:concept/preferred-label :preferred-label, :concept/id :id, :concept/definition :definition, :concept/type :type :concept/deprecated :deprecated :concept/replaced-by :replaced-by})]
 
-    (if (:replacedBy renamed-concept)
-      (update renamed-concept :replacedBy #(map transform-replaced-by %))
+    (if (:replaced-by renamed-concept)
+      (update renamed-concept :replaced-by #(map transform-replaced-by %))
       renamed-concept
       )
     )
@@ -35,14 +35,14 @@
 (defn parse-find-concept-datomic-result [result]
   (->> result
        (map move-relations-into-concept)
-       (map rename-concept-keys-for-api)
+       ;;(map rename-concept-keys-for-api)
        )
   )
 
 (defn parse-seach-concept-datomic-result [result]
   (->> result
        (map first)
-       (map rename-concept-keys-for-api)
+       ;;(map rename-concept-keys-for-api)
        )
   )
 
