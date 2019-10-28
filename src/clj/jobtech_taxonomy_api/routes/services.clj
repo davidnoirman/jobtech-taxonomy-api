@@ -220,7 +220,7 @@
 
    ["/suggesters"
     {:swagger {:tags ["Suggesters"]
-               :description "Help end-users to find relevant concepts from the taxonomy"
+
                }
 
      :middleware [cors/cors auth]}
@@ -228,6 +228,7 @@
     ["/autocomplete"
      {
       :summary      "Autocomplete from query string"
+      :description "Help end-users to find relevant concepts from the taxonomy"
       :parameters {:query {:query-string (taxonomy/par string? "String to search for"),
                            (ds/opt :type) (taxonomy/par string? "Type to search for"),
                            (ds/opt :relation) (taxonomy/par string? "Relation to search for"),
@@ -253,7 +254,8 @@
 
     ["/parse-text"
      {
-      :summary "Finds all concepts in a text."
+      :summary "This end point is in Alpha. Finds all concepts in a text."
+      :description "This end point is in Alpha. Help end-users to find relevant concepts from the taxonomy"
       :parameters {:query {:text (taxonomy/par string? "Substring to search for")}}
       :post {:responses {200 {:body types/parse-text-spec}
                          500 {:body types/error-spec}}
