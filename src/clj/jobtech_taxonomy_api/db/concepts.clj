@@ -120,6 +120,8 @@
   (reduce handle-extra-where-attribute query extra-where-attributes)
   )
 
+(defn ignore-case [string]
+  (str "(?i:" string  ")"))
 
 (defn fetch-concepts [{:keys [id preferred-label type deprecated relation related-ids offset limit db pull-pattern extra-where-attributes]}]
   {:pre [pull-pattern]}
@@ -139,9 +141,10 @@
         )
 
     preferred-label
-    (-> (update :in conj '?preferred-label)
-        (update :args conj preferred-label)
+    (-> (update :in conj '?case-insensitive-preferred-label)
+        (update :args conj (ignore-case preferred-label))
         (update :where conj '[?c :concept/preferred-label ?preferred-label])
+        (update :where conj '[(.matches ^String ?preferred-label ?case-insensitive-preferred-label)])
         )
 
     type
