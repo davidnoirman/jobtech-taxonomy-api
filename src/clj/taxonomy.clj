@@ -319,8 +319,8 @@
 (sp/def ::concept-language-shallow
   (st/spec
    {:name ::concept-language-shallow
-    :spec (sp/keys :req [::id ::iso-639-3-alpha-2-2007 ::iso-639-3-alpha-3-2007 ::type ::preferred-label]
-                   :opt [::definition ::deprecated  ::concept-relations])}))
+    :spec (sp/keys :req [::id  ::iso-639-3-alpha-3-2007 ::type ::preferred-label]
+                   :opt [::definition ::deprecated  ::concept-relations ::iso-639-3-alpha-2-2007])}))
 
 (sp/def ::replaced-by-language
   (ds/spec
@@ -330,8 +330,8 @@
 (sp/def ::concept-language
   (ds/spec
    {:name ::concept-language
-    :spec (sp/keys :req [::id ::type  ::iso-639-3-alpha-2-2007 ::iso-639-3-alpha-3-2007 ::preferred-label]
-                   :opt [::definition ::deprecated ::replaced-by-language ::concept-relations])}))
+    :spec (sp/keys :req [::id ::type  ::iso-639-3-alpha-3-2007 ::preferred-label]
+                   :opt [::definition ::deprecated ::replaced-by-language ::concept-relations ::iso-639-3-alpha-2-2007])}))
 
 (sp/def ::concepts-language
   (ds/spec

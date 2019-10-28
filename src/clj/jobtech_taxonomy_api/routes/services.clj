@@ -237,10 +237,11 @@
                            (ds/opt :version) (taxonomy/par int? "Version to search for")}}
       :get {:responses {200 {:body types/search-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [q type relation relation-ids offset limit version]}
+            :handler (fn [{{{:keys [query-string type relation relation-ids offset limit version]}
                             :query} :parameters}]
+
                        (log/info (str "GET /search"
-                                      " q:" q
+                                      " query-string:" query-string
                                       " type:" type
                                       " offset:" offset
                                       " limit:" limit
@@ -248,7 +249,7 @@
                        {:status 200
                         :body (vec (map types/map->nsmap
                                         (search/get-concepts-by-search
-                                         q type nil nil offset limit version)))})}}]
+                                         query-string type nil nil offset limit version)))})}}]
 
     ["/parse-text"
      {
