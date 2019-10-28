@@ -386,55 +386,49 @@
 
 ;; /concepts
 
-(sp/def ::concept
+(sp/def ::concept-shallow
   (ds/spec
-   {:name ::concept
-    :spec (sp/keys :req [::id ::type ::preferredLabel]
+   {:name ::concept-shallow
+    :spec (sp/keys :req [::id ::type ::preferred-label]
                    :opt [::definition ::deprecated])}))
+
+(sp/def ::concepts-shallow
+  (ds/spec
+   {:name ::concepts-shallow
+    :spec (sp/coll-of ::concept-shallow )}))
+
 
 (sp/def ::replaced-by
   (ds/spec
    {:name ::replaced-by
-    :spec (sp/coll-of ::concept )}))
+    :spec (sp/coll-of ::concept-shallow )}))
 
-(sp/def ::concept-with-replace
+(sp/def ::concept
   (ds/spec
-   {:name ::concept-with-replace
+   {:name ::concept
     :spec (sp/keys :req [::id ::type ::preferred-label]
                    :opt [::definition ::deprecated ::replaced-by])}))
 
 (sp/def ::concepts
   (ds/spec
    {:name ::concepts
-    :spec (sp/coll-of ::concept-with-replace )}))
+    :spec (sp/coll-of ::concept )}))
 
 (def concepts-spec ::concepts)
 
-;; /search
+;; /autocomplete
 
-(sp/def ::search-result
-  (ds/spec
-   {:name ::search-result
-    :spec (sp/keys :req [::id ::type ::preferred-label])}))
 
-(sp/def ::search-results
-  (ds/spec
-   {:name ::search-results
-    :spec (sp/coll-of ::search-result )}))
-
-(def search-spec ::search-results)
+(def autocomplete-spec ::concepts-shallow)
 
 ;; /replaced-by-changes
 
-(sp/def ::concept
-  (ds/spec
-   {:name ::concept
-    :spec ::concept-with-replace}))
+
 
 (sp/def ::replaced-by-change
   (ds/spec
    {:name ::replaced-by-change
-    :spec (sp/keys :req [::version ::concept-with-replace])}))
+    :spec (sp/keys :req [::version ::concept])}))
 
 (sp/def ::replaced-by-changes
   (ds/spec
@@ -463,12 +457,7 @@
 
 ;; /parse-text
 
-(sp/def ::concepts-without-replace
-  (ds/spec
-   {:name ::concepts-without-replace
-    :spec (sp/coll-of ::concept )}))
-
-(def parse-text-spec ::concepts-without-replace)
+(def parse-text-spec ::concepts-shallow)
 
 
 
@@ -526,16 +515,16 @@
 ;; driving-licence
 (sp/def ::driving-licence-code-2013 (st/spec string?))
 
-(sp/def ::concept-without-replace-driving-licence
+(sp/def ::concept-driving-licence-shallow
   (st/spec
-   {:name ::concept-without-replace-driving-licence
+   {:name ::concept-driving-licence-shallow
     :spec (sp/keys :req [::id ::type ::driving-licence-code-2013]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
 (sp/def ::replaced-by-driving-licence
   (ds/spec
    {:name ::replaced-by-driving-licence
-    :spec (sp/coll-of ::concept-without-replace-driving-licence )}))
+    :spec (sp/coll-of ::concept-driving-licence-shallow )}))
 
 (sp/def ::concept-driving-licence
   (ds/spec

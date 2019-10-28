@@ -203,7 +203,7 @@
    ["/specific"
 
 
-    {:swagger {:tags ["Specific"]
+    {:swagger {:tags ["Specific Types"]
                :description "Exposes concept with detailed information such as codes from external standards."
                }
 
@@ -235,7 +235,7 @@
                            (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (taxonomy/par int? "Return list limit"),
                            (ds/opt :version) (taxonomy/par int? "Version to search for")}}
-      :get {:responses {200 {:body types/search-spec}
+      :get {:responses {200 {:body types/autocomplete-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [query-string type relation relation-ids offset limit version]}
                             :query} :parameters}]
