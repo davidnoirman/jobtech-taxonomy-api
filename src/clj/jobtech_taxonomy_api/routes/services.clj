@@ -73,7 +73,10 @@
     ["/swagger-ui*"
      {:get (swagger-ui/create-swagger-ui-handler
             {:url "/v1/taxonomy/swagger.json"
-             :config {:validator-url nil}})}]]
+             :config {:validator-url nil
+                      :operationsSorter "alpha"
+
+                      }})}]]
 
    ["/main"
     {:swagger {:tags ["Main"]}

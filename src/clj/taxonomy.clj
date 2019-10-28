@@ -65,14 +65,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; ssyk-2012
-(sp/def ::ssyk-2012 (st/spec string?))
+(sp/def ::ssyk-code-2012 (st/spec string?))
 
 
 
 (sp/def ::concept-ssyk-shallow
   (st/spec
    {:name ::concept-ssyk-shallow
-    :spec (sp/keys :req [::id ::type ::ssyk-2012]
+    :spec (sp/keys :req [::id ::type ::ssyk-code-2012]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
 (sp/def ::replaced-by-ssyk
@@ -82,7 +82,7 @@
 (sp/def ::concept-ssyk
   (ds/spec
    {:name ::concept-ssyk
-    :spec (sp/keys :req [::id ::type ::ssyk-2012 ::preferred-label]
+    :spec (sp/keys :req [::id ::type ::ssyk-code-2012 ::preferred-label]
                    :opt [::definition ::deprecated ::replaced-by-ssyk ::concept-relations])}))
 
 (sp/def ::concepts-ssyk
@@ -206,12 +206,12 @@
  (def concepts-spec-id ::concepts-id)
 
 ;; isco-08
-(sp/def ::isco-08 (st/spec string?))
+(sp/def ::isco-code-08 (st/spec string?))
 
 (sp/def ::concept-isco-shallow
   (st/spec
    {:name ::concept-isco-shallow
-    :spec (sp/keys :req [::id ::isco-08 ::type]
+    :spec (sp/keys :req [::id ::isco-code-08 ::type]
                    :opt [::definition ::deprecated ::preferred-label ::concept-relations])}))
 
  (sp/def ::replaced-by-isco
@@ -222,7 +222,7 @@
  (sp/def ::concept-isco
    (ds/spec
     {:name ::concept-isco
-     :spec (sp/keys :req [::id ::type ::isco-08 ::preferred-label]
+     :spec (sp/keys :req [::id ::type ::isco-code-08 ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-isco ::concept-relations])}))
 
  (sp/def ::concepts-isco
@@ -571,7 +571,7 @@
                                  :pull-expression :concept.external-standard/driving-licence-code-2013
                                  }
 
-                                {:pull-expression {:concept.implicit-driving-licences [:concept/id
+                                {:pull-expression {:concept.external-standard/implicit-driving-licences [:concept/id
                                                                                        :concept.external-standard/driving-licence-code-2013]}
 
                                  }
@@ -580,8 +580,8 @@
 
             {:endpoint-name "ssyk"
              :extra-attributes [{:query-field "ssyk-2012"
-                                 :where-field :concept.external-standard/ssyk-2012
-                                 :pull-expression :concept.external-standard/ssyk-2012
+                                 :where-field :concept.external-standard/ssyk-code-2012
+                                 :pull-expression :concept.external-standard/ssyk-code-2012
                                  }]}
 
             {:endpoint-name "employment-duration"
@@ -619,8 +619,8 @@
 
             {:endpoint-name "isco"
              :extra-attributes [{:query-field "isco-08"
-                                 :where-field :concept.external-standard/isco-08
-                                 :pull-expression :concept.external-standard/isco-08
+                                 :where-field :concept.external-standard/isco-code-08
+                                 :pull-expression :concept.external-standard/isco-code-08
                                  }]
              }
 
