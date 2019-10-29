@@ -743,7 +743,13 @@
     ;    _ (println query-params)
         extra-attributes (:extra-attributes endpoint-meta-data)
         ;;    renamed-query-params (clojure.set/rename-keys query-params {:preferred-label :preferred-label})
-        renamed-query-params-fixed-related-ids (update query-params :related-ids vector)
+        renamed-query-params-fixed-related-ids (cond-> query-params
+
+                                                   (:related-ids query-params)
+                                                   (update :related-ids #(clojure.string/split % #" "))
+                                                   (:type query-params)
+                                                   (update :type #(clojure.string/split % #" "))
+                                                   )
 
 
      ;   _ (println renamed-query-params)

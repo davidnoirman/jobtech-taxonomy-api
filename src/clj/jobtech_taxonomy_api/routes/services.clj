@@ -1,4 +1,5 @@
 (ns jobtech-taxonomy-api.routes.services
+  (:refer-clojure :exclude [type])
   (:require
    [reitit.swagger :as swagger]
    [reitit.swagger-ui :as swagger-ui]
@@ -119,7 +120,7 @@
       :summary      "Get concepts. Supply at least one search parameter."
       :parameters {:query {(ds/opt :id) (taxonomy/par string? "ID of concept"),
                            (ds/opt :preferred-label) (taxonomy/par string? "Textual name of concept"),
-                           (ds/opt :type) (taxonomy/par string? "Restrict to concept type"),
+                           (ds/opt :type) (st/spec {:name "types" :spec string? :description "Restrict to concept type"})
                            (ds/opt :deprecated) (taxonomy/par boolean? "Restrict to deprecation state"),
                            (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type"),
                            (ds/opt :related-ids) (taxonomy/par string? "OR-restrict to these relation IDs (white space separated list)"),
@@ -141,10 +142,10 @@
                         :body (vec (map types/map->nsmap (concepts/find-concepts
                                                           {:id id
                                                            :preferred-label preferred-label
-                                                           :type type
+                                                           :type (when type (clojure.string/split type #" "))
                                                            :deprecated deprecated
                                                            :relation relation
-                                                           :related-ids (when related-ids (list related-ids))
+                                                           :related-ids (when related-ids (clojure.string/split related-ids))
                                                            :offset offset
                                                            :limit limit
                                                            :version version
@@ -246,10 +247,18 @@
                                       " offset:" offset
                                       " limit:" limit
                                       " version: " version))
+
+
                        {:status 200
                         :body (vec (map types/map->nsmap
                                         (search/get-concepts-by-search
-                                         query-string type nil nil offset limit version)))})}}]
+                                         query-string
+                                         (when type (clojure.string/split type #" "))
+                                         nil
+                                         nil
+                                         offset
+                                         limit
+                                         version)))})}}]
 
 
 

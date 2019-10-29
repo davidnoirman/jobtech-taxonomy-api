@@ -148,7 +148,7 @@
         )
 
     type
-    (-> (update :in conj '?type)
+    (-> (update :in conj '[?type ...])
         (update :args conj type)
         (update :where conj '[?c :concept/type ?type])
         )
