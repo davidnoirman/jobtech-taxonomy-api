@@ -22,9 +22,9 @@
                  [metosin/ring-http-response "0.9.1"]
                  [mount "0.1.16"]
                  [nrepl "0.6.0"]
-                 [jobtech-nlp-stava "0.1.0"]
-                 [jobtech-nlp-stop-words "0.1.0"]
-                 [jobtech-nlp-tokeniser "0.1.0"]
+
+
+
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.cli "0.4.2"]
                  [org.clojure/tools.logging "0.5.0"]
@@ -111,20 +111,19 @@
              :uberjar-name "jobtech-taxonomy-api.jar"
              :source-paths ["env/prod/clj"]
              :resource-paths ["env/prod/resources"]
-             :jvm-opts ["-Djava.library.path=/jobtech-nlp-stava/resources"]} ; works better in OpenShift
+             }
 
    :dev           [:project/dev :profiles/dev]
    :local         [:project/local :profiles/local]
    :test          [:project/test :profiles/test]
 
    :project/kaocha {:dependencies [[lambdaisland/kaocha "0.0-418"]]
-                    :jvm-opts [~(str "-Djava.library.path=" (System/getenv "HOME") "/.clj-nativedep/jobtech-nlp-stava/0.1.0/linux-amd64")]
                     ;; You can only comment in one resource-path:
                     ;:resource-paths ["env/dev/resources"] ; comment in for local use
                     :resource-paths ["env/integration-test/resources"] ; comment in for Jenkins
                     }
    :project/dev  {:jvm-opts ["-Dconf=dev-config.edn" ; FIXME: the filed referred here does not exist
-                             ~(str "-Djava.library.path=" (System/getenv "HOME") "/.clj-nativedep/jobtech-nlp-stava/0.1.0/linux-amd64")]
+                             ]
                   :dependencies [[expound "0.7.2"]
                                  [lambdaisland/kaocha "0.0-418"]
                                  [pjstadig/humane-test-output "0.9.0"]

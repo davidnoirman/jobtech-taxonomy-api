@@ -21,7 +21,6 @@
    [jobtech-taxonomy-api.db.search :as search]
    [jobtech-taxonomy-api.db.core :as core]
    [taxonomy :as types]
-   [jobtech-taxonomy-api.db.information-extraction :as ie]
    [clojure.tools.logging :as log]
    [clojure.spec.alpha :as s]
    [spec-tools.core :as st]
@@ -252,17 +251,7 @@
                                         (search/get-concepts-by-search
                                          query-string type nil nil offset limit version)))})}}]
 
-    ["/parse-text"
-     {
-      :summary "This end point is in Alpha. Finds all concepts in a text."
-      :description "This end point is in Alpha. Help end-users to find relevant concepts from the taxonomy"
-      :parameters {:query {:text (taxonomy/par string? "Substring to search for")}}
-      :post {:responses {200 {:body types/parse-text-spec}
-                         500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [text]} :query} :parameters}]
-                        (log/info (str "GET /parse-text text: " text ))
-                        {:status 200
-                         :body (vec (map types/map->nsmap (ie/parse-text text)))})}}]
+
 
     ]
 
