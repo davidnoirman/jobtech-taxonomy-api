@@ -136,6 +136,7 @@
                                       " preferred-label:" preferred-label
                                       " type:" type
                                       " deprecated:" deprecated
+                                      " related-ids  " related-ids
                                       " offset:" offset
                                       " limit:" limit))
                        {:status 200
@@ -145,7 +146,7 @@
                                                            :type (when type (clojure.string/split type #" "))
                                                            :deprecated deprecated
                                                            :relation relation
-                                                           :related-ids (when related-ids (clojure.string/split related-ids))
+                                                           :related-ids (when related-ids (clojure.string/split related-ids #" "))
                                                            :offset offset
                                                            :limit limit
                                                            :version version
