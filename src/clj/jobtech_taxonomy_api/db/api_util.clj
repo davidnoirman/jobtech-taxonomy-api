@@ -55,3 +55,31 @@
     :else coll
     )
   )
+
+
+(def regex-char-esc-smap
+  (let [esc-chars "()&^%$#!?*."]
+    (zipmap esc-chars
+            (map #(str "\\" %) esc-chars))))
+
+(defn ignore-case [string]
+  (str "(?i:" string  ")"))
+
+(defn ignore-case-eager [string]
+  (str "(?i:" string  ".*)"))
+
+(defn str-to-pattern-lazy
+  [string]
+  (->> string
+       (replace regex-char-esc-smap)
+       (reduce str)
+       ignore-case
+       ))
+
+(defn str-to-pattern-eager
+  [string]
+  (->> string
+       (replace regex-char-esc-smap)
+       (reduce str)
+       ignore-case-eager
+       ))

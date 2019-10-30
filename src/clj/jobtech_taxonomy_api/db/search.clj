@@ -6,13 +6,10 @@
    [jobtech-taxonomy-api.db.database-connection :refer :all]
    [jobtech-taxonomy-api.db.api-util :refer :all]
    [jobtech-taxonomy-api.db.concepts :as concepts]
+   [jobtech-taxonomy-api.db.api-util :as api-util]
    [clojure.set :as set]
    )
   )
-
-
-(defn ignore-case [string]
-  (str "(?i:" string  ".*)"))
 
 
 (def initial-concept-query
@@ -51,7 +48,7 @@
 
     true
     (-> (update :args conj (get-db version))
-        (update :args conj (ignore-case q))
+        (update :args conj (api-util/str-to-pattern-eager q))
 
         )
 

@@ -562,7 +562,7 @@
              }
 
             {:endpoint-name "ssyk"
-             :extra-attributes [{:query-field "ssyk-2012"
+             :extra-attributes [{:query-field "ssyk-code-2012"
                                  :where-field :concept.external-standard/ssyk-code-2012
                                  :pull-expression :concept.external-standard/ssyk-code-2012
                                  }]}
@@ -601,7 +601,7 @@
              }
 
             {:endpoint-name "isco"
-             :extra-attributes [{:query-field "isco-08"
+             :extra-attributes [{:query-field "isco-code-08"
                                  :where-field :concept.external-standard/isco-code-08
                                  :pull-expression :concept.external-standard/isco-code-08
                                  }]
