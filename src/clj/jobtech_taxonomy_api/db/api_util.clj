@@ -58,7 +58,7 @@
 
 
 (def regex-char-esc-smap
-  (let [esc-chars "()&^%$#!?*."]
+  (let [esc-chars "()&^%$#!?*.+"]
     (zipmap esc-chars
             (map #(str "\\" %) esc-chars))))
 
