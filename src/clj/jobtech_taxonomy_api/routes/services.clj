@@ -170,11 +170,8 @@
                                       " from-version: " from-version
                                       " to-version: " to-version))
                        {:status 200
-                        :body (let [events (events/get-deprecated-concepts-replaced-by-from-version from-version to-version)
-                                    ;; This is needed to squeeze :concept into the same namespace as the other's :concept
-                                    renamed (map #(clojure.set/rename-keys % {:concept :concept-with-replace}) events)]
-
-                                (vec (map types/map->nsmap renamed)))})}}]
+                        :body (vec (map types/map->nsmap events))
+                        })}}]
 
     ["/concept/types"
      {
