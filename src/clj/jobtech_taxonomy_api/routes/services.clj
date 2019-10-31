@@ -96,21 +96,21 @@
     ["/changes"
      {
       :summary      "Show the history from a given version."
-      :parameters {:query {:fromVersion (taxonomy/par int? "Changes from this version, exclusive"),
-                           (ds/opt :toVersion) (taxonomy/par int? "Changes to this version, inclusive"),
+      :parameters {:query {:from-version (taxonomy/par int? "Changes from this version, exclusive"),
+                           (ds/opt :to-version) (taxonomy/par int? "Changes to this version, inclusive"),
                            (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (taxonomy/par int? "Return list limit")}}
 
       :get {:responses {200 {:body types/events-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [fromVersion toVersion offset limit]} :query} :parameters}]
+            :handler (fn [{{{:keys [from-version to-version offset limit]} :query} :parameters}]
                        (log/info (str "GET /changes"
-                                      " fromVersion:" fromVersion
-                                      " toVersion: " toVersion
+                                      " from-version:" from-version
+                                      " to-version: " to-version
                                       " offset: " offset
                                       " limit: " limit))
                        {:status 200
-                        :body (let [events (doall (events/get-all-events-from-version-with-pagination fromVersion toVersion offset limit))
+                        :body (let [events (doall (events/get-all-events-from-version-with-pagination from-version to-version offset limit))
                                     ;; This is needed to squeeze /changes :concept into the same namespace as the other's :concept
                                     renamed (map #(clojure.set/rename-keys % {:concept :changed-concept}) events)]
                                 (vec (map types/map->nsmap renamed )))})}}]
@@ -161,16 +161,16 @@
     ["/replaced-by-changes"
      {
       :summary      "Show the history of concepts being replaced from a given version."
-      :parameters {:query {:fromVersion (taxonomy/par int? "From taxonomy version"),
-                           (ds/opt :toVersion) (taxonomy/par int? "To taxonomy version (default: latest version)")}}
+      :parameters {:query {:from-version (taxonomy/par int? "From taxonomy version"),
+                           (ds/opt :to-version) (taxonomy/par int? "To taxonomy version (default: latest version)")}}
       :get {:responses {200 {:body types/replaced-by-changes-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [fromVersion toVersion]} :query} :parameters}]
+            :handler (fn [{{{:keys [from-version to-version]} :query} :parameters}]
                        (log/info (str "GET /replaced-by-changes"
-                                      " from-version: " fromVersion
-                                      " toVersion: " toVersion))
+                                      " from-version: " from-version
+                                      " to-version: " to-version))
                        {:status 200
-                        :body (let [events (events/get-deprecated-concepts-replaced-by-from-version fromVersion toVersion)
+                        :body (let [events (events/get-deprecated-concepts-replaced-by-from-version from-version to-version)
                                     ;; This is needed to squeeze :concept into the same namespace as the other's :concept
                                     renamed (map #(clojure.set/rename-keys % {:concept :concept-with-replace}) events)]
 
