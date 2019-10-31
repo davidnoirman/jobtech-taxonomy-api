@@ -63,10 +63,10 @@
             (map #(str "\\" %) esc-chars))))
 
 (defn ignore-case [string]
-  (str "(?i:" string  ")"))
+  (str "(?iu:" string  ")"))
 
 (defn ignore-case-eager [string]
-  (str "(?i:" string  ".*)"))
+  (str "(?iu:" string  ".*)"))
 
 (defn str-to-pattern-lazy
   [string]
