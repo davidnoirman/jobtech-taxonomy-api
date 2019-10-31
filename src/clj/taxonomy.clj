@@ -116,8 +116,10 @@
 (sp/def ::concept-region-shallow
   (st/spec
    {:name ::concept-region-shallow
-    :spec (sp/keys :req [::id ::nuts-level-3-code-2013 ::type]
-                   :opt [::definition ::deprecated ::preferred-label ::concept-relations ::national-nuts-level-3-code-2019])}))
+    :spec (sp/keys :req [::id  ::type]
+                   :opt [::definition ::deprecated ::preferred-label ::concept-relations ::national-nuts-level-3-code-2019
+                         ::nuts-level-3-code-2013
+                         ])}))
 
  (sp/def ::replaced-by-region
    (ds/spec
@@ -127,9 +129,9 @@
  (sp/def ::concept-region
    (ds/spec
     {:name ::concept-region
-     :spec (sp/keys :req [::id ::type ::nuts-level-3-code-2013 ::preferred-label]
+     :spec (sp/keys :req [::id ::type  ::preferred-label]
                     :opt [::definition ::deprecated ::replaced-by-region ::concept-relations
-                          ::national-nuts-level-3-code-2019
+                          ::national-nuts-level-3-code-2019 ::nuts-level-3-code-2013
                           ])}))
 
  (sp/def ::concepts-region
