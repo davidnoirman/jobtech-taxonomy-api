@@ -170,7 +170,7 @@
                                       " from-version: " from-version
                                       " to-version: " to-version))
                        {:status 200
-                        :body (vec (map types/map->nsmap events))
+                        :body (vec (map types/map->nsmap (events/get-deprecated-concepts-replaced-by-from-version from-version to-version)))
                         })}}]
 
     ["/concept/types"
