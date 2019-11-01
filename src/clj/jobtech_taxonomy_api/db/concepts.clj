@@ -32,9 +32,10 @@
 (def initial-concept-query
   '{:find [(pull ?c pull-pattern)
            (sum  ?broader-relation-weight)
-           (sum ?narrower-relation-weight)
-           (sum ?related-relation-weight)
-           (sum  ?occupation-name-affinity-relation-weight)
+           (sum  ?narrower-relation-weight)
+           (sum  ?related-relation-weight)
+           (sum  ?substitutability-to-relation-weight)
+           (sum  ?substitutability-from-relation-weight)
            ]
     :with [ ?uniqueness]
     :in [$ pull-pattern]
@@ -48,7 +49,7 @@
                             :relation/concept-2
                             :relation/type
                             :relation/description
-                            :relation/affinity-percentage
+                            :relation/substitutability-percentage
                            ])
 
 (def initial-relation-query
@@ -77,38 +78,63 @@
 
 
 
+
 (defn handle-relations [query relation related-ids]
 
-  (if (= "related" relation)
+  (cond
+    (= "related" relation)
     (-> query
         (update :in conj '?relation '[?related-ids ...])
         (update :args conj relation related-ids)
         (update :where conj  '[?cr :concept/id ?related-ids]
-                             '[or [and [?r :relation/concept-1 ?cr] [?r :relation/concept-2 ?c]]
-                                  [and [?r :relation/concept-1 ?c] [?r :relation/concept-2 ?cr]]]
-                             '[?r :relation/type ?relation])
+                '[or [and [?r :relation/concept-1 ?cr] [?r :relation/concept-2 ?c]]
+                  [and [?r :relation/concept-1 ?c] [?r :relation/concept-2 ?cr]]]
+                '[?r :relation/type ?relation])
         )
-    (if (not= "narrower" relation)
-      (-> query
-          (update :in conj '?relation '[?related-ids ...])
-          (update :args conj relation related-ids)
-          (update :where conj
-                  '[?cr :concept/id ?related-ids]
-                  '[?r :relation/concept-1 ?cr]
-                  '[?r :relation/concept-2 ?c]
-                  '[?r :relation/type ?relation])
-          )
 
-      (-> query
-          (update :in conj '?relation '[?related-ids ...])
-          (update :args conj "broader" related-ids)
-          (update :where conj
-                  '[?cr :concept/id ?related-ids]
-                  '[?r :relation/concept-1 ?c]
-                  '[?r :relation/concept-2 ?cr]
-                  '[?r :relation/type ?relation])
-          )
-      )
+    (= "narrower" relation)
+    (-> query
+        (update :in conj '?relation '[?related-ids ...])
+        (update :args conj "broader" related-ids)
+        (update :where conj
+                '[?cr :concept/id ?related-ids]
+                '[?r :relation/concept-1 ?c]
+                '[?r :relation/concept-2 ?cr]
+                '[?r :relation/type ?relation])
+        )
+
+    (= "broader" relation)
+    (-> query
+        (update :in conj '?relation '[?related-ids ...])
+        (update :args conj relation related-ids)
+        (update :where conj
+                '[?cr :concept/id ?related-ids]
+                '[?r :relation/concept-1 ?cr]
+                '[?r :relation/concept-2 ?c]
+                '[?r :relation/type ?relation])
+        )
+
+    (= "substitutability-from" relation)
+    (-> query
+        (update :in conj '?relation '[?related-ids ...])
+        (update :args conj "substitutability" related-ids)
+        (update :where conj
+                '[?cr :concept/id ?related-ids]
+                '[?r :relation/concept-1 ?c]
+                '[?r :relation/concept-2 ?cr]
+                '[?r :relation/type ?relation])
+        )
+
+    (= "substitutability-to" relation)
+    (-> query
+        (update :in conj '?relation '[?related-ids ...])
+        (update :args conj "substitutability" related-ids)
+        (update :where conj
+                '[?cr :concept/id ?related-ids]
+                '[?r :relation/concept-1 ?cr]
+                '[?r :relation/concept-2 ?c]
+                '[?r :relation/type ?relation])
+        )
     )
   )
 
@@ -171,7 +197,8 @@
                            ?related-relation-weight
                            ?broader-relation-weight
                            ?narrower-relation-weight
-                           ?occupation-name-affinity-relation-weight]
+                           ?substitutability-to-relation-weight
+                           ?substitutability-from-relation-weight]
              (and
               [?broader-relation :relation/concept-1 ?c]
               [?broader-relation :relation/type "broader"]
@@ -179,7 +206,8 @@
               [(ground 1) ?broader-relation-weight]
               [(ground 0) ?narrower-relation-weight]
               [(ground 0) ?related-relation-weight]
-              [(ground 0) ?occupation-name-affinity-relation-weight]
+              [(ground 0) ?substitutability-to-relation-weight]
+              [(ground 0) ?substitutability-from-relation-weight]
               )
              (and
               [?narrower-relation :relation/concept-2 ?c]
@@ -188,7 +216,8 @@
               [(ground 1) ?narrower-relation-weight]
               [(ground 0) ?broader-relation-weight]
               [(ground 0) ?related-relation-weight]
-              [(ground 0) ?occupation-name-affinity-relation-weight]
+              [(ground 0) ?substitutability-to-relation-weight]
+              [(ground 0) ?substitutability-from-relation-weight]
               )
              (and
               [?related-relation :relation/concept-1 ?c]
@@ -197,23 +226,37 @@
               [(ground 1) ?related-relation-weight]
               [(ground 0) ?narrower-relation-weight]
               [(ground 0) ?broader-relation-weight]
-              [(ground 0) ?occupation-name-affinity-relation-weight]
+              [(ground 0) ?substitutability-to-relation-weight]
+              [(ground 0) ?substitutability-from-relation-weight]
               )
              (and
-              [?related-relation :relation/concept-1 ?c]
-              [?related-relation :relation/type "occupation_name_affinity"]
-              [(identity ?related-relation) ?uniqueness]
-              [(ground 1) ?occupation-name-affinity-relation-weight]
+              [?substitutability-to-relation :relation/concept-2 ?c]
+              [?substitutability-to-relation :relation/type "substitutability"]
+              [(identity  ?substitutability-to-relation) ?uniqueness]
+              [(ground 1) ?substitutability-to-relation-weight]
               [(ground 0) ?narrower-relation-weight]
               [(ground 0) ?related-relation-weight]
               [(ground 0) ?broader-relation-weight]
+              [(ground 0) ?substitutability-from-relation-weight]
+              )
+             (and
+              [?substitutability-from-relation :relation/concept-1 ?c]
+              [?substitutability-from-relation :relation/type "substitutability"]
+              [(identity  ?substitutability-from-relation) ?uniqueness]
+              [(ground 1) ?substitutability-from-relation-weight]
+              [(ground 0) ?narrower-relation-weight]
+              [(ground 0) ?related-relation-weight]
+              [(ground 0) ?broader-relation-weight]
+              [(ground 0) ?substitutability-to-relation-weight]
               )
              (and
               [(identity ?c) ?uniqueness]
               [(ground 0) ?broader-relation-weight]
               [(ground 0) ?related-relation-weight]
-              [(ground 0) ?occupation-name-affinity-relation-weight]
+              [(ground 0) ?substitutability-relation-weight]
               [(ground 0) ?narrower-relation-weight]
+              [(ground 0) ?substitutability-to-relation-weight]
+              [(ground 0) ?substitutability-from-relation-weight]
               ))))
 
     offset
@@ -335,7 +378,8 @@
   {:broader s/Num
    :narrower s/Num
    :related s/Num
-   :affinity s/Num
+   :substitutability-to s/Num
+   :substitutability-from s/Num
    }
   )
 

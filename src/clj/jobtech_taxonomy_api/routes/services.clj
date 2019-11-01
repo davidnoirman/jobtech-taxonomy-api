@@ -122,7 +122,7 @@
                            (ds/opt :preferred-label) (taxonomy/par string? "Textual name of concept"),
                            (ds/opt :type) (st/spec {:name "types" :spec string? :description "Restrict to concept type"})
                            (ds/opt :deprecated) (taxonomy/par boolean? "Restrict to deprecation state"),
-                           (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type"),
+                           (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
                            (ds/opt :related-ids) (taxonomy/par string? "OR-restrict to these relation IDs (white space separated list)"),
                            (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (taxonomy/par int? "Return list limit"),
