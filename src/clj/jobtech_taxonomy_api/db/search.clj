@@ -86,6 +86,7 @@
   )
 
 
+;;;;;; FOLLOWING CODE IS NOT USED, ONly FOR development
 
 (def s-query
   '[:find
