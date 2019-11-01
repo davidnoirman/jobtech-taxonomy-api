@@ -122,7 +122,7 @@
                            (ds/opt :preferred-label) (taxonomy/par string? "Textual name of concept"),
                            (ds/opt :type) (st/spec {:name "types" :spec string? :description "Restrict to concept type"})
                            (ds/opt :deprecated) (taxonomy/par boolean? "Restrict to deprecation state"),
-                           (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type"),
+                           (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
                            (ds/opt :related-ids) (taxonomy/par string? "OR-restrict to these relation IDs (white space separated list)"),
                            (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (taxonomy/par int? "Return list limit"),
@@ -229,14 +229,14 @@
       :description "Help end-users to find relevant concepts from the taxonomy"
       :parameters {:query {:query-string (taxonomy/par string? "String to search for"),
                            (ds/opt :type) (taxonomy/par string? "Type to search for"),
-                           (ds/opt :relation) (taxonomy/par string? "Relation to search for"),
-                           (ds/opt :related-ids) (taxonomy/par string? "List of relation IDs to search for"),
+                           (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
+                           (ds/opt :related-ids) (taxonomy/par string? "List of related IDs to search for"),
                            (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (taxonomy/par int? "Return list limit"),
                            (ds/opt :version) (taxonomy/par int? "Version to search for")}}
       :get {:responses {200 {:body types/autocomplete-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [query-string type relation relation-ids offset limit version]}
+            :handler (fn [{{{:keys [query-string type relation related-ids offset limit version]}
                             :query} :parameters}]
 
                        (log/info (str "GET /search"
@@ -252,8 +252,8 @@
                                         (search/get-concepts-by-search
                                          query-string
                                          (when type (clojure.string/split type #" "))
-                                         nil
-                                         nil
+                                         relation
+                                         (when related-ids (clojure.string/split related-ids #" "))
                                          offset
                                          limit
                                          version)))})}}]

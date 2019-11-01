@@ -23,11 +23,12 @@
     )
   )
 
-(defn move-relations-into-concept [[concept broader narrower related affinity]]
+(defn move-relations-into-concept [[concept broader narrower related substitutability-to substitutability-from]]
   (merge {:relations {:broader broader
                       :narrower narrower
-                              :related related
-                              :affinity affinity
+                      :related related
+                      :substitutability-to substitutability-to
+                      :substitutability-from substitutability-from
                       }}
          concept)
   )
