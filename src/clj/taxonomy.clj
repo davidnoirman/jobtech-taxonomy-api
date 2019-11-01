@@ -40,13 +40,14 @@
 (sp/def ::broader (st/spec int?))
 (sp/def ::narrower (st/spec int?))
 (sp/def ::related (st/spec int?))
-(sp/def ::affinity (st/spec int?))
+(sp/def ::substitutability-to (st/spec int?))
+(sp/def ::substitutability-from (st/spec int?))
 
 
 (sp/def ::concept-relations
   (st/spec
    {:name ::concept-relations
-    :spec (sp/keys :req [::broader ::narrower ::related ::affinity] )}
+    :spec (sp/keys :req [::broader ::narrower ::related ::substitutability-to  ::substitutability-from] )}
    )
   )
 
@@ -665,7 +666,7 @@
    (ds/opt :type) (par string? "Restrict to concept type"),
    ;;(ds/opt :type) (par #{"ssyk_level_1" "ssyk_level_2" "ssyk_level_3" "ssyk_level_4" } "Restrict to concept type")
    (ds/opt :deprecated) (par boolean? "Restrict to deprecation state")
-   (ds/opt :relation) (par #{"broader" "narrower" "related" "occupation_name_affinity"} "Relation type")
+   (ds/opt :relation) (par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from"} "Relation type")
    (ds/opt :related-ids) (par string? "OR-restrict to these relation IDs (white space separated list)")
 
    ;;   (ds/opt :code) (par string? name) ;; TODO Create one for each attribute
