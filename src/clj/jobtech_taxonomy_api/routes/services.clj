@@ -20,6 +20,7 @@
    [jobtech-taxonomy-api.db.concepts :as concepts]
    [jobtech-taxonomy-api.db.events :as events]
    [jobtech-taxonomy-api.db.search :as search]
+   [jobtech-taxonomy-api.db.graph :as graph]
    [jobtech-taxonomy-api.db.core :as core]
    [taxonomy :as types]
    [clojure.tools.logging :as log]
@@ -155,6 +156,28 @@
                                                           )))})}}]
 
 
+    ["/graph"
+     {:summary "Fetch nodes and edges from the Taxonomies. Only one depth is returned at the time."
+      :parameters {:query {:edge-relation-type (taxonomy/par string? "Edge relation type")
+                           :source-concept-type (taxonomy/par string? "Source nodes concept type")
+                           :target-concept-type (taxonomy/par string? "Target nodes concept type")
+                           (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)")
+                           (ds/opt :limit) (taxonomy/par int? "Return list limit")
+                           (ds/opt :version) (taxonomy/par int? "Version to search for")
+                           }  }
+      :get {:responses {200 {:body {:graph {:edges [{:source string?
+                                                     :target string?
+                                                     :relation string?
+                                                     }]
+                                            :nodes [{:id string?
+                                                     :preferred-label string?
+                                                     :type string?}]
+                                            }}}
+                        401 {:body types/unauthorized-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [edge-relation-type source-concept-type target-concept-type offset limit version]} :query} :parameters}]
+                       {:status 200
+                        :body (graph/fetch-graph edge-relation-type source-concept-type target-concept-type offset limit version)})}}]
 
 
 
