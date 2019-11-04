@@ -159,34 +159,34 @@
 ;; (d/q (build-graph-query  "related" "skill"  "isco-level-4"  nil 3  nil))
 
 (def initial-graph-response
-  {:graph
-   {:nodes []
-    :edges []
+  {:taxonomy/graph
+   {:taxonomy/nodes []
+    :taxonomy/edges []
     }
    }
   )
 
 (defn create-edge [{:relation/keys [concept-1 concept-2 type substitutability-percentage]}]
-  (cond-> {:source (:concept/id concept-1)
-           :target (:concept/id concept-2)
-           :relation type
+  (cond-> {:taxonomy/source (:concept/id concept-1)
+           :taxonomy/target (:concept/id concept-2)
+           :taxonomy/relation-type type
            }
     substitutability-percentage
-    (assoc :substitutability-percentage substitutability-percentage)
+    (assoc :taxonomy/substitutability-percentage substitutability-percentage)
     )
   )
 
 (defn create-node [{:concept/keys [id preferred-label type]}]
-  {:id id
-   :preferred-label preferred-label
-   :type type}
+  {:taxonomy/id id
+   :taxonomy/preferred-label preferred-label
+   :taxonomy/type type}
   )
 
 (defn db-graph-response-reducer [acc [relation-data concept-1 concept-2]]
   (-> acc
-      (update-in [:graph :edges] #(conj % (create-edge relation-data)))
-      (update-in [:graph :nodes]  #(conj % (create-node concept-1)) )
-      (update-in [:graph :nodes]  #(conj % (create-node concept-2)) )
+      (update-in [:taxonomy/graph :taxonomy/edges] #(conj % (create-edge relation-data)))
+      (update-in [:taxonomy/graph :taxonomy/nodes]  #(conj % (create-node concept-1)) )
+      (update-in [:taxonomy/graph :taxonomy/nodes]  #(conj % (create-node concept-2)) )
       )
   )
 

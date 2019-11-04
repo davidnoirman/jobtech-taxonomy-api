@@ -484,6 +484,40 @@
 (def unauthorized-spec ::unauthorized)
 
 
+
+
+(sp/def ::source (st/spec string?))
+(sp/def ::target (st/spec string?))
+(sp/def ::relation-type (st/spec string?))
+(sp/def ::substitutability-percentage (st/spec pos?))
+
+(sp/def ::edge (ds/spec {:name "edge"
+                         :spec (sp/keys :req [::source
+                                              ::target
+                                              ::relation-type
+                                              ]
+                                        :opt [::substitutability-percentage]
+                                        )
+                        }))
+
+(sp/def ::edges (ds/spec {:name "edges"
+                          :spec (sp/coll-of ::edge)
+                          }))
+
+
+(sp/def ::nodes (ds/spec {:name "nodes"
+                          :spec (sp/coll-of ::concept-shallow)
+                          }))
+
+(sp/def ::graph (ds/spec {:name "graph"
+                         :spec (sp/keys :req [::edges ::nodes])
+                          }))
+
+(def graph-spec ::graph)
+
+
+
+
 (declare koncept-spec)
 
 (sp/def :concept/id (st/spec string?))

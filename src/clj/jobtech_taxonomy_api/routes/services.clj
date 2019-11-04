@@ -165,14 +165,7 @@
                            (ds/opt :limit) (taxonomy/par int? "Return list limit")
                            (ds/opt :version) (taxonomy/par int? "Version to search for")
                            }  }
-      :get {:responses {200 {:body {:graph {:edges [{:source string?
-                                                     :target string?
-                                                     :relation string?
-                                                     }]
-                                            :nodes [{:id string?
-                                                     :preferred-label string?
-                                                     :type string?}]
-                                            }}}
+      :get {:responses {200 {:body taxonomy/graph-spec}
                         401 {:body types/unauthorized-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [edge-relation-type source-concept-type target-concept-type offset limit version]} :query} :parameters}]
