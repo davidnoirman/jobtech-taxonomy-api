@@ -87,9 +87,9 @@
         (update :in conj '?relation '[?related-ids ...])
         (update :args conj relation related-ids)
         (update :where conj  '[?cr :concept/id ?related-ids]
-                '[or [and [?r :relation/concept-1 ?cr] [?r :relation/concept-2 ?c]]
-                  [and [?r :relation/concept-1 ?c] [?r :relation/concept-2 ?cr]]]
-                '[?r :relation/type ?relation])
+                             '[or [and [?r :relation/concept-1 ?cr] [?r :relation/concept-2 ?c]]
+                                  [and [?r :relation/concept-1 ?c] [?r :relation/concept-2 ?cr]]]
+                              '[?r :relation/type ?relation])
         )
 
     (= "narrower" relation)
