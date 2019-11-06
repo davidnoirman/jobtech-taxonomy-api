@@ -13,8 +13,8 @@
   (test/testing "test search "
     (concept/assert-concept "skill" "cyklade" "cykla")
     (let [[status body] (util/send-request-to-json-service
-                          :get "/v1/taxonomy/public/search"
+                          :get "/v1/taxonomy/suggesters/autocomplete"
                           :headers [(util/header-auth-user)]
                           :query-params [{:key "q", :val "cykla"}])
           found-concept (first (concept/find-concepts-including-unpublished {:preferred-label "cykla"}))]
-      (test/is (= "cykla" (get found-concept :preferred-label))))))
+      (test/is (= "cykla" (get found-concept :concept/preferred-label))))))
