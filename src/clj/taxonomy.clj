@@ -510,7 +510,7 @@
                           }))
 
 (sp/def ::graph (ds/spec {:name "graph"
-                         :spec (sp/keys :req [::edges ::nodes])
+                          :spec (sp/keys :opt [::edges ::nodes])
                           }))
 
 (def graph-spec ::graph)
