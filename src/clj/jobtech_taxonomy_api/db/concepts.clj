@@ -417,6 +417,31 @@
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
         [result timestamp  new-concept]))))
 
+(defn concept-to-entity
+  "Return the entity for the concept with the given id, or nil"
+  [id]
+  (let [query '[:find ?e :in $ ?id :where [?e :concept/id ?id]]
+        response (d/q query (get-db) id)]
+    (when (> (count response) 0)
+      (ffirst response))))
+
+(defn assert-relation-part [c1 c2 type desc substitutability-percentage]
+  (let* [new-rel {:relation/concept-1 c1
+                  :relation/concept-2 c2
+                  :relation/description desc
+                  :relation/type type
+                  :relation/substitutability-percentage substitutability-percentage}
+
+         tx        [ new-rel]
+         result     (d/transact (get-conn) {:tx-data tx})]
+         [result new-rel]))
+
+(defn assert-relation "" [concept-1 concept-2 type description substitutability-percentage]
+  (let [existing (find-relations-including-unpublished {:concept-1 concept-1 :concept-2 concept-2 :type type})]
+    (if (> (count existing) 0)
+      [false nil]
+      (assert-relation-part concept-1 concept-2 type description substitutability-percentage)
+      )))
 
 (comment
 
