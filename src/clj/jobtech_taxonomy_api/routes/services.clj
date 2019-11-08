@@ -282,9 +282,6 @@
     {:swagger {:tags ["Private"]}
      :middleware [cors/cors auth authorized-private?]}
 
-    ;; for now used by tests for simple private access. TODO: replace that test call, with call to delete
-
-
     ["/delete-concept"
      {
       :summary      "Retract the concept with the given ID."
@@ -313,6 +310,25 @@
                           (if result
                             {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]
+
+    ["/relation"
+     {
+      :summary      "Assert a new relation."
+      :parameters {:query {(ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
+                           (ds/opt :definition) (taxonomy/par string? "Description"),
+                           (ds/opt :concept-1) (taxonomy/par string? "ID of source concept"),
+                           (ds/opt :concept-2) (taxonomy/par string? "ID of target concept"),
+                           (ds/opt :substitutability-to) (taxonomy/par int? "substitutability")
+                           }}
+      :post {:responses {200 {:body types/msg-spec}
+                         409 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [relation definition concept-1 concept-2 substitutability-to]} :query} :parameters}]
+                        (log/info "POST /relation")
+                        (let [[result new-relation] (concepts/assert-relation concept-1 concept-2 relation definition substitutability-to)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap {:message "Created relation."}) }
+                            {:status 409 :body (types/map->nsmap {:error "Can't create new relation since it is in conflict with existing relation."}) })))}}]
 
     ["/replace-concept"
      {
