@@ -17,7 +17,7 @@
 
 
 (defn retract-concept [id]
-  (let [found-concept (db-concepts/find-concepts-including-unpublished id)]
+  (let [found-concept (db-concepts/find-concepts-including-unpublished {:id id})]
     (if (or (= 0 (count found-concept))
             (get (ffirst found-concept) :concept/deprecated))
       false

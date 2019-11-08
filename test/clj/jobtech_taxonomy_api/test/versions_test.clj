@@ -17,7 +17,7 @@
     (d/transact (get-conn) {:tx-data [ {:taxonomy-version/id 66}]})
     (concept/assert-concept "skill" "Gammel Java, the old version" "Gammel Java")
     (versions/create-new-version 67)
-    (let [concept-id (:id (first (concept/find-concepts nil "Gammel Java" "skill" nil nil nil nil)))]
+    (let [concept-id (:id (first (concept/find-concepts-including-unpublished {:preferred-label "Gammel Java" :type "skill"})))]
       (core/retract-concept concept-id)
       )
     (versions/create-new-version 68)

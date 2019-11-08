@@ -4,4 +4,5 @@
                :secret      "mysecret"
                :endpoint    "localhost:8998"}
  :database-url "datomic:dev://localhost:4334/taxonomy_v13"
+ :jobtech-taxonomy-api {:auth-tokens { :111 :user :222 :admin}}
  }

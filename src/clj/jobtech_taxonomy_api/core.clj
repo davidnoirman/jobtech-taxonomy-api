@@ -1,12 +1,21 @@
 (ns jobtech-taxonomy-api.core
-  (:require [jobtech-taxonomy-api.handler :as handler]
-            [jobtech-taxonomy-api.nrepl :as nrepl]
-            [luminus.http-server :as http]
-            [jobtech-taxonomy-api.config :refer [env]]
-            [clojure.tools.cli :refer [parse-opts]]
-            [clojure.tools.logging :as log]
-            [mount.core :as mount])
+  (:require
+    [jobtech-taxonomy-api.handler :as handler]
+    [jobtech-taxonomy-api.nrepl :as nrepl]
+    [luminus.http-server :as http]
+    [jobtech-taxonomy-api.config :refer [env]]
+    [clojure.tools.cli :refer [parse-opts]]
+    [clojure.tools.logging :as log]
+    [mount.core :as mount])
   (:gen-class))
+
+;; log uncaught exceptions in threads
+(Thread/setDefaultUncaughtExceptionHandler
+  (reify Thread$UncaughtExceptionHandler
+    (uncaughtException [_ thread ex]
+      (log/error {:what :uncaught-exception
+                  :exception ex
+                  :where (str "Uncaught exception on" (.getName thread))}))))
 
 (def cli-options
   [["-p" "--port PORT" "Port number"
@@ -15,10 +24,10 @@
 (mount/defstate ^{:on-reload :noop} http-server
   :start
   (http/start
-   (-> env
-       (assoc  :handler #'handler/app)
-       (update :io-threads #(or % (* 2 (.availableProcessors (Runtime/getRuntime)))))
-       (update :port #(or (-> env :options :port) %))))
+    (-> env
+        (assoc  :handler #'handler/app)
+        (update :io-threads #(or % (* 2 (.availableProcessors (Runtime/getRuntime)))))
+        (update :port #(or (-> env :options :port) %))))
   :stop
   (http/stop http-server))
 
@@ -30,6 +39,7 @@
   :stop
   (when repl-server
     (nrepl/stop repl-server)))
+
 
 (defn stop-app []
   (doseq [component (:stopped (mount/stop))]

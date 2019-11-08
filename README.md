@@ -111,7 +111,7 @@ Then write a test:
   (test/testing "Test concept assertion."
     (c/assert-concept "skill" "cykla" "cykla")
     (let [found-concept (first (core/find-concept-by-preferred-term "cykla"))]
-      (test/is (= "cykla" (get found-concept :preferredLabel))))))
+      (test/is (= "cykla" (get found-concept :preferred-label))))))
 ```
 
 #### Define a test which calls the Luminus REST API
@@ -132,8 +132,8 @@ Then write a test:
     (let [[status body] (util/send-request-to-json-service
                          :get "/v0/taxonomy/public/concepts"
                          :headers [util/header-auth-user]
-                         :query-params [{:key "preferredLabel", :val "cykla"}])]
-      (test/is (= "cykla" (get (first body) :preferredLabel))))))
+                         :query-params [{:key "preferred-label", :val "cykla"}])]
+      (test/is (= "cykla" (get (first body) :preferred-label))))))
 ```
 
 

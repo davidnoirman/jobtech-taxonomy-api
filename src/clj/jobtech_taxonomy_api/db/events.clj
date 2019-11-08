@@ -256,12 +256,12 @@ Like replaced-by will return nil."
   )
 
 (defn transform-event-result [{:keys [type version preferred-label concept-id event-type deprecated] }]
-  {:eventType event-type
+  {:event-type event-type
    :version version
    :concept (merge (if (true? deprecated) {:deprecated true} {}) ; deprecated optional
                    {:id concept-id,
                     :type type,
-                    :preferredLabel preferred-label})})
+                    :preferred-label preferred-label})})
 
 (defn get-all-events-since-v0-9 "Beta for v0.9." [db date-time offset limit]
   (u/pagination  (map transform-event-result  (get-all-events-since db date-time))  offset limit))
@@ -277,12 +277,12 @@ Like replaced-by will return nil."
 
 (def show-changes-schema
   "The response schema for /changes. Beta for v0.9."
-  [{:eventType s/Str
+  [{:event-type s/Str
     :version s/Int
     :concept { :id s/Str
               :type s/Str
               (s/optional-key :deprecated) s/Bool
-              (s/optional-key :preferredLabel) s/Str }}])
+              (s/optional-key :preferred-label) s/Str }}])
 
 
 
@@ -319,19 +319,20 @@ Like replaced-by will return nil."
   (rename-keys concept {:concept/id :id
                         :concept/definition :definition
                         :concept/type :type
-                        :concept/preferred-label :preferredLabel
+                        :concept/preferred-label :preferred-label
                         :concept/deprecated :deprecated })
  )
 
 (defn transform-deprecated-concept-replaced-by-result [[deprecated-concept transaction-id]]
-  (let [{:keys [:concept/id :concept/preferred-label :concept/definition :concept/deprecated :concept/replaced-by]}  deprecated-concept
+  (let [{:keys [:concept/id :concept/preferred-label :concept/definition :concept/deprecated :concept/replaced-by :concept/type]}  deprecated-concept
         ]
     {:transaction-id transaction-id
      :concept {:id id
+               :type type
                :definition definition
-               :preferredLabel preferred-label
+               :preferred-label preferred-label
                :deprecated deprecated
-               :replacedBy (map u/transform-replaced-by replaced-by)
+               :replaced-by replaced-by
                }
      }
     )
