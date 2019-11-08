@@ -440,7 +440,7 @@
   (let [existing (find-relations-including-unpublished {:concept-1 concept-1 :concept-2 concept-2 :type type})]
     (if (> (count existing) 0)
       [false nil]
-      (assert-relation-part concept-1 concept-2 type description substitutability-percentage)
+      (assert-relation-part (concept-to-entity concept-1) (concept-to-entity concept-2) type description substitutability-percentage)
       )))
 
 (comment
