@@ -42,6 +42,8 @@
 (sp/def ::related (st/spec int?))
 (sp/def ::substitutability-to (st/spec int?))
 (sp/def ::substitutability-from (st/spec int?))
+(sp/def ::concept-1 (st/spec string?))
+(sp/def ::concept-2 (st/spec string?))
 
 
 (sp/def ::relations
@@ -473,6 +475,10 @@
 (sp/def ::ok (ds/spec {:name "ok"
                        :spec {::message (st/spec string?)}}))
 (def ok-spec ::ok)
+
+(sp/def ::msg (ds/spec {:name "msg"
+                        :spec {::message (st/spec string?)}}))
+(def msg-spec ::msg)
 
 (sp/def ::ok-concept (ds/spec {:name "ok"
                                :spec {::time inst?
