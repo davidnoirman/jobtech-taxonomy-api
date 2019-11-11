@@ -411,8 +411,8 @@
 (sp/def ::concept
   (ds/spec
    {:name ::concept
-    :spec (sp/keys :req [::id ::type ::preferred-label ::relations]
-                   :opt [::definition ::deprecated ::replaced-by])}))
+    :spec (sp/keys :req [::id ::type ::preferred-label]
+                   :opt [::definition ::deprecated ::replaced-by ::relations])}))
 
 (sp/def ::concepts
   (ds/spec
