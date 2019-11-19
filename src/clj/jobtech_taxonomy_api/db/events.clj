@@ -10,6 +10,21 @@
    [clojure.set :refer :all]
    ))
 
+;; TODO bryt upp i tre olika frågor en för CREATE, DEPRECATE, UPDATE
+
+(def show-history-2
+  '[:find ?entity ?aname ?v ?tx ?added  ?concept-id ?preferred-label ?type ?idtx ?pltx ?ttx
+    :keys  entity aname v tx added concept-id preferred-label type idtx pltx ttx
+    :where
+    [?entity :concept/id ?concept-id ?idtx]
+    [?entity :concept/preferred-label ?preferred-label ?pltx]
+    [?entity :concept/type ?type ?ttx]
+    [?entity ?a ?v ?tx ?added]
+    [?a :db/ident ?aname]
+                                        ;  [?tx :db/txInstant ?inst]
+    ]
+  )
+
 (def show-concept-history
   '[:find ?e ?aname ?v ?tx ?added ?inst ?concept-id ?preferred-label ?type
     :where
@@ -36,14 +51,17 @@
     ]
   )
 
+;; TODO skriv om fråga, går inte att lita på vilken den väljer??
+;; om fel sak kommer sist så används den...
+;; add tx for every attribute, take the largest tx for preferred-label
 
-(def show-concept-history-since-version-query
-  '[:find ?e ?aname ?v ?tx ?added ?inst ?concept-id ?preferred-label ?type ?deprecated
+#_(def show-concept-history-since-version-query
+  '[:find ?e ?aname ?v ?tx ?added ?inst ?concept-id ?preferred-label ?type ?deprecated ?concept-id-tx ?preferred-label-tx  ?type-tx
     :in $ ?one-version-before-from-version ?to-version
     :where
-    [?e :concept/preferred-label ?preferred-label]
-    [?e :concept/id ?concept-id]
-    [?e :concept/type ?type]
+    [?e :concept/preferred-label ?preferred-label ?preferred-label-tx]
+    [?e :concept/id ?concept-id ?concept-id-tx]
+    [?e :concept/type ?type ?type-tx]
     [(get-else $ ?e :concept/deprecated false) ?deprecated]
     [?e ?a ?v ?tx ?added]
     [?tx :db/txInstant ?inst]
@@ -56,6 +74,28 @@
     [?a :db/ident ?aname]
     ]
   )
+
+
+(def show-concept-history-since-version-query
+  '[:find ?e ?aname ?v ?tx ?added ?inst ?concept-id ?preferred-label ?type ?deprecated ?concept-id-tx ?preferred-label-tx ?type-tx
+    :in $ ?one-version-before-from-version ?to-version
+    :where
+    [?e :concept/preferred-label ?preferred-label ?preferred-label-tx]
+    [?e :concept/id ?concept-id ?concept-id-tx]
+    [?e :concept/type ?type ?type-tx]
+    [(get-else $ ?e :concept/deprecated false) ?deprecated]
+    [?e ?a ?v ?tx ?added]
+    [?tx :db/txInstant ?inst]
+    [?fv :taxonomy-version/id ?one-version-before-from-version ?one-version-before-from-version-tx]
+    [?one-version-before-from-version-tx :db/txInstant ?one-version-before-from-version-inst]
+    [(< ?one-version-before-from-version-inst ?inst)]
+    [?tv :taxonomy-version/id ?to-version ?to-version-tx]
+    [?to-version-tx :db/txInstant ?to-version-inst]
+    [(> ?to-version-inst ?inst)]
+    [?a :db/ident ?aname]
+    ]
+  )
+
 
 (def show-version-instance-ids
   '[:find ?inst ?version
@@ -110,8 +150,20 @@
 (defn keep-after-update [[_ _ _ _ operation]]
   operation)
 
-(defn is-event-update-preferred-label? [datoms-grouped-by-attribute]
-  "checks if op is not all true or false"
+#_(defn is-datom-updated [[_ _ attribute-value tx _ _ _ preferred-label _ _ id-tx preferred-label-tx type-tx]]
+  (println attribute-value preferred-label tx id-tx preferred-label-tx)
+  )
+
+
+#_(defn is-event-updated? [datoms-grouped-by-attribute]
+  (if-let [datoms (:concept/preferred-label datoms-grouped-by-attribute)]
+
+    false)
+  )
+
+;; TODO skriv om till updated rör alla fält utom id.  type preferred-label definition
+(defn is-event-update-preferred-label? "checks if op is not all true or false"
+  [datoms-grouped-by-attribute]
   (if-let [datoms (:concept/preferred-label datoms-grouped-by-attribute)]
     (not (apply = (map #(nth % 4) datoms)))
     false))
