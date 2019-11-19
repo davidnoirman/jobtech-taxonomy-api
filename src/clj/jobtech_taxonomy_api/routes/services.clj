@@ -19,6 +19,7 @@
    [jobtech-taxonomy-api.db.versions :as v]
    [jobtech-taxonomy-api.db.concepts :as concepts]
    [jobtech-taxonomy-api.db.events :as events]
+   [jobtech-taxonomy-api.db.changes :as changes]
    [jobtech-taxonomy-api.db.search :as search]
    [jobtech-taxonomy-api.db.graph :as graph]
    [jobtech-taxonomy-api.db.core :as core]
@@ -111,7 +112,7 @@
                                       " offset: " offset
                                       " limit: " limit))
                        {:status 200
-                        :body (let [events (doall (events/get-all-events-from-version-with-pagination from-version to-version offset limit))
+                        :body (let [events (doall (changes/get-all-events-from-version-with-pagination from-version to-version offset limit))
                                     ;; This is needed to squeeze /changes :concept into the same namespace as the other's :concept
                                     renamed (map #(clojure.set/rename-keys % {:concept :changed-concept}) events)]
                                 (vec (map types/map->nsmap renamed )))})}}]
