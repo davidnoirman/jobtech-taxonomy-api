@@ -312,6 +312,24 @@
                             {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]
 
+     ["/accumulate-concept"
+     {
+      :summary      "Accumulate data on an existing concept."
+      :parameters {:query {(ds/opt :id) (taxonomy/par string? "Concept id")
+                           (ds/opt :type) (taxonomy/par string? "Concept type"),
+                           (ds/opt :definition) (taxonomy/par string? "Definition"),
+                           (ds/opt :preferred-label) (taxonomy/par string? "Preferred label")}}
+      :patch {:responses {200 {:body types/ok-concept-spec}
+                         409 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [id type definition preferred-label]} :query} :parameters}]
+                        (log/info "PATCH concept")
+                        (let [result (concepts/accumulate-concept id type definition preferred-label)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap result) }
+                            {:status 409 :body (types/map->nsmap {:error "Can't update concept since it is in conflict with existing concept." }) })))}}]
+
+
     ["/relation"
      {
       :summary      "Assert a new relation."
