@@ -323,7 +323,7 @@
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
              :handler (fn [{{{:keys [id type definition preferred-label]} :query} :parameters}]
-                        (log/info "PATCH concept")
+                        (log/info "PATCH /accumulate-concept")
                         (let [result (concepts/accumulate-concept id type definition preferred-label)]
                           (if result
                             {:status 200 :body (types/map->nsmap result) }
