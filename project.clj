@@ -11,8 +11,8 @@
                  [expound "0.7.2"]
                  [funcool/struct "1.4.0"]
                  [luminus-immutant "0.2.4"]
-                 [com.datomic/client-cloud "0.8.71"] ; for env/dev/
-                 [com.datomic/client-pro "0.8.28"]  ; for env/local/
+               ;;  [com.datomic/client-cloud "0.8.71"] ; for env/dev/
+                 [com.datomic/client-pro "0.9.41"]  ; for env/local/
 ;;                 [luminus-jetty "0.1.7"]
                  [luminus-transit "0.1.1"]
                  [luminus/ring-ttl-session "0.3.3"]
@@ -119,8 +119,8 @@
 
    :project/kaocha {:dependencies [[lambdaisland/kaocha "0.0-418"]]
                     ;; You can only comment in one resource-path:
-                    ;:resource-paths ["env/dev/resources"] ; comment in for local use
-                    :resource-paths ["env/integration-test/resources"] ; comment in for Jenkins
+                   resource-paths ["env/dev/resources"] ; comment in for local use
+                   ;; :resource-paths ["env/integration-test/resources"] ; comment in for Jenkins
                     }
    :project/dev  {:jvm-opts ["-Dconf=dev-config.edn" ; FIXME: the filed referred here does not exist
                              ]
