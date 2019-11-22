@@ -1,0 +1,4805 @@
+{
+  "swagger": "2.0",
+  "x-id": [
+    "jobtech-taxonomy-api.routes.services/api"
+  ],
+  "info": {
+    "version": "1.0",
+    "title": "JobTech Taxonomy DMZ",
+    "description": "Jobtech taxonomy services."
+  },
+  "parameters": {
+    "client_id": {
+      "required": true,
+      "type": "string",
+      "in": "query",
+      "name": "client_id"
+    },
+    "client_secret": {
+      "required": true,
+      "type": "string",
+      "in": "query",
+      "name": "client_secret"
+    },
+    "AF-TrackingId": {
+      "description": "Used to track a request between systems. Must be created by the originating system and forwarded by all parties. The format is a GUID.",
+      "type": "string",
+      "in": "header",
+      "name": "AF-TrackingId",
+      "required": true
+    },
+    "AF-SystemId": {
+      "description": "Unique identifier for the calling system.",
+      "type": "string",
+      "in": "header",
+      "name": "AF-SystemId",
+      "required": true
+    }
+  },
+  "paths": {
+    "/v1/taxonomy/main/versions": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 0
+                  },
+                  "taxonomy/timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-11-08T09:37:11.029Z"
+                  }
+                },
+                "required": [
+                  "taxonomy/version",
+                  "taxonomy/timestamp"
+                ],
+                "title": "taxonomy/version-object"
+              },
+              "title": "taxonomy/versions"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "401": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/unauthorized"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Show the available versions.",
+        "tags": [
+          "Main"
+        ]
+      }
+    },
+    "/v1/taxonomy/main/changes": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from-version",
+            "description": "Changes from this version, exclusive",
+            "type": "integer",
+            "required": true,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "to-version",
+            "description": "Changes to this version, inclusive",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/event-type": {
+                    "type": "string",
+                    "title": "taxonomy/event-type",
+                    "example": "string"
+                  },
+                  "taxonomy/version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 0
+                  },
+                  "taxonomy/changed-concept": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/id": {
+                        "type": "string",
+                        "title": "taxonomy/id",
+                        "example": "string"
+                      },
+                      "taxonomy/type": {
+                        "type": "string",
+                        "title": "taxonomy/type",
+                        "example": "string"
+                      },
+                      "taxonomy/definition": {
+                        "type": "string",
+                        "title": "taxonomy/definition",
+                        "example": "string"
+                      },
+                      "taxonomy/deprecated": {
+                        "type": "boolean",
+                        "title": "taxonomy/deprecated",
+                        "example": true
+                      },
+                      "taxonomy/preferred-label": {
+                        "type": "string",
+                        "title": "taxonomy/preferred-label",
+                        "example": "string"
+                      }
+                    },
+                    "required": [
+                      "taxonomy/id",
+                      "taxonomy/type"
+                    ],
+                    "title": "taxonomy/changed-concept"
+                  }
+                },
+                "required": [
+                  "taxonomy/event-type",
+                  "taxonomy/version",
+                  "taxonomy/changed-concept"
+                ],
+                "title": "taxonomy/event"
+              },
+              "title": "taxonomy/events"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Show the history from a given version.",
+        "tags": [
+          "Main"
+        ]
+      }
+    },
+    "/v1/taxonomy/main/concepts": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/type",
+                        "taxonomy/preferred-label"
+                      ],
+                      "title": "taxonomy/concept-shallow"
+                    },
+                    "title": "taxonomy/replaced-by"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept"
+              },
+              "title": "taxonomy/concepts"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get concepts. Supply at least one search parameter.",
+        "tags": [
+          "Main"
+        ]
+      }
+    },
+    "/v1/taxonomy/main/graph": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "edge-relation-type",
+            "description": "Edge relation type",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "source-concept-type",
+            "description": "Source nodes concept type",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "target-concept-type",
+            "description": "Target nodes concept type",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to search for",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/edges": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/source": {
+                        "type": "string",
+                        "title": "taxonomy/source",
+                        "example": "string"
+                      },
+                      "taxonomy/target": {
+                        "type": "string",
+                        "title": "taxonomy/target",
+                        "example": "string"
+                      },
+                      "taxonomy/relation-type": {
+                        "type": "string",
+                        "title": "taxonomy/relation-type",
+                        "example": "string"
+                      },
+                      "taxonomy/substitutability-percentage": {
+                        "minimum": 0,
+                        "exclusiveMinimum": true,
+                        "title": "taxonomy/substitutability-percentage"
+                      }
+                    },
+                    "required": [
+                      "taxonomy/source",
+                      "taxonomy/target",
+                      "taxonomy/relation-type"
+                    ],
+                    "title": "taxonomy/edge"
+                  },
+                  "title": "taxonomy/edges"
+                },
+                "taxonomy/nodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/id": {
+                        "type": "string",
+                        "title": "taxonomy/id",
+                        "example": "string"
+                      },
+                      "taxonomy/type": {
+                        "type": "string",
+                        "title": "taxonomy/type",
+                        "example": "string"
+                      },
+                      "taxonomy/preferred-label": {
+                        "type": "string",
+                        "title": "taxonomy/preferred-label",
+                        "example": "string"
+                      },
+                      "taxonomy/definition": {
+                        "type": "string",
+                        "title": "taxonomy/definition",
+                        "example": "string"
+                      },
+                      "taxonomy/deprecated": {
+                        "type": "boolean",
+                        "title": "taxonomy/deprecated",
+                        "example": true
+                      }
+                    },
+                    "required": [
+                      "taxonomy/id",
+                      "taxonomy/type",
+                      "taxonomy/preferred-label"
+                    ],
+                    "title": "taxonomy/concept-shallow"
+                  },
+                  "title": "taxonomy/nodes"
+                }
+              },
+              "title": "taxonomy/graph"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "401": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/unauthorized"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Fetch nodes and edges from the Taxonomies. Only one depth is returned at the time.",
+        "tags": [
+          "Main"
+        ]
+      }
+    },
+    "/v1/taxonomy/main/replaced-by-changes": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from-version",
+            "description": "From taxonomy version",
+            "type": "integer",
+            "required": true,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "to-version",
+            "description": "To taxonomy version (default: latest version)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 0
+                  },
+                  "taxonomy/concept": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/id": {
+                        "type": "string",
+                        "title": "taxonomy/id",
+                        "example": "string"
+                      },
+                      "taxonomy/type": {
+                        "type": "string",
+                        "title": "taxonomy/type",
+                        "example": "string"
+                      },
+                      "taxonomy/preferred-label": {
+                        "type": "string",
+                        "title": "taxonomy/preferred-label",
+                        "example": "string"
+                      },
+                      "taxonomy/definition": {
+                        "type": "string",
+                        "title": "taxonomy/definition",
+                        "example": "string"
+                      },
+                      "taxonomy/deprecated": {
+                        "type": "boolean",
+                        "title": "taxonomy/deprecated",
+                        "example": true
+                      },
+                      "taxonomy/replaced-by": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/id": {
+                              "type": "string",
+                              "title": "taxonomy/id",
+                              "example": "string"
+                            },
+                            "taxonomy/type": {
+                              "type": "string",
+                              "title": "taxonomy/type",
+                              "example": "string"
+                            },
+                            "taxonomy/preferred-label": {
+                              "type": "string",
+                              "title": "taxonomy/preferred-label",
+                              "example": "string"
+                            },
+                            "taxonomy/definition": {
+                              "type": "string",
+                              "title": "taxonomy/definition",
+                              "example": "string"
+                            },
+                            "taxonomy/deprecated": {
+                              "type": "boolean",
+                              "title": "taxonomy/deprecated",
+                              "example": true
+                            }
+                          },
+                          "required": [
+                            "taxonomy/id",
+                            "taxonomy/type",
+                            "taxonomy/preferred-label"
+                          ],
+                          "title": "taxonomy/concept-shallow"
+                        },
+                        "title": "taxonomy/replaced-by"
+                      }
+                    },
+                    "required": [
+                      "taxonomy/id",
+                      "taxonomy/type",
+                      "taxonomy/preferred-label"
+                    ],
+                    "title": "taxonomy/concept"
+                  }
+                },
+                "required": [
+                  "taxonomy/version",
+                  "taxonomy/concept"
+                ],
+                "title": "taxonomy/replaced-by-change"
+              },
+              "title": "taxonomy/replaced-by-changes"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Show the history of concepts being replaced from a given version.",
+        "tags": [
+          "Main"
+        ]
+      }
+    },
+    "/v1/taxonomy/main/concept/types": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Taxonomy version (default: latest version)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "taxonomy/concept-types",
+              "example": [
+                "string"
+              ]
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Return a list of all taxonomy types.",
+        "tags": [
+          "Main"
+        ]
+      }
+    },
+    "/v1/taxonomy/main/relation/types": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "taxonomy/relation-types",
+              "example": [
+                "string"
+              ]
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Relation types. Type 'narrower' is not listed here, as it exists as the inverse of 'broader'.",
+        "tags": [
+          "Main"
+        ]
+      }
+    },
+    "/v1/taxonomy/specific/concepts/country": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "iso-3166-1-alpha-3-2013",
+            "description": "iso-3166-1-alpha-3-2013",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "iso-3166-1-alpha-2-2013",
+            "description": "iso-3166-1-alpha-2-2013",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  },
+                  "taxonomy/replaced-by-country": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/iso-3166-1-alpha-3-2013": {
+                          "type": "string",
+                          "title": "taxonomy/iso-3166-1-alpha-3-2013",
+                          "example": "string"
+                        },
+                        "taxonomy/iso-3166-1-alpha-2-2013": {
+                          "type": "string",
+                          "title": "taxonomy/iso-3166-1-alpha-2-2013",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/iso-3166-1-alpha-3-2013",
+                        "taxonomy/iso-3166-1-alpha-2-2013",
+                        "taxonomy/type"
+                      ],
+                      "title": "taxonomy/concept-country-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-country"
+                  },
+                  "taxonomy/iso-3166-1-alpha-2-2013": {
+                    "type": "string",
+                    "title": "taxonomy/iso-3166-1-alpha-2-2013",
+                    "example": "string"
+                  },
+                  "taxonomy/iso-3166-1-alpha-3-2013": {
+                    "type": "string",
+                    "title": "taxonomy/iso-3166-1-alpha-3-2013",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/iso-3166-1-alpha-3-2013",
+                  "taxonomy/iso-3166-1-alpha-2-2013",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-country"
+              },
+              "title": "taxonomy/concepts-country"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get country. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/driving-licence": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "driving-licence-code-2013",
+            "description": "driving-licence-code-2013",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/driving-licence-code-2013": {
+                    "type": "string",
+                    "title": "taxonomy/driving-licence-code-2013",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by-driving-licence": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/driving-licence-code-2013": {
+                          "type": "string",
+                          "title": "taxonomy/driving-licence-code-2013",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/type",
+                        "taxonomy/driving-licence-code-2013"
+                      ],
+                      "title": "taxonomy/concept-driving-licence-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-driving-licence"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/driving-licence-code-2013",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-driving-licence"
+              },
+              "title": "taxonomy/concepts-driving-licence"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get driving-licence. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/employment-duration": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "eures-code-2014",
+            "description": "eures-code-2014",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/eures-code-2014": {
+                    "type": "string",
+                    "title": "taxonomy/eures-code-2014",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by-employment-duration": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/eures-code-2014": {
+                          "type": "string",
+                          "title": "taxonomy/eures-code-2014",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/type",
+                        "taxonomy/eures-code-2014"
+                      ],
+                      "title": "taxonomy/concept-employment-duration-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-employment-duration"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/eures-code-2014",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-employment-duration"
+              },
+              "title": "taxonomy/concepts-employment-duration"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get employment-duration. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/isco": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "isco-code-08",
+            "description": "isco-code-08",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/isco-code-08": {
+                    "type": "string",
+                    "title": "taxonomy/isco-code-08",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by-isco": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/isco-code-08": {
+                          "type": "string",
+                          "title": "taxonomy/isco-code-08",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/isco-code-08",
+                        "taxonomy/type"
+                      ],
+                      "title": "taxonomy/concept-isco-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-isco"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/isco-code-08",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-isco"
+              },
+              "title": "taxonomy/concepts-isco"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get isco. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/language": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "iso-639-3-alpha-3-2007",
+            "description": "iso-639-3-alpha-3-2007",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "iso-639-3-alpha-2-2007",
+            "description": "iso-639-3-alpha-2-2007",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  },
+                  "taxonomy/iso-639-3-alpha-3-2007": {
+                    "type": "string",
+                    "title": "taxonomy/iso-639-3-alpha-3-2007",
+                    "example": "string"
+                  },
+                  "taxonomy/replaced-by-language": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/iso-639-3-alpha-3-2007": {
+                          "type": "string",
+                          "title": "taxonomy/iso-639-3-alpha-3-2007",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        },
+                        "taxonomy/iso-639-3-alpha-2-2007": {
+                          "type": "string",
+                          "title": "taxonomy/iso-639-3-alpha-2-2007",
+                          "example": "string"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/iso-639-3-alpha-3-2007",
+                        "taxonomy/type",
+                        "taxonomy/preferred-label"
+                      ],
+                      "title": "taxonomy/concept-language-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-language"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/iso-639-3-alpha-2-2007": {
+                    "type": "string",
+                    "title": "taxonomy/iso-639-3-alpha-2-2007",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/iso-639-3-alpha-3-2007",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-language"
+              },
+              "title": "taxonomy/concepts-language"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get language. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/region": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "nuts-level-3-code-2013",
+            "description": "nuts-level-3-code-2013",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "national-nuts-level-3-code-2019",
+            "description": "national-nuts-level-3-code-2019",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  },
+                  "taxonomy/national-nuts-level-3-code-2019": {
+                    "type": "string",
+                    "title": "taxonomy/national-nuts-level-3-code-2019",
+                    "example": "string"
+                  },
+                  "taxonomy/nuts-level-3-code-2013": {
+                    "type": "string",
+                    "title": "taxonomy/nuts-level-3-code-2013",
+                    "example": "string"
+                  },
+                  "taxonomy/replaced-by-region": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        },
+                        "taxonomy/national-nuts-level-3-code-2019": {
+                          "type": "string",
+                          "title": "taxonomy/national-nuts-level-3-code-2019",
+                          "example": "string"
+                        },
+                        "taxonomy/nuts-level-3-code-2013": {
+                          "type": "string",
+                          "title": "taxonomy/nuts-level-3-code-2013",
+                          "example": "string"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/type"
+                      ],
+                      "title": "taxonomy/concept-region-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-region"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-region"
+              },
+              "title": "taxonomy/concepts-region"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get region. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/sni-level": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "sni-level-code-2007",
+            "description": "sni-level-code-2007",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/sni-level-code-2007": {
+                    "type": "string",
+                    "title": "taxonomy/sni-level-code-2007",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by-sni-level": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/sni-level-code-2007": {
+                          "type": "string",
+                          "title": "taxonomy/sni-level-code-2007",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/sni-level-code-2007",
+                        "taxonomy/type"
+                      ],
+                      "title": "taxonomy/concept-sni-level-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-sni-level"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/sni-level-code-2007",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-sni-level"
+              },
+              "title": "taxonomy/concepts-sni-level"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get sni-level. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/ssyk": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ssyk-code-2012",
+            "description": "ssyk-code-2012",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/ssyk-code-2012": {
+                    "type": "string",
+                    "title": "taxonomy/ssyk-code-2012",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by-ssyk": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/ssyk-code-2012": {
+                          "type": "string",
+                          "title": "taxonomy/ssyk-code-2012",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/type",
+                        "taxonomy/ssyk-code-2012"
+                      ],
+                      "title": "taxonomy/concept-ssyk-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-ssyk"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/ssyk-code-2012",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-ssyk"
+              },
+              "title": "taxonomy/concepts-ssyk"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get ssyk. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/sun-education-field": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "sun-education-field-code-2020",
+            "description": "sun-education-field-code-2020",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/sun-education-field-code-2020": {
+                    "type": "string",
+                    "title": "taxonomy/sun-education-field-code-2020",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by-sun-education-field": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/sun-education-field-code-2020": {
+                          "type": "string",
+                          "title": "taxonomy/sun-education-field-code-2020",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/sun-education-field-code-2020",
+                        "taxonomy/type"
+                      ],
+                      "title": "taxonomy/concept-sun-education-field-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-sun-education-field"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/sun-education-field-code-2020",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-sun-education-field"
+              },
+              "title": "taxonomy/concepts-sun-education-field"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get sun-education-field. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/specific/concepts/sun-education-level": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "preferred-label",
+            "description": "Textual name of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "description": "ID of concept",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "sun-education-level-code-2020",
+            "description": "sun-education-level-code-2020",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "OR-restrict to these relation IDs (white space separated list)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "deprecated",
+            "description": "Restrict to deprecation state",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Restrict to concept type",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to use",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/sun-education-level-code-2020": {
+                    "type": "string",
+                    "title": "taxonomy/sun-education-level-code-2020",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  },
+                  "taxonomy/replaced-by-sun-education-level": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "taxonomy/id": {
+                          "type": "string",
+                          "title": "taxonomy/id",
+                          "example": "string"
+                        },
+                        "taxonomy/sun-education-level-code-2020": {
+                          "type": "string",
+                          "title": "taxonomy/sun-education-level-code-2020",
+                          "example": "string"
+                        },
+                        "taxonomy/type": {
+                          "type": "string",
+                          "title": "taxonomy/type",
+                          "example": "string"
+                        },
+                        "taxonomy/definition": {
+                          "type": "string",
+                          "title": "taxonomy/definition",
+                          "example": "string"
+                        },
+                        "taxonomy/deprecated": {
+                          "type": "boolean",
+                          "title": "taxonomy/deprecated",
+                          "example": true
+                        },
+                        "taxonomy/preferred-label": {
+                          "type": "string",
+                          "title": "taxonomy/preferred-label",
+                          "example": "string"
+                        },
+                        "taxonomy/concept-relations": {
+                          "type": "object",
+                          "properties": {
+                            "taxonomy/broader": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/broader",
+                              "example": 0
+                            },
+                            "taxonomy/narrower": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/narrower",
+                              "example": 0
+                            },
+                            "taxonomy/related": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/related",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-to": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-to",
+                              "example": 0
+                            },
+                            "taxonomy/substitutability-from": {
+                              "type": "integer",
+                              "format": "int64",
+                              "title": "taxonomy/substitutability-from",
+                              "example": 0
+                            }
+                          },
+                          "required": [
+                            "taxonomy/broader",
+                            "taxonomy/narrower",
+                            "taxonomy/related",
+                            "taxonomy/substitutability-to",
+                            "taxonomy/substitutability-from"
+                          ],
+                          "title": "taxonomy/concept-relations"
+                        }
+                      },
+                      "required": [
+                        "taxonomy/id",
+                        "taxonomy/sun-education-level-code-2020",
+                        "taxonomy/type"
+                      ],
+                      "title": "taxonomy/concept-sun-education-level-shallow"
+                    },
+                    "title": "taxonomy/replaced-by-sun-education-level"
+                  },
+                  "taxonomy/concept-relations": {
+                    "type": "object",
+                    "properties": {
+                      "taxonomy/broader": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/broader",
+                        "example": 0
+                      },
+                      "taxonomy/narrower": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/narrower",
+                        "example": 0
+                      },
+                      "taxonomy/related": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/related",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-to": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-to",
+                        "example": 0
+                      },
+                      "taxonomy/substitutability-from": {
+                        "type": "integer",
+                        "format": "int64",
+                        "title": "taxonomy/substitutability-from",
+                        "example": 0
+                      }
+                    },
+                    "required": [
+                      "taxonomy/broader",
+                      "taxonomy/narrower",
+                      "taxonomy/related",
+                      "taxonomy/substitutability-to",
+                      "taxonomy/substitutability-from"
+                    ],
+                    "title": "taxonomy/concept-relations"
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/sun-education-level-code-2020",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-sun-education-level"
+              },
+              "title": "taxonomy/concepts-sun-education-level"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Get sun-education-level. Supply at least one search parameter.",
+        "tags": [
+          "Specific Types"
+        ],
+        "description": "Exposes concept with detailed information such as codes from external standards."
+      }
+    },
+    "/v1/taxonomy/suggesters/autocomplete": {
+      "get": {
+        "produces": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "consumes": [
+          "application/json",
+          "application/transit+msgpack",
+          "application/transit+json",
+          "application/edn"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query-string",
+            "description": "String to search for",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Type to search for",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "relation",
+            "description": "Relation type",
+            "type": "string",
+            "required": false,
+            "enum": [
+              "substitutability-from",
+              "narrower",
+              "related",
+              "substitutability-to",
+              "broader"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "related-ids",
+            "description": "List of related IDs to search for",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Return list offset (from 0)",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Return list limit",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "description": "Version to search for",
+            "type": "integer",
+            "required": false,
+            "format": "int64"
+          },
+          {
+            "$ref": "#/parameters/AF-TrackingId"
+          },
+          {
+            "$ref": "#/parameters/AF-SystemId"
+          },
+          {
+            "$ref": "#/parameters/client_id"
+          },
+          {
+            "$ref": "#/parameters/client_secret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taxonomy/id": {
+                    "type": "string",
+                    "title": "taxonomy/id",
+                    "example": "string"
+                  },
+                  "taxonomy/type": {
+                    "type": "string",
+                    "title": "taxonomy/type",
+                    "example": "string"
+                  },
+                  "taxonomy/preferred-label": {
+                    "type": "string",
+                    "title": "taxonomy/preferred-label",
+                    "example": "string"
+                  },
+                  "taxonomy/definition": {
+                    "type": "string",
+                    "title": "taxonomy/definition",
+                    "example": "string"
+                  },
+                  "taxonomy/deprecated": {
+                    "type": "boolean",
+                    "title": "taxonomy/deprecated",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "taxonomy/id",
+                  "taxonomy/type",
+                  "taxonomy/preferred-label"
+                ],
+                "title": "taxonomy/concept-shallow"
+              },
+              "title": "taxonomy/concepts-shallow"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          },
+          "500": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "taxonomy/error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "taxonomy/error"
+              ],
+              "title": "taxonomy/err"
+            },
+            "description": "",
+            "headers": {
+              "AF-TrackingId": {
+                "type": "string"
+              },
+              "AF-SystemId": {
+                "description": "Unique identifier for the responding system.",
+                "type": "string"
+              },
+              "AF-ResponseTime": {
+                "description": "The time it took for the system to process the request in milliseconds.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "summary": "Autocomplete from query string",
+        "description": "Help end-users to find relevant concepts from the taxonomy",
+        "tags": [
+          "Suggesters"
+        ]
+      }
+    }
+  },
+  "host": "https://eu1.anypoint.mulesoft.com",
+  "basePath": "/mocking/api/v1/links/a47cda72-d158-4ae8-8ece-396bbf4d6351/"
+}
