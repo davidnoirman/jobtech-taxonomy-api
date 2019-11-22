@@ -97,22 +97,22 @@
 
     ["/changes"
      {
-      :summary      "Show the history from a given version."
-      :parameters {:query {:from-version (taxonomy/par int? "Changes from this version, exclusive"),
-                           (ds/opt :to-version) (taxonomy/par int? "Changes to this version, inclusive"),
+      :summary      "Show changes to the taxonomy as a stream of events."
+      :parameters {:query {:after-version (taxonomy/par int? "Limit the result to show changes that occured after this version was published."),
+                           (ds/opt :to-version-inclusive) (taxonomy/par int? "Limit the result to show changes that occured before this version was published and during this version."),
                            (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (taxonomy/par int? "Return list limit")}}
 
       :get {:responses {200 {:body types/events-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [from-version to-version offset limit]} :query} :parameters}]
+            :handler (fn [{{{:keys [after-version to-version-inclusive offset limit]} :query} :parameters}]
                        (log/info (str "GET /changes"
-                                      " from-version:" from-version
-                                      " to-version: " to-version
+                                      " after-version:" after-version
+                                      " to-version-inclusive: " to-version-inclusive
                                       " offset: " offset
                                       " limit: " limit))
                        {:status 200
-                        :body (let [events (doall (changes/get-all-events-from-version-with-pagination from-version to-version offset limit))
+                        :body (let [events (doall (changes/get-all-events-from-version-with-pagination after-version to-version-inclusive offset limit))
                                     ;; This is needed to squeeze /changes :concept into the same namespace as the other's :concept
                                     renamed (map #(clojure.set/rename-keys % {:concept :changed-concept}) events)]
                                 (vec (map types/map->nsmap renamed )))})}}]

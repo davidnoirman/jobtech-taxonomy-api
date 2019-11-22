@@ -43,6 +43,12 @@
   )
 
 
+(defn get-current-version-id []
+  (:version (last (get-all-versions))))
+
+(defn get-next-version-id []
+  (inc (get-current-version-id)))
+
 (defn is-the-new-version-id-correct? [new-version-id]
   (= new-version-id (inc (ffirst (d/q show-latest-version (get-db)))))
   )
