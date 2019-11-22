@@ -53,7 +53,8 @@
   )
 
 (defn create-concept-and-version []
-  (let [version (versions/get-current-version-id)
+  (let [_ (versions/create-new-version 0)
+        version (versions/get-current-version-id)
         next-version (inc version)
         concept-pl (str (gensym "cykla-"))
         ;;_ (println "createing concept " concept-pl)
@@ -85,7 +86,7 @@
 
 
 (defn update-concept-and-publish-version []
-  (let [[version next-version created-event new-concept]  (create-concept-and-version)
+  (let [ [version next-version created-event new-concept]  (create-concept-and-version)
         next-next-version (inc next-version)
         new-concept-pl (str (gensym "hoppa-"))
         {:keys [time concept]} (concept/accumulate-concept (:concept/id new-concept) "skill" nil new-concept-pl)
@@ -114,7 +115,7 @@
 
 
 (defn deprecate-concept-and-publish-version []
-  (let [[version next-version created-event new-concept]  (create-concept-and-version)
+  (let [ [version next-version created-event new-concept]  (create-concept-and-version)
         next-next-version (inc next-version)
         _ (core/retract-concept (:concept/id new-concept))
         _ (versions/create-new-version next-next-version)
