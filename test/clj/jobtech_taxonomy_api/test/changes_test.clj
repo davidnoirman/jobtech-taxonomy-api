@@ -53,7 +53,8 @@
   )
 
 (defn create-concept-and-version []
-  (let [version (versions/get-current-version-id)
+  (let [_ (versions/create-version-0)
+        version (versions/get-current-version-id)
         next-version (inc version)
         concept-pl (str (gensym "cykla-"))
         ;;_ (println "createing concept " concept-pl)

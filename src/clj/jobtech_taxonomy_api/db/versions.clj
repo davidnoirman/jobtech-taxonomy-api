@@ -46,6 +46,12 @@
 (defn get-current-version-id []
   (:version (last (get-all-versions))))
 
+(defn create-version-0 "only used for tests" []
+  (when  (empty? (get-all-versions))
+    (d/transact (get-conn) {:tx-data [ {:taxonomy-version/id 0}  ]})
+    )
+  )
+
 (defn get-next-version-id []
   (inc (get-current-version-id)))
 
