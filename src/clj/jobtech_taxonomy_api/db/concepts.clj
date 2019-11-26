@@ -426,11 +426,18 @@
       (ffirst response))))
 
 (defn assert-relation-part [c1 c2 type desc substitutability-percentage]
-  (let* [new-rel {:relation/concept-1 c1
-                  :relation/concept-2 c2
-                  :relation/description desc
-                  :relation/type type
-                  :relation/substitutability-percentage substitutability-percentage}
+  (let* [new-rel (cond->
+                     {:relation/concept-1 c1
+                      :relation/concept-2 c2
+                      :relation/type type
+                      }
+
+                   desc
+                   (assoc :relation/description desc)
+
+                   substitutability-percentage
+                   (assoc :relation/substitutability-percentage substitutability-percentage)
+                   )
 
          tx        [ new-rel]
          result     (d/transact (get-conn) {:tx-data tx})]
