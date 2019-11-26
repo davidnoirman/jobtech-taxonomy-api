@@ -333,18 +333,20 @@
     ["/relation"
      {
       :summary      "Assert a new relation."
-      :parameters {:query {(ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
+      :parameters {:query {(ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability" } "Relation type"),
                            (ds/opt :definition) (taxonomy/par string? "Description"),
                            (ds/opt :concept-1) (taxonomy/par string? "ID of source concept"),
                            (ds/opt :concept-2) (taxonomy/par string? "ID of target concept"),
-                           (ds/opt :substitutability-to) (taxonomy/par int? "substitutability")
+                           (ds/opt :substitutability-percentage) (taxonomy/par int? "You only need this one if the relation is substitutability")
                            }}
       :post {:responses {200 {:body types/msg-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [relation definition concept-1 concept-2 substitutability-to]} :query} :parameters}]
+             :handler (fn [{{{:keys [relation definition concept-1 concept-2 substitutability-percentage]} :query} :parameters}]
                         (log/info "POST /relation")
-                        (let [[result new-relation] (concepts/assert-relation concept-1 concept-2 relation definition substitutability-to)]
+                        (let [[result new-relation] (concepts/assert-relation concept-1 concept-2 relation definition substitutability-percentage)
+                              _ (log/info new-relation)
+                              ]
                           (if result
                             {:status 200 :body (types/map->nsmap {:message "Created relation."}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new relation since it is in conflict with existing relation."}) })))}}]
