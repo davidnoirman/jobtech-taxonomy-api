@@ -1,21 +1,15 @@
 (ns jobtech-taxonomy-api.authentication-service
   (:require
+   [jobtech-taxonomy-api.config :refer [env]]
    [clj-http.conn-mgr :as conn]
    [clj-http.client :as client]
    [muuntaja.core :as m]
    ))
 
 
-
-;; (def keymanager-api-key (System/getenv "KEY_MANAGER_API_KEY"))
-;; (def keymanager-url (System/getenv "KEY_MANAGER_API_URL") )
-
-
-
-(def password (System/getenv "KEY_MANAGER_API_KEY"))
-
-(def keymanager-url
-  (str "https://" "taxonomy-apikey-reader" ":"  password  "@" "780bc2c2a86c4c8abdd6236b4e557f13.eu-west-1.aws.found.io:9243/apikeys/_search?q=_id:taxonomy"))
+(defn keymanager-url []
+  (:keymanager-url env)
+  )
 
 (def state (atom { }))
 
@@ -23,7 +17,7 @@
 ;; https://github.com/dakrone/clj-http#caching
 (defn setup-connection []
   (let [cm (conn/make-reusable-conn-manager {})
-        caching-client (:http-client (client/get keymanager-url
+        caching-client (:http-client (client/get (keymanager-url)
                                                  {:connection-manager cm :cache true}))
         ]
     {:cm cm
@@ -45,17 +39,37 @@
 
 (defn call-api []
   (let [current-state (get-state)]
-    (client/get keymanager-url {:connection-manager (:cm current-state) :http-client (:client current-state) :cache true} ))
+    (client/get (keymanager-url) {:connection-manager (:cm current-state) :http-client (:client current-state) :cache true} ))
   )
 
 (defn parse-response [response]
   (m/decode "application/json" (:body response))
   )
 
+(defn valid-keys-from-external-key-service []
+  (set (keys (get-in  (parse-response (call-api)) [:hits :hits 0 :_source])))
+)
+
+(defn get-tokens-from-env []
+  (get-in env [:jobtech-taxonomy-api :auth-tokens])
+ )
+
+(defn valid-keys-from-env []
+  (set (keys (get-tokens-from-env)))
+  )
+
 (defn valid-keys []
-  (set (map name (keys (get-in  (parse-response (call-api)) [:hits :hits 0 :_source]  ))))
+  (set (concat (valid-keys-from-env) (valid-keys-from-external-key-service)))
   )
 
 (defn is-valid-key? [a-key]
-  (contains? (valid-keys) a-key)
+  (contains? (valid-keys) (keyword a-key))
+  )
+
+(defn get-user [token]
+  (cond
+    (= :admin (get (get-tokens-from-env) token)) :admin
+    (is-valid-key? token) :user
+    :else nil
+    )
   )

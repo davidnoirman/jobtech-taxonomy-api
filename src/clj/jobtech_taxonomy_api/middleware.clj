@@ -8,7 +8,9 @@
             [buddy.auth.accessrules :refer [restrict]]
             [buddy.auth :refer [authenticated?]]
             [buddy.auth.backends.session :refer [session-backend]]
-            [jobtech-taxonomy-api.apikey :refer [apikey-backend]]))
+            [jobtech-taxonomy-api.apikey :refer [apikey-backend]]
+            [jobtech-taxonomy-api.authentication-service :as keymanager]
+            ))
 
 (defn on-error [request response]
   {:status 403
@@ -23,25 +25,12 @@
 ;; TODO use the api-key service
 
 
-(defn get-tokens-from-system-env []
-  (get-in env [:jobtech-taxonomy-api :auth-tokens])
-  )
-
-(defn get-all-tokens []
-   (get-tokens-from-system-env)
-  )
-
-(defn get-token [token]
-  "i e (get-token :admin)"
-  (let [tokens (get-all-tokens)]
-    (str (clojure.string/replace (first (filter #(= (% tokens) token) (keys tokens))) #":" ""))))
-
 (defn authenticate-user [api-key]
-  (contains? (set (keys (get-all-tokens)))   (keyword api-key) )
+  (keymanager/is-valid-key? api-key)
   )
 
 (defn authenticate-admin [api-key]
-  (contains? (set (map first (filter (fn [[token role]] (= role :admin)  ) (get-all-tokens))))
+  (contains? (set (map first (filter (fn [[token role]] (= role :admin)) (keymanager/get-tokens-from-env ))))
              (keyword api-key)
              )
   )
@@ -54,7 +43,7 @@
 (defn my-authfn
   [request token]
   (let [token (keyword token)]
-    (get (get-all-tokens) token nil)))
+    (keymanager/get-user token)))
 
 ;; Create an instance
 (def api-backend-instance (apikey-backend {:authfn my-authfn}))
