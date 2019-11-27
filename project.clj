@@ -23,6 +23,8 @@
                  [mount "0.1.16"]
                  [nrepl "0.6.0"]
 
+                 [clj-http "3.10.0"]
+
 
 
                  [org.clojure/clojure "1.10.1"]
