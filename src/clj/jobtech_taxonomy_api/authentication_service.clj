@@ -4,6 +4,7 @@
    [clj-http.conn-mgr :as conn]
    [clj-http.client :as client]
    [muuntaja.core :as m]
+   [clojure.set :as sets]
    ))
 
 
@@ -58,8 +59,11 @@
   (set (keys (get-tokens-from-env)))
   )
 
-(defn valid-keys []
-  (set (concat (valid-keys-from-env) (valid-keys-from-external-key-service)))
+(defn valid-keys  "If keymanager-url is not set, use only keys from env" []
+  (cond-> (valid-keys-from-env)
+    (keymanager-url)
+      (sets/union (valid-keys-from-external-key-service))
+      )
   )
 
 (defn is-valid-key? [a-key]
