@@ -87,20 +87,21 @@
 
 ;; (def name-lookup (into {} (flatten  (map extracs-label-fun sample))))
 
-(defn get-cell [matrix id-1 id-2]
-  (if (= id-1 id-2)
-    1
-    (get matrix [id-1 id-2] 0)
+(comment
+  (defn get-cell [matrix id-1 id-2]
+    (if (= id-1 id-2)
+      1
+      (get matrix [id-1 id-2] 0)
+      )
     )
-  )
 
-(defn create-vector [id ids matrix]
-  (map #(get-cell matrix id %) ids)
-  )
+  (defn create-vector [id ids matrix]
+    (map #(get-cell matrix id %) ids)
+    )
 
-(defn vector-reducer [acc id]
-  (assoc acc id (create-vector id ids matrix))
-  )
+  (defn vector-reducer [acc id]
+    (assoc acc id (create-vector id ids matrix))
+    ))
 
 
 #_("yszw_TRw_S9p"
