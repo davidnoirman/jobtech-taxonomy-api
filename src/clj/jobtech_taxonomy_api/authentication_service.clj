@@ -77,3 +77,7 @@
     :else nil
     )
   )
+
+(defn get-token "i e (get-token :admin)" [token]
+  (let [tokens (get-tokens-from-env)]
+    (str (clojure.string/replace (first (filter #(= (% tokens) token) (keys tokens))) #":" ""))))

@@ -10,10 +10,12 @@
             [jobtech-taxonomy-api.middleware :as middleware]
             [jobtech-taxonomy-database.datomic-connection :as db]
             [datomic.client.api :as d]
-            [mount.core :as mount]))
+            [mount.core :as mount]
+            [jobtech-taxonomy-api.authentication-service :as auth-service]
+            ))
 
-(defn header-auth-user [] { :key "api-key", :val (middleware/get-token :user)})
-(defn header-auth-admin [] { :key "api-key", :val (middleware/get-token :admin)})
+(defn header-auth-user [] { :key "api-key", :val (auth-service/get-token :user)})
+(defn header-auth-admin [] { :key "api-key", :val (auth-service/get-token :admin)})
 
 (defmacro with-properties [property-map & body]
   "Run a badly simulated closure with a system property. Not thread safe."
