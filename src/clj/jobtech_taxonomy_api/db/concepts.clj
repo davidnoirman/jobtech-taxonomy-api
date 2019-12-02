@@ -426,11 +426,18 @@
       (ffirst response))))
 
 (defn assert-relation-part [c1 c2 type desc substitutability-percentage]
-  (let* [new-rel {:relation/concept-1 c1
-                  :relation/concept-2 c2
-                  :relation/description desc
-                  :relation/type type
-                  :relation/substitutability-percentage substitutability-percentage}
+  (let* [new-rel (cond->
+                     {:relation/concept-1 c1
+                      :relation/concept-2 c2
+                      :relation/type type
+                      }
+
+                   desc
+                   (assoc :relation/description desc)
+
+                   substitutability-percentage
+                   (assoc :relation/substitutability-percentage substitutability-percentage)
+                   )
 
          tx        [ new-rel]
          result     (d/transact (get-conn) {:tx-data tx})]
@@ -442,6 +449,78 @@
       [false nil]
       (assert-relation-part (concept-to-entity concept-1) (concept-to-entity concept-2) type description substitutability-percentage)
       )))
+
+(def fetch-simple-concept-query
+  '[:find (pull ?e [:concept/id
+                    :concept/type
+                    :concept/definition
+                    :concept/preferred-label]) :in $ ?id :where [?e :concept/id ?id]]
+  )
+
+(defn fetch-simple-concept [id]
+  (ffirst (d/q fetch-simple-concept-query (get-db) id))
+  )
+
+;; Todo add case insensitive match unicode
+(def duplicate-label-query
+  '[:find (pull ?e [:concept/id
+                    :concept/type
+                    :concept/definition
+                    :concept/preferred-label])
+    :in $ ?preferred-label ?type
+    :where
+    [?e :concept/type ?type]
+    [?e :concept/preferred-label ?preferred-label]
+    ]
+  )
+
+(def duplicate-definition-query
+  '[:find (pull ?e [:concept/id
+                    :concept/type
+                    :concept/definition
+                    :concept/preferred-label])
+    :in $ ?definition ?type
+    :where
+    [?e :concept/type ?type]
+    [?e :concept/definition ?definition]
+    ]
+  )
+
+
+(defn duplicate-concept-exists? [{:concept/keys [id preferred-label definition type]}]
+  {:pre [id preferred-label definition type]}
+  (let [concepts (concat  (d/q duplicate-label-query (get-db) preferred-label type)
+                         (d/q duplicate-definition-query (get-db) definition type))
+        duplicates (filter #(not (= id (:concept/id (first %)))) concepts)
+        ]
+    {:result  (not (zero? (count duplicates)))
+     :duplicates duplicates
+     })
+  )
+
+(defn accumulate-concept [id type definition preferred-label]
+  {:pre [id (or preferred-label definition type)]}
+
+  (let [old-concept (fetch-simple-concept id)
+        concept (cond-> old-concept
+                  preferred-label
+                  (assoc :concept/preferred-label preferred-label)
+                  definition
+                  (assoc :concept/definition definition)
+                  type
+                  (assoc :concept/type type)
+                  )
+
+        duplicate-exists (duplicate-concept-exists? concept)
+        datomic-result (when (not (:result duplicate-exists))
+                 (d/transact (get-conn) {:tx-data [concept]}))
+        ]
+
+    (when datomic-result
+      {:time (nth (first (:tx-data datomic-result)) 2) :concept concept}
+      )
+    )
+  )
 
 (comment
 

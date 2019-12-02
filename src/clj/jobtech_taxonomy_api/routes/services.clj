@@ -97,22 +97,22 @@
 
     ["/changes"
      {
-      :summary      "Show the history from a given version."
-      :parameters {:query {:from-version (taxonomy/par int? "Changes from this version, exclusive"),
-                           (ds/opt :to-version) (taxonomy/par int? "Changes to this version, inclusive"),
+      :summary      "Show changes to the taxonomy as a stream of events."
+      :parameters {:query {:after-version (taxonomy/par int? "Limit the result to show changes that occured after this version was published."),
+                           (ds/opt :to-version-inclusive) (taxonomy/par int? "Limit the result to show changes that occured before this version was published and during this version. (default: latest version)"),
                            (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
                            (ds/opt :limit) (taxonomy/par int? "Return list limit")}}
 
       :get {:responses {200 {:body types/events-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [from-version to-version offset limit]} :query} :parameters}]
+            :handler (fn [{{{:keys [after-version to-version-inclusive offset limit]} :query} :parameters}]
                        (log/info (str "GET /changes"
-                                      " from-version:" from-version
-                                      " to-version: " to-version
+                                      " after-version:" after-version
+                                      " to-version-inclusive: " to-version-inclusive
                                       " offset: " offset
                                       " limit: " limit))
                        {:status 200
-                        :body (let [events (doall (changes/get-all-events-from-version-with-pagination from-version to-version offset limit))
+                        :body (let [events (doall (changes/get-all-events-from-version-with-pagination after-version to-version-inclusive offset limit))
                                     ;; This is needed to squeeze /changes :concept into the same namespace as the other's :concept
                                     renamed (map #(clojure.set/rename-keys % {:concept :changed-concept}) events)]
                                 (vec (map types/map->nsmap renamed )))})}}]
@@ -177,17 +177,17 @@
 
     ["/replaced-by-changes"
      {
-      :summary      "Show the history of concepts being replaced from a given version."
-      :parameters {:query {:from-version (taxonomy/par int? "From taxonomy version"),
-                           (ds/opt :to-version) (taxonomy/par int? "To taxonomy version (default: latest version)")}}
+      :summary      "Show the history of concepts being replaced after a given version."
+      :parameters {:query {:after-version (taxonomy/par int? "After what taxonomy version did the change occur"),
+                           (ds/opt :to-version-inclusive) (taxonomy/par int?  "Limit the result to show changes that occured before this version was published and during this version. (default: latest version)"  )}}
       :get {:responses {200 {:body types/replaced-by-changes-spec}
                         500 {:body types/error-spec}}
-            :handler (fn [{{{:keys [from-version to-version]} :query} :parameters}]
+            :handler (fn [{{{:keys [after-version to-version-inclusive]} :query} :parameters}]
                        (log/info (str "GET /replaced-by-changes"
-                                      " from-version: " from-version
-                                      " to-version: " to-version))
+                                      " after-version: " after-version
+                                      " to-version-inclusive: " to-version-inclusive))
                        {:status 200
-                        :body (vec (map types/map->nsmap (events/get-deprecated-concepts-replaced-by-from-version from-version to-version)))
+                        :body (vec (map types/map->nsmap (events/get-deprecated-concepts-replaced-by-from-version after-version to-version-inclusive)))
                         })}}]
 
     ["/concept/types"
@@ -312,21 +312,41 @@
                             {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]
 
+     ["/accumulate-concept"
+     {
+      :summary      "Accumulate data on an existing concept."
+      :parameters {:query {(ds/opt :id) (taxonomy/par string? "Concept id")
+                           (ds/opt :type) (taxonomy/par string? "Concept type"),
+                           (ds/opt :definition) (taxonomy/par string? "Definition"),
+                           (ds/opt :preferred-label) (taxonomy/par string? "Preferred label")}}
+      :patch {:responses {200 {:body types/ok-concept-spec}
+                         409 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [id type definition preferred-label]} :query} :parameters}]
+                        (log/info "PATCH /accumulate-concept")
+                        (let [result (concepts/accumulate-concept id type definition preferred-label)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap result) }
+                            {:status 409 :body (types/map->nsmap {:error "Can't update concept since it is in conflict with existing concept." }) })))}}]
+
+
     ["/relation"
      {
       :summary      "Assert a new relation."
-      :parameters {:query {(ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
+      :parameters {:query {(ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability" } "Relation type"),
                            (ds/opt :definition) (taxonomy/par string? "Description"),
                            (ds/opt :concept-1) (taxonomy/par string? "ID of source concept"),
                            (ds/opt :concept-2) (taxonomy/par string? "ID of target concept"),
-                           (ds/opt :substitutability-to) (taxonomy/par int? "substitutability")
+                           (ds/opt :substitutability-percentage) (taxonomy/par int? "You only need this one if the relation is substitutability")
                            }}
       :post {:responses {200 {:body types/msg-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [relation definition concept-1 concept-2 substitutability-to]} :query} :parameters}]
+             :handler (fn [{{{:keys [relation definition concept-1 concept-2 substitutability-percentage]} :query} :parameters}]
                         (log/info "POST /relation")
-                        (let [[result new-relation] (concepts/assert-relation concept-1 concept-2 relation definition substitutability-to)]
+                        (let [[result new-relation] (concepts/assert-relation concept-1 concept-2 relation definition substitutability-percentage)
+                              _ (log/info new-relation)
+                              ]
                           (if result
                             {:status 200 :body (types/map->nsmap {:message "Created relation."}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new relation since it is in conflict with existing relation."}) })))}}]

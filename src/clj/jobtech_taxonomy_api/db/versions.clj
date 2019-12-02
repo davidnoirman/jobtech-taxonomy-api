@@ -43,8 +43,25 @@
   )
 
 
+(defn get-current-version-id []
+  (:version (last (get-all-versions))))
+
+(defn create-version-0 "only used for tests" []
+  (when  (empty? (get-all-versions))
+    (d/transact (get-conn) {:tx-data [ {:taxonomy-version/id 0}  ]})
+    )
+  )
+
+(defn get-next-version-id []
+  (inc (get-current-version-id)))
+
 (defn is-the-new-version-id-correct? [new-version-id]
-  (= new-version-id (inc (ffirst (d/q show-latest-version (get-db)))))
+  (let [current-version (ffirst (d/q show-latest-version (get-db)))]
+    (if (and (nil? current-version) (= 0 new-version-id))
+      true
+      (= new-version-id (inc current-version))
+      )
+    )
   )
 
 
