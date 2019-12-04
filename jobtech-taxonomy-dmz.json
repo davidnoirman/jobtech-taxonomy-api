@@ -186,16 +186,16 @@
         "parameters": [
           {
             "in": "query",
-            "name": "from-version",
-            "description": "Changes from this version, exclusive",
+            "name": "after-version",
+            "description": "Limit the result to show changes that occured after this version was published.",
             "type": "integer",
             "required": true,
             "format": "int64"
           },
           {
             "in": "query",
-            "name": "to-version",
-            "description": "Changes to this version, inclusive",
+            "name": "to-version-inclusive",
+            "description": "Limit the result to show changes that occured before this version was published and during this version. (default: latest version)",
             "type": "integer",
             "required": false,
             "format": "int64"
@@ -825,16 +825,16 @@
         "parameters": [
           {
             "in": "query",
-            "name": "from-version",
-            "description": "From taxonomy version",
+            "name": "after-version",
+            "description": "After what taxonomy version did the change occur",
             "type": "integer",
             "required": true,
             "format": "int64"
           },
           {
             "in": "query",
-            "name": "to-version",
-            "description": "To taxonomy version (default: latest version)",
+            "name": "to-version-inclusive",
+            "description": "Limit the result to show changes that occured before this version was published and during this version. (default: latest version)",
             "type": "integer",
             "required": false,
             "format": "int64"
