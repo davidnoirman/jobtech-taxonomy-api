@@ -1,64 +1,31 @@
-DOCUMENT IS WORK IN PROGRESS!
+** Reference Guide JobTech Taxonomy API**
 
-# Getting started with JobTech Taxonomy API
+**The Taxonomy Database**
 
-Hello developer! This document will get you started using the API at [www.jobtech-taxonomy-api.dev.services.jtech.se/v0/taxonomy/swagger-ui/index.html][API Swagger page]
-. The tools we provide gives you access to the Taxonomy Database containing terminology used in the Swedish labour market and the relationships between concepts within taxonomies like occupations, skills, education levels and much more!
+The Taxonomy Database contains terms or phrases used at the Swedish
+labour market. These are called **concepts** in the database. Every
+concept has a unique concept-ID, a preferred label and a type.
 
-The public API is open source (code found at [www.github.com/JobtechSwe/jobtech-taxonomy-api][This repo on Github]) and the data is free to use by anyone. Make sure to read through the documentation for the specific resource you want, and the information about the Taxonomy Database, to understand what this API can offer. If you have any questions about the API or the data, don’t hesitate to contact us at [contact@jobtechdev.se][Jobtechdev contact email adress] , or create an issue on Github if you find any bugs.
+Some concepts include extra attributes like definitions and alternative
+labels. The concepts are connected in schemas, see the schema headlines
+below.
 
-# Table of content
-* [ Getting started - Short version ](#short)
-* [ Getting started - Longer version ](#long)
-  * [ Background - The Taxonomy Database ](#background)
-    * [ Schema: Occupations ](#occupations)
-    * [ Schema: Skills ](#skills)
-    * [ Schema: Geographical places ](#geography)
-    * [ Schema: Wage type ](#wageType)
-    * [ Schema: Employment type ](#eType)
-    * [ Schema: Driving licence ](#driving)
-    * [ Schema: Worktime extent ](#worktime)
-    * [ Schema: SUN ](#sun)
-    * [ Schema: SNI ](#sni)
-    * [ Schema: Languages ](#language)
-    * [ Schema: Language levels ](#languageLevel)
-    * [ Schema: Employment duration ](#employmentDuration)
-  * [ Using the API ](#using)
-    * [ Authentication ](#auth)
-  * [ Resources ](#resources)
-    * [ Endpoint: /v0/taxonomy/public/versions ](#versions)
-    * [ Endpoint: /v0/taxonomy/public/changes ](#changes)
-    * [ Endpoint: /v0/taxonomy/public/concepts ](#concepts)
-    * [ Endpoint: /v0/taxonomy/public/search ](#search)
-    * [ Endpoint: /v0/taxonomy/public/replaced-by-changes ](#replaced)
-    * [ Endpoint: /v0/taxonomy/public/concept/types ](#types)
-    * [ Endpoint: /v0/taxonomy/public/parse-text ](#parse)
-  * [ Results ](#results)
-    * [ Successful queries ](#success)
-    * [ Errors ](#error)
-  * [ Use cases ](#useCases)
-* [ Contact Information ](#contact)
+Within schemas the concepts are linked with relationships.
 
-<a name="short"></a>
-# Getting started - Short version
+The content of the Taxonomy Database is constantly improved and updated
+by the JobTech editorial team. New versions of the database will be
+released at regular intervals. However, none of the concepts/terms are
+deleted in the Taxonomy Database. If a concept becomes outdated for the
+matching purposes, it is tagged with a deprecated flag, but it is still
+available in the API from some endpoints.
 
-EXPLAIN HOW TO GET AN API KEY!
+The Taxonomy Database contains several schemas. Some of these schemas
+are multilevel taxonomies with hierarchical relationships between
+concepts. Some schemas are merely simple collections of concepts. The
+following section will walk you through the schemas and relations within
+the database.
 
-<a name="long"></a>
-# Getting started - Longer version 
-
-<a name="background"></a>
-## Background - The Taxonomy Database 
-
-The Taxonomy Database contains terms or phrases used within the Swedish labour market. These are called concepts in the database. Every concept in the database has a unique concept-ID, a preferred label and a type. Some concepts have extra attributes like definitions and alternative labels. The concepts are grouped together in schemas (see the schema headlines below) and within schemas the concepts from different types are linked with relationships.
-
-The content of the Taxonomy Database is constantly improved and updated behind the scenes by Jobtech’s editorial team. When enough updates of the database has been made, a new version is released. However, nothing ever gets deleted in the Taxonomy Database. If a concept or an attribute becomes outdated it is tagged with a deprecated flag but it is still available in the API from some endpoints.
-
-The Taxonomy Database contains a number of schemas. Some of these schemas are multilevel taxonomies with hierarchical relationships between concepts. Some schemas are merely simple collections of concepts. The following section will walk you through all the different schemas.
-
-<a name="occupations"></a>
-### Schema: Occupations
-
+**Schema: Occupations**
 
 <!---
 Chart created in www.draw.io
@@ -66,15 +33,51 @@ Chart created in www.draw.io
 
 ![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Untitled%20Diagram.png "Diagram for Occupation Schema")
 
-The occupation taxonomy is a multilevel collection of occupations. The taxonomy is based on external standards together with content created by the editorial team for use in the Swedish labour market, with the concepts all connected to each other directly or indirectly. Depending on your needs you might be interested in different parts of the schema. If you work with job seekers or employers the recommended types to use is the Occupation Field type together with SSYK-4 and Occupation Names. The Occupation collections and Keywords might also be useful. If you are working with official labour market statistics you are more likely to use the SSYK or ISCO types.
 
-Most types in the Occupation schema comes from “[Svensk standard för yrkesklassificering][SSYK at SCB]" (Swedish Standard Classification of Occupations), or SSYK, which is based on “[International Standard Classification of Occupation][ISCO occupations]”, or ISCO. The current version used is SSYK-2012 and ISCO-08. All the concepts in the SSYK and ISCO types have external-standard codes. If you are using the taxonomy for statistical reasons for example, these codes come in handy. **Very important to note is that the SSYK and ISCO codes are not to be used as unique ID numbers for specific concepts since they are not fixed**. When the external standard gets updated the SSYK and ISCO codes are moved around according to the new version of the standard. **Always use the Concept ID as identification for specific concepts. This is guaranteed to not change over time**. 
+**The occupation taxonomy** is a multilevel collection, based on a
+national standard. The content, occupation names, synonyms and other
+concepts, are created and updated in cooperation with actors at the
+Swedish labour market. The concepts are connected to each other directly
+or indirectly.
 
-The external standard types at the topmost level in the schema (SSYK-1 and ISCO-1) contain general areas of work, like "Yrken inom administration och kundtjänst". Since the concepts at this level covers very broad areas of the labour market, there aren’t that many in each type. The third top level type, Occupation Field, is also very broad. This type isn’t an external standard but a collection of nonspecific occupation areas created specifically for the job seeking market. 
+Occupation schema is structured according to “SSYK, [Svensk standard för
+yrkesklassificering](https://www.scb.se/dokumentation/klassifikationer-och-standarder/standard-for-svensk-yrkesklassificering-ssyk/)"
+(Swedish Standard Classification of Occupations), which is based on
+“ISCO, [International Standard Classification of
+Occupation](https://www.ilo.org/public/english/bureau/stat/isco/)”. The
+current version used is SSYK-2012.
 
-The lower you get in the taxonomy, the more detailed concepts you’ll find with Occupation Name at the bottom. This type contains more than 3000 concepts, collected by the editorial team often by suggestions from employers and industry organizations. In this level you’ll find concepts like “Stödpedagog”. 
+All the concepts in the SSYK have external-standard codes.
 
-Every concept at a lower and more detailed level is connected to one concept at the parent level, throughout the taxonomy. Example: 
+**Please note that the SSYK codes are not to be used as unique ID
+numbers for specific concepts since they are not fixed**. **Always use
+the Concept ID as identification for specific concepts. This is
+guaranteed to not change over time**.
+
+The external standard type at the topmost level in the schema (SSYK-1)
+contain nine **major groups of occupations**, like " Yrken med krav på
+fördjupad högskolekompetens". These major groups of occupations are
+recommended to be used for statistic purposes only.
+
+Another “top level” groups of occupations, **Occupation Field**, is
+based labour market sectors, created to make it easier for job seekers
+to find relevant jobs. Occupation Field is not an external standard.
+
+**The connections between SSYK Occupation Groups and Occupation Field is
+recommended to be used for statistical purposes only.**
+
+All Occupation names are also connected to at least one Occupation
+Field, some of them are connected to two Occupation Fields. **These
+connections are recommended to be used for matching purposes.**
+
+The most detailed concept, **Occupation Name** contain terms collected
+by the editorial team in co-operation with employers’ organizations,
+professional boards and recruiters. In this level you’ll find concepts
+like “IT-arkitekt/Lösningsarkitekt”. Occupation names are the “official”
+terms for occupations.
+
+Every concept at a lower and more detailed level is connected to one
+concept at the parent level, throughout the taxonomy. Example:
 
 <!---
 Chart created in www.draw.io
@@ -82,171 +85,193 @@ Chart created in www.draw.io
 
 ![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Hierarchy.png "Diagram linked occupation levels")
 
-In the type Occupation Collections you’ll find listings of Occupation Names grouped by different variables that may span over different occupation areas. examples are “Arbeten utan krav på utbildning” and “Chefsyrken”.
-The Keyword type contains a variety of different search terms and phrases in some way related to Occupation Names. They can be used to help candidates find job ads they are interested in even if they don’t know the exact Occupation Name. An example is the Keyword “Coop” (like the food store), mapped to the Occupation Name “Butiksbiträde”. 
 
-<a name="skills"></a>
-### Schema: Skills
+In the type **Occupation Collections,** you’ll find listings of
+Occupation Names grouped by variables that may span over different
+occupation areas: “Yrken utan krav på utbildning” and “Chefer,
+direktörer och föreståndare”. These collections are created to highlight
+a certain group of occupations, not based on SSYK.
 
-This taxonomy contains two levels. The top type contains a number of broader skill areas, like “Databaser”. The lower type contains specific skill concepts like “SQL-Base, databashanterare”. Each of these concepts are mapped to a parent skill headline in the above level. The database contains around 5500 skills as of May 2019.
+The **Keyword** type contains search terms related to Occupation Names.
+They can be used to help candidates find job ads they are interested in
+even if they don’t know the exact Occupation Name. An example is the
+Keyword “Asfaltarbetare”, mapped to the Occupation Name
+“Beläggningsarbetare”. Keywords are recommended to be used as “hidden”
+terms, connected to one or several official Occupation Names. Keywords
+should not be exposed to end users.
 
-<a name="geography"></a>
-### Schema: Geographical places
+**Schema: Skills**
 
-The database contains a four level taxonomy of geographical places. Like the occupation taxonomy and the skill taxonomy the concepts are related to each other in a hierarchical structure.
+The skills taxonomy contains two levels: Skills headlines like
+“Databaser” and Skills like “SQL-Base, databashanterare”. Each of the
+skill concepts are mapped to a parent skill headline and to one or
+several SSYK Occupation groups. The database of skills is created and
+updated in co-operation with employers’ organizations, professional
+boards and recruiters and includes the most relevant skills for each
+four-digit SSYK Occupation Group.
 
-The top geographic type lists all continents in the world, including Antarctica. The taxonomy is based on the [UN standard for continents][Continents]. In this level you’ll also find the concept “Hela världen”, which can be used in cases where a system requires a location but a job seeker for example doesn’t want to specify.
+The skill headline named “**General skills**” contains broader skills
+like “Projektledning, erfarenhet”. They are not mapped to any Occupation
+groups. They are recommended to use as optional skills for all job
+seekers and employers
 
-The second type in this taxonomy contains all countries in the world. The countries are categorized according to [ISO standard for countries][Countries]. Each country in this level has a parent continent in the top level.
+**Schema: Geographical areas**
 
-The third type is simply called regions and it contains all regions within the EU with a “NUTS code” (See [Eurostat][NUTS] for information about NUTS). In Sweden the regions corresponds to “län”. Every region is mapped to a specific parent country in the second level in the taxonomy. 
+The database contains a four-level taxonomy of geographical areas. Like
+the occupation and skill taxonomy, the concepts are related to each
+other in a hierarchical structure.
 
-The fourth level in the geographic places taxonomy contains the Swedish municipalities. Each municipality is mapped to a specific parent region in the above level.
+The top geographic type lists all continents in the world, including
+Antarctica. The taxonomy is based on the [<span class="underline">UN
+standard for
+continents</span>](https://unstats.un.org/unsd/methodology/m49/). In
+this type, there is also the concept “Hela världen”, which is a list of
+all countries.
 
-<a name="wageType"></a>
-### Schema: Wage type
+The second type in this taxonomy contains all countries in the world,
+according to [<span class="underline">ISO standard for
+countries</span>](https://www.iso.org/iso-3166-country-codes.html). Each
+country in this level has a parent continent in the top level.
 
-This schema only has one type. This type contains descriptions of different forms of payment, like “Rörlig ackords- eller provisionslön”.
+The third type is simply called “regions” and contains all regions
+within the EU with a “NUTS code” (See [<span
+class="underline">Eurostat</span>](https://ec.europa.eu/eurostat/web/nuts/background) for
+information about NUTS). In Sweden the regions correspond to “län”.
+Every region is mapped to a specific parent country in the second level
+in the taxonomy.
 
-<a name="eType"></a>
-### Schema: Employment type
+The fourth type of the geographic areas contains the Swedish
+municipalities. Each municipality is mapped to a specific parent region
+in the above level. Geographical areas are recommended to use when a
+vacancy is abroad or when a job seeker looks for a job abroad.
 
-This schema only contain one type. It lists different types of employment, like “Säsongsanställning” och “Behovsanställning”.
+**Schema: Wage type**
 
-<a name="driving"></a>
-### Schema: Driving licence
+This schema only has one type. This type contains descriptions of forms
+of payment, like “Rörlig ackords- eller provisionslön”.
 
-This single type schema contains all different driving licence categories in Sweden, according to [EU standard][Driving licence], and the description and limitation of each licence. 
+**Schema: Employment type**
 
-All but the “lowest” ranked licence also contain a list of the licences that are implicit within that level. The A2 licence for example has the Implicit licence attribute listing AM and A1. These are lower level licences for scooters that you are automatically allowed to drive if you carry the A2 licence.
+This schema only contains one type. It lists types of employment, like
+“Säsongsanställning” och “Behovsanställning/Timanställning”.
 
-<a name="worktime"></a>
-### Schema: Worktime extent
- 
+**Schema: Driving license**
+
+This single type schema contains driving license categories in Sweden,
+according to [<span class="underline">EU
+standard</span>](https://europa.eu/youreurope/citizens/vehicles/driving-licence/driving-licence-recognition-validity/index_en.htm),
+and the description and limitation of each license.
+
+“Körkortskombinationer”: All but the “lowest” ranked license also
+contain a list of the licenses that are implicit within that level. The
+A2 license for example has the Implicit license attribute listing AM and
+A1. These are lower level licenses for scooters that you are
+automatically allowed to drive if you carry the A2 license.
+
+**Schema: Worktime extent**
+
 This schema only contains the two concepts “Heltid” and “Deltid”.
 
-<a name="sun"></a>
-### Schema: SUN
+**Schema: SUN**
 
-INFORMATION ABOUT SUN HERE!
+“Svensk utbildningsklassifkation” SUN is used for classifying education.
+SUN provides the conditions for producing comparable statistics and
+analysis of population, education and the Swedish education system, both
+nationally and internationally. SUN consists of two classifications: one
+describing education *level* and another describing education
+*orientation*.
 
-<a name="sni"></a>
-### Schema: SNI
+**Schema: SNI**
 
-SNI stands for “svensk näringsgrensindelning” and the collection contains terms for different industries. This taxonomy follows the [SCB documentation][SNI] and has two levels. 
+“Svensk näringsgrensindelning SNI” contains terms for industries. This
+taxonomy follows the [<span class="underline">SCB
+documentation</span>](https://www.scb.se/contentassets/d43b798da37140999abf883e206d0545/mis-2007-2.pdf) and
+has two levels.
 
-The SNI-level-1 contains general area term of industries. An example is the concept “Tillverkning”.
+The SNI-level-1 contains general area term of industries. An example is
+the concept “Tillverkning”.
 
-The second level, SNI-level-2, lists the industries in more detail. It has concepts like “Livsmedelsframställning”. Every concept in this level has a parent concept in the first level.
+The second level, SNI-level-2, lists the industries in more detail. It
+has concepts like “Livsmedelsframställning”. Every concept in this level
+has a parent concept in the first level.
 
-<a name="language"></a>
-### Schema: Languages
+**Schema: Languages**
 
-The language taxonomy lists more than 400 natural languages in the world, like “Svenska” and “Xhosa/Isixhosa”. The language names follows the [ISO standard][Languages].
+The language taxonomy lists natural languages like “Svenska” and
+“Xhosa/Isixhosa”. The language taxonomy is based on [<span
+class="underline">ISO
+standard</span>](https://www.iso.org/iso-639-language-codes.html) and
+it’s recommended to highlight which languages are requested for a
+vacancy and the languages a job seeker is able to work with.
 
-<a name="languageLevel"></a>
-### Schema: Language levels
+**Schema: Language levels**
 
-The language level taxonomy is a simple collection of different terms used to describe language proficiency. It contains concepts like “Lite” and “Flytande”.
+The language level taxonomy is a simple collection of different terms
+used to describe language proficiency. It contains concepts like “Lite”
+and “Flytande”.
 
-<a name="employmentDuration"></a>
-### Schema: Employment duration
+**Schema: Employment duration**
 
-The employment duration taxonomy contains concepts describing how long an employment is meant to last. The schema contains concepts like “3 månader – upp till 6 månader”.
+The employment duration taxonomy contains concepts describing how long
+an employment is meant to last. The schema contains concepts like “3
+månader – upp till 6 månader”.
 
-<a name="using"></a>
-## Using the API
+Relations
+=========
 
-<a name="auth"></a>
-### Authentication
+The concepts in the Taxonomy database may be related to each other in a
+number of ways. The different types of relations are in part based on
+the SKOS standard found here: [<span
+class="underline">https://www.w3.org/TR/skos-reference/\#L1170</span>](https://www.w3.org/TR/skos-reference/#L1170).
+The relations can be either vertical (describing a hierarchy) or
+horizontal.
 
-At [the API page][API Swagger page] you’ll see the headlines public and private. You can access the endpoints under public by authenticating with the API key EXPLAIN HOW TO GET AN API KEY! The private endpoint is only for the editorial team and not open to the public.
+Narrower
+--------
 
-<a name="resources"></a>
-## Resources
+This relation is vertical and is used to express when one concept is on
+a lower level than another in a hierarchy. For example: the occupation
+“Beläggningsarbetare” is narrower than the occupation group
+“Anläggningsarbetare”.
 
-<a name="versions"></a>
-### Endpoint: /v0/taxonomy/public/versions
+Broader
+-------
 
-The response is a list of all versions of the database that exists. It starts with version 0 - which is the empty database - and ends with the last published version.
+This relation is vertical and is used to express when one concept is on
+a higher level than another in a hierarchy. For example: the occupation
+group “Anläggningsarbetare” is broader than the occupation
+“Beläggningsarbetare”.
 
-<a name="changes"></a>
-### Endpoint: /v0/taxonomy/public/changes
+Substitutability
+----------------
 
-This endpoint returns a list of all “events” that has occured for concepts in the database between versions. The possible events are “CREATED”, “DEPRECATED” and “UPDATED”. The earliest possible version that exists is 0, which represent the database before any data were created in it. If you choose to see the changes from version 0 to version 1 you will see all the concepts that were added to the database in the first iteration. If you don’t choose any specific “toVersion” parameter you will get changes that happened all the way to the latest version by default.
+This relation is horizontal and describes the closeness of two
+occupations. The relation can be expressed as both *high* (75) and *low*
+(25) substitutability between occupations. For example: the occupation
+“Beläggningsarbetare” has a high substitutability with the occupation
+“Väg- och anläggningsarbetare”. In the API the objects in the
+substitutability relations are expressed as a source occupation and a
+target occupation. In the example above the occupation
+“Beläggningsarbetare” would be the source.
 
-<a name="concepts"></a>
-### Endpoint: /v0/taxonomy/public/concepts
+The two levels can be described as following:
 
-This endpoint allows you to search specific concepts in the database. In the response you’ll see the concept ID, the description and the type. If the concept is outdated (i.e. no longer recommended for use in the Swedish labour market) you’ll also see  “deprecated”: true in the json response.
+-   High (or 75%): very closely related with a high level of similarity
+    in tasks
 
-<a name="search"></a>
-### Endpoint: /v0/taxonomy/public/search
+-   Low (or 25%): some tasks are similar and/or some education or
+    training might be needed to traverse the gap
 
-This endpoint lets you search concepts based on part of the label. The result will contain all concepts with the search string, no matter if the search string is at the beginning, middle or end of the concept label. Like the concepts endpoint, the result will contain the concept ID, the description, the type and if applicable also the “deprecated”: true attribute.
+The substitutability relation may be asymmetrical, meaning that a high
+substitutability from one occupation to another does not necessarily
+mean that the reverse is true. For instance in the example above, the
+reversed substitutability (from Väg- och underhållningsarbetare to
+Beläggningsarbetare) is in fact low.
 
-<a name="replaced"></a>
-### Endpoint: /v0/taxonomy/public/replaced-by-changes
-
-Similar to the Changes endpoint, this will give you changes between versions of the database but in this endpoint you will only see concepts that has been replaced by another concept. This means one concept has been deprecated and is pointing to another existing concept in the database. One example is the Occupation Name “Användbarhetsexpert” with Concept ID HciA_Cu7_FXt from version 1, that has been replaced by “Interaktionsdesigner” with Concept ID QQjZ_NAN_bDR in version 2. The replaced concept will still be searchable in the database but from this point it will have the Deprecated-flag attached to it.
-
-<a name="types"></a>
-### Endpoint: /v0/taxonomy/public/concept/types
-
-With this endpoint you’ll get a list with all concept types that exists in the taxonomy.
-
-<a name="parse"></a>
-### Endpoint: /v0/taxonomy/public/parse-text
-
-The Parse Text is a “post” endpoint, allowing you to input a string. The response will return all the concepts from the database that relates to the words in the input text. For example, if you input the string “I Skövde arbetade jag som clown. Jag är även bra på handkirurgi.”, the result will contain the concepts “Skövde” (Municipality), “clown” (Occupation name) and “handkirurgi” (Skill).
-
-This endpoint can be used to automatically parse CVs to match words or phrases to job ads. Or vice versa. 
-
-<a name="results"></a>
-### Results
-
-All API responses are in json format.
-
-<a name="success"></a>
-### Successful queries
-
-Successful requests will return the HTTP status code 200. The details in the response will vary depending on the specific endpoint. 
-
-<a name="error"></a>
-### Errors
-
-The three possible error codes are listed below. Note that a request returning an empty list does not count as an error and will return status code 200.
-
-| HTTP Status code | Reason | Explanation |
-| ------------- | ------------- | -------------|
-| 500 | Internal Server Error | Something wrong on the server side |
-| 400 | Bad Request | Something wrong in the query |
-| 401 | Unauthorized | You are not using an API key |
-
-<a name="useCases"></a>
-## Use cases
-
-Insert link to example application!
-
-<a name="contact"></a>
-# Contact Information
-
-
-Bug reports are issued at [the Github repo][This repo on Github].
-
-Questions about the Taxonomy database, about Jobtech, about the API in general are best emailed to [contact@jobtechdev.se][Jobtechdev contact email adress].
-
-Check out our other open API:s at [jobtechdev][Jobtechdev].
-
-[API Swagger page]: http://jobtech-taxonomy-api.dev.services.jtech.se/v0/taxonomy/swagger-ui/index.html
-[This repo on Github]: https://github.com/JobtechSwe/jobtech-taxonomy-api
-[Jobtechdev contact email adress]: contact@jobtechdev.se
-[SSYK at SCB]: https://www.scb.se/dokumentation/klassifikationer-och-standarder/standard-for-svensk-yrkesklassificering-ssyk/
-[ISCO occupations]: https://www.ilo.org/public/english/bureau/stat/isco/
-[Continents]: https://unstats.un.org/unsd/methodology/m49/
-[Countries]: https://www.iso.org/iso-3166-country-codes.html
-[NUTS]: https://ec.europa.eu/eurostat/web/nuts/background
-[Driving licence]: https://europa.eu/youreurope/citizens/vehicles/driving-licence/driving-licence-recognition-validity/index_en.htm
-[SNI]: https://www.scb.se/contentassets/d43b798da37140999abf883e206d0545/mis-2007-2.pdf
-[Languages]: https://www.iso.org/iso-639-language-codes.html
-[Jobtechdev]: www.jobtechdev.se
+The substitutability relations are created and recommended for employers
+looking for candidates. If they cannot find exactly what they are
+looking for, they get suggestions that may work out for them instead.
+For example: an employer is looking for a candidate for “Förskollärare”
+but cannot find one. Instead they get suggestions for “Barnskötare”
+through the substitutability relation. In this case the substitutability
+from “Förskollärare” to “Barnskötare” is low.
