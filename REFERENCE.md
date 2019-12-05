@@ -1,4 +1,4 @@
-** Reference Guide JobTech Taxonomy API**
+*Reference Guide JobTech Taxonomy API*
 
 **The Taxonomy Database**
 
