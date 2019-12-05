@@ -71,7 +71,7 @@ Field, some of them are connected to two Occupation Fields. **These
 connections are recommended to be used for matching purposes.**
 
 The most detailed concept, **Occupation Name** contain terms collected
-by the editorial team in co-operation with employers’ organizations,
+by the editorial team in co-operation with employers’ organisations,
 professional boards and recruiters. In this level you’ll find concepts
 like “IT-arkitekt/Lösningsarkitekt”. Occupation names are the “official”
 terms for occupations.
@@ -106,7 +106,7 @@ The skills taxonomy contains two levels: Skills headlines like
 “Databaser” and Skills like “SQL-Base, databashanterare”. Each of the
 skill concepts are mapped to a parent skill headline and to one or
 several SSYK Occupation groups. The database of skills is created and
-updated in co-operation with employers’ organizations, professional
+updated in co-operation with employers’ organisations, professional
 boards and recruiters and includes the most relevant skills for each
 four-digit SSYK Occupation Group.
 
