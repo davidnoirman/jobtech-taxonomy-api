@@ -83,32 +83,34 @@
 
 (def concepts-spec-ssyk-2012 ::concepts-ssyk)
 
-;; eures
-(sp/def ::eures-code-2014 (st/spec string?))
 
-(sp/def ::concept-employment-duration-shallow
+;; municipality
+
+(sp/def ::lau-2-code-2015 (st/spec string?))
+
+(sp/def ::concept-municipality-shallow
   (st/spec
-   {:name ::concept-employment-duration-shallow
-    :spec (sp/keys :req [::id ::type ::eures-code-2014]
+   {:name ::concept-municipality-shallow
+    :spec (sp/keys :req [::id ::type ::lau-2-code-2015]
                    :opt [::definition ::deprecated ::preferred-label ::relations])}))
 
-(sp/def ::replaced-by-employment-duration
-   (ds/spec
-    {:name ::replaced-by-employment-duration
-     :spec (sp/coll-of ::concept-employment-duration-shallow )}))
+(sp/def ::replaced-by-municipality
+  (ds/spec
+   {:name ::replaced-by-municipality
+    :spec (sp/coll-of ::concept-municipality-shallow )}))
 
-(sp/def ::concept-employment-duration
-   (ds/spec
-    {:name ::concept-employment-duration
-     :spec (sp/keys :req [::id ::type ::eures-code-2014 ::preferred-label]
-                    :opt [::definition ::deprecated ::replaced-by-employment-duration ::relations])}))
+(sp/def ::concept-municipality
+  (ds/spec
+   {:name ::concept-municipality
+    :spec (sp/keys :req [::id ::type ::lau-2-code-2015 ::preferred-label]
+                   :opt [::definition ::deprecated ::replaced-by-municipality ::relations])}))
 
-(sp/def ::concepts-employment-duration
-   (ds/spec
-    {:name ::concepts-employment-duration
-     :spec (sp/coll-of ::concept-employment-duration)}))
+(sp/def ::concepts-municipality
+  (ds/spec
+   {:name ::concepts-municipality
+    :spec (sp/coll-of ::concept-municipality)}))
 
-(def concepts-spec-eures-code ::concepts-employment-duration)
+(def concepts-spec-municipality-code ::concepts-municipality)
 
 
 ;; nuts-level-3
@@ -592,7 +594,9 @@
   (sort-by :endpoint-name
            [
             {:endpoint-name "driving-licence"
-             :extra-attributes [{:query-field "driving-licence-code-2013"
+             :extra-attributes [{:query-field {:name "driving-licence-code-2013"
+                                               :doc "Driving licence code"
+                                               }
                                  :where-field :concept.external-standard/driving-licence-code-2013
                                  :pull-expression :concept.external-standard/driving-licence-code-2013
                                  }
@@ -605,25 +609,34 @@
              }
 
             {:endpoint-name "ssyk"
-             :extra-attributes [{:query-field "ssyk-code-2012"
+             :extra-attributes [{:query-field {:name "ssyk-code-2012"
+                                               :doc "SSYK 2012"
+                                               }
                                  :where-field :concept.external-standard/ssyk-code-2012
                                  :pull-expression :concept.external-standard/ssyk-code-2012
                                  }]}
 
-            {:endpoint-name "employment-duration"
-             :extra-attributes [{:query-field "eures-code-2014"
-                                 :where-field :concept.external-standard/eures-code-2014
-                                 :pull-expression :concept.external-standard/eures-code-2014
-                                 }]
+            {:endpoint-name "municipality"
+             :extra-attributes [{:query-field {:name "lau-2-code-2015"
+                                               :doc "Swedish municipality code"
+                                               }
+                                 :where-field :concept.external-standard/lau-2-code-2015
+                                 :pull-expression :concept.external-standard/lau-2-code-2015
+                                 }
+                                ]
              }
 
             {:endpoint-name "region"
-             :extra-attributes [{:query-field "nuts-level-3-code-2013"
+             :extra-attributes [{:query-field {:name "nuts-level-3-code-2013"
+                                               :doc "Nuts level 3 code"
+                                               }
                                  :where-field :concept.external-standard/nuts-level-3-code-2013
                                  :pull-expression :concept.external-standard/nuts-level-3-code-2013
                                  }
 
-                                {:query-field "national-nuts-level-3-code-2019"
+                                {:query-field {:name "national-nuts-level-3-code-2019"
+                                               :doc "Swedish län code"
+                                               }
                                  :where-field :concept.external-standard/national-nuts-level-3-code-2019
                                  :pull-expression :concept.external-standard/national-nuts-level-3-code-2019
                                  }
@@ -632,26 +645,34 @@
 
             {:endpoint-name "country"
              :extra-attributes [
-                                {:query-field "iso-3166-1-alpha-2-2013"
+                                {:query-field {:name "iso-3166-1-alpha-2-2013"
+                                               :doc "Country code 2 letter"
+                                               }
                                  :where-field :concept.external-standard/iso-3166-1-alpha-2-2013
                                  :pull-expression :concept.external-standard/iso-3166-1-alpha-2-2013
                                  }
 
-                                {:query-field "iso-3166-1-alpha-3-2013"
+                                {:query-field {:name "iso-3166-1-alpha-3-2013"
+                                               :doc  "Country code 3 letter"
+                                               }
                                  :where-field :concept.external-standard/iso-3166-1-alpha-3-2013
                                  :pull-expression :concept.external-standard/iso-3166-1-alpha-3-2013}
                                 ]
              }
 
             {:endpoint-name "isco"
-             :extra-attributes [{:query-field "isco-code-08"
+             :extra-attributes [{:query-field {:name "isco-code-08"
+                                               :doc "ISCO code 2008"
+                                               }
                                  :where-field :concept.external-standard/isco-code-08
                                  :pull-expression :concept.external-standard/isco-code-08
                                  }]
              }
 
             {:endpoint-name "sun-education-field"
-             :extra-attributes [{:query-field "sun-education-field-code-2020"
+             :extra-attributes [{:query-field {:name "sun-education-field-code-2020"
+                                               :doc  "SUN education field code, either 1, 2 or 3 digits and a letter"
+                                               }
                                  :where-field :concept.external-standard/sun-education-field-code-2020
                                  :pull-expression :concept.external-standard/sun-education-field-code-2020
                                  }]
@@ -659,7 +680,9 @@
 
 
             {:endpoint-name "sun-education-level"
-             :extra-attributes [{:query-field "sun-education-level-code-2020"
+             :extra-attributes [{:query-field {:name "sun-education-level-code-2020"
+                                               :doc "SUN education level code, either 1, 2 or 3 digits"
+                                               }
                                  :where-field  :concept.external-standard/sun-education-level-code-2020
                                  :pull-expression :concept.external-standard/sun-education-level-code-2020
                                  }]
@@ -667,19 +690,25 @@
 
 
             {:endpoint-name "sni-level"
-             :extra-attributes [{:query-field "sni-level-code-2007"
+             :extra-attributes [{:query-field {:name "sni-level-code-2007"
+                                               :doc "SNI 2007 level code"
+                                               }
                                  :where-field :concept.external-standard/sni-level-code-2007
                                  :pull-expression :concept.external-standard/sni-level-code-2007
                                  }]
              }
 
             {:endpoint-name "language"
-             :extra-attributes [{:query-field "iso-639-3-alpha-2-2007"
+             :extra-attributes [{:query-field {:name "iso-639-3-alpha-2-2007"
+                                               :doc  "2 letter language code"
+                                               }
                                  :where-field :concept.external-standard/iso-639-3-alpha-2-2007
                                  :pull-expression :concept.external-standard/iso-639-3-alpha-2-2007
                                  }
 
-                                {:query-field "iso-639-3-alpha-3-2007"
+                                {:query-field {:name "iso-639-3-alpha-3-2007"
+                                               :doc  "3 letter language code"
+                                               }
                                  :where-field :concept.external-standard/iso-639-3-alpha-3-2007
                                  :pull-expression :concept.external-standard/iso-639-3-alpha-3-2007
                                  }
@@ -719,7 +748,7 @@
 
 
 (defn create-extra-query-spec-field [query-field-name]
-  { (ds/opt (keyword query-field-name)) (par string? query-field-name)}
+  { (ds/opt (keyword (:name query-field-name))) (par string? (:doc query-field-name))}
   )
 
 (defn add-extra-queries [extra-query-attributes]
@@ -744,13 +773,27 @@
             }
     }})
 
-(def test-extra-query-data {:endpoint-name "driving-licence"
+#_(def test-extra-query-data {:endpoint-name "driving-licence"
                             :extra-attributes [{:query-field-name "driving-licence-code-2013"
                                                 :db-field-name :concept.external-standard/driving-licence-code-2013}
                                                {:db-field-name :concept.implicit-driving-licences }
                                                ]
                             })
 
+(def test-extra-query-data {:endpoint-name "driving-licence"
+                            :extra-attributes [{:query-field {:name "driving-licence-code-2013"
+                                                              :doc "Driving licence code"
+                                                              }
+                                                :where-field :concept.external-standard/driving-licence-code-2013
+                                                :pull-expression :concept.external-standard/driving-licence-code-2013
+                                                }
+
+                                               {:pull-expression {:concept.external-standard/implicit-driving-licences [:concept/id
+                                                                                                                        :concept.external-standard/driving-licence-code-2013]}
+
+                                                }
+                                               ]
+                            })
 ;; (add-extra-queries (:extra-attributes (first taxonomy-extra-attributes )))
 
 (defn get-pull-expression-from-extra-attributes [extra-attributes]
@@ -758,14 +801,16 @@
   )
 
 (defn get-query-fields-from-extra-attributes-as-keywords [extra-attributes]
-  (remove nil? (map #(-> % :query-field keyword) extra-attributes))
+  (remove nil? (map #(-> % :query-field
+                           :name
+                           keyword) extra-attributes))
   )
 
 
 (defn compose-extra-where-attribute [extra-attribute query-params]
   (let [
         db-field-name (:where-field extra-attribute)
-        field-name (-> extra-attribute :query-field keyword)
+        field-name (-> extra-attribute :query-field :name keyword)
         value (when (get query-params field-name )
                 (field-name query-params))]
     [db-field-name value])
@@ -820,7 +865,7 @@
 
 
 
-;        _ (println  renamed-query-params-with-extra-pull-fields-and-extra-where-attributes)
+        _ (println  renamed-query-params-with-extra-pull-fields-and-extra-where-attributes)
         ]
     renamed-query-params-with-extra-pull-fields-and-extra-where-attributes
     )
