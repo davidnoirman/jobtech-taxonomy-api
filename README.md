@@ -1,8 +1,8 @@
 # JobTech Taxonomy API
 
-The JobTech Taxonomy Database contains terms or phrases used at the Swedish
-labour market. The JobTech Taxonomy API is a REST API for that database, providing
-endpoints for working with the taxonomy.
+The JobTech Taxonomy API is a REST API for the [JobTech Taxonomy
+Database][0]. The JobTech Taxonomy Database contains terms or phrases used
+at the Swedish labour market.
 
 ## Prerequisites
 
@@ -13,15 +13,14 @@ You will need [Leiningen][1] 2.0 or above installed.
 You will also need a [Datomic][2] database with the JobTech Taxonomy Database installed:
 <https://github.com/JobtechSwe/jobtech-taxonomy-database
 
-Set your connection details in
-    env/dev/resources/config.edn
+Set your connection details in `env/dev/resources/config.edn`.
 
 ## Running
 
 The project is based on [Luminus][3], which provides the web server
 infrastructure.
 
-You can either run from your terminal or from a repl.
+You can either run Luminus from either your terminal or from a repl.
 
 Regardless of how you start the project, don't forget to start the
 Datomic proxy script first, in case you use Datomic Cloud:
@@ -31,8 +30,6 @@ Datomic proxy script first, in case you use Datomic Cloud:
 ### Controlling from Terminal
 
 Change directory to the project root folder.
-
-You can either use a web server or a local Datomic.
 
 To start a web server for the application, run this
 to connect to AWS Datomic:
@@ -46,8 +43,8 @@ To use a local Datomic, run:
 
 ### Controlling from nREPL
 
-Change to the project root folder and start your repl (If IntelliJ,
-dont' forget to load the project in your repl).
+Change to the project root folder and start your repl (If you use IntelliJ,
+don't forget to load the project in your repl).
 
 It is recommended to keep a file `dev-config.edn`, see "CREATE dev-config for local developement below".
 
@@ -64,8 +61,7 @@ Then open the following URL in a web browser:
 
 ## Authorize
 Click the Authorize button, and enter your test account code,
-defined in
-    env/dev/resources/config.edn
+defined in `env/dev/resources/config.edn`.
 
 ## Running a query
 
@@ -85,7 +81,7 @@ Summary:
    tag (e.g. `(test/deftest ^:changes-test-2 changes-test-2 ...)`), and then
    run it with `lein kaocha --focus-meta changes-test-2`.
 
-### Howto write an integration test
+### How to write an integration test
 
 #### File and namespace
 Your test should reside in the directory `test/clj/jobtech_taxonomy_api/test/`.
@@ -261,7 +257,7 @@ you have forgot to start luminus. Run (start) in the user> namespace
 
 # Contact Information
 
-Bug reports are issued at [the Github repo][This repo on Github].
+Bug reports are issued at [https://github.com/JobtechSwe/jobtech-taxonomy-api][the repo on Github].
 
 Questions about the Taxonomy database, about Jobtech, about the API in
 general are best emailed to [contact@jobtechdev.se][Jobtechdev contact
@@ -270,6 +266,7 @@ email adress].
 Check out our other open APIs at [jobtechdev][Jobtechdev].
 
 
+[0]: https://github.com/JobtechSwe/jobtech-taxonomy-database "The JobTech Taxonomy Database"
 [1]: https://leiningen.org "Leiningen"
 [2]: https://www.datomic.com "Datomic"
 [3]: http://www.luminusweb.net "Luminus"
