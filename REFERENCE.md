@@ -57,7 +57,7 @@ guaranteed to not change over time**.
 The external standard type at the topmost level in the schema (SSYK-1)
 contain nine **major groups of occupations**, like " Yrken med krav på
 fördjupad högskolekompetens". These major groups of occupations are
-recommended to be used for statistic purposes only.
+recommended to be used for statistical purposes only.
 
 Another “top level” groups of occupations, **Occupation Field**, is
 based labour market sectors, created to make it easier for job seekers
@@ -113,7 +113,7 @@ four-digit SSYK Occupation Group.
 The skill headline named “**General skills**” contains broader skills
 like “Projektledning, erfarenhet”. They are not mapped to any Occupation
 groups. They are recommended to use as optional skills for all job
-seekers and employers
+seekers and employers.
 
 **Schema: Geographical areas**
 
@@ -125,10 +125,10 @@ The top geographic type lists all continents in the world, including
 Antarctica. The taxonomy is based on the [<span class="underline">UN
 standard for
 continents</span>](https://unstats.un.org/unsd/methodology/m49/). In
-this type, there is also the concept “Hela världen”, which is a list of
+this type, there is also the concept “Alla länder”, which is a list of
 all countries.
 
-The second type in this taxonomy contains all countries in the world,
+The second type in this taxonomy contains all countries
 according to [<span class="underline">ISO standard for
 countries</span>](https://www.iso.org/iso-3166-country-codes.html). Each
 country in this level has a parent continent in the top level.
@@ -142,7 +142,9 @@ in the taxonomy.
 
 The fourth type of the geographic areas contains the Swedish
 municipalities. Each municipality is mapped to a specific parent region
-in the above level. Geographical areas are recommended to use when a
+in the above level. 
+
+Geographical areas are recommended to use when a
 vacancy is abroad or when a job seeker looks for a job abroad.
 
 **Schema: Wage type**
@@ -182,6 +184,7 @@ describing education *level* and another describing education
 *orientation*.
 
 **Schema: SNI**
+This schema will be updated soon.
 
 “Svensk näringsgrensindelning SNI” contains terms for industries. This
 taxonomy follows the [<span class="underline">SCB
@@ -197,8 +200,8 @@ has a parent concept in the first level.
 
 **Schema: Languages**
 
-The language taxonomy lists natural languages like “Svenska” and
-“Xhosa/Isixhosa”. The language taxonomy is based on [<span
+The language taxonomy lists natural languages like “Engelska” and
+“Nederländska”. The language taxonomy is based on [<span
 class="underline">ISO
 standard</span>](https://www.iso.org/iso-639-language-codes.html) and
 it’s recommended to highlight which languages are requested for a
@@ -206,9 +209,7 @@ vacancy and the languages a job seeker is able to work with.
 
 **Schema: Language levels**
 
-The language level taxonomy is a simple collection of different terms
-used to describe language proficiency. It contains concepts like “Lite”
-and “Flytande”.
+This schema will be updated soon.
 
 **Schema: Employment duration**
 
