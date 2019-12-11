@@ -312,6 +312,46 @@
                             {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]
 
+    ["/concepts"
+     {
+      :summary      "Get concepts. Supply at least one search parameter."
+      :parameters {:query {(ds/opt :id) (taxonomy/par string? "ID of concept"),
+                           (ds/opt :preferred-label) (taxonomy/par string? "Textual name of concept"),
+                           (ds/opt :type) (st/spec {:name "types" :spec string? :description "Restrict to concept type"})
+                           (ds/opt :deprecated) (taxonomy/par boolean? "Restrict to deprecation state"),
+                           (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
+                           (ds/opt :related-ids) (taxonomy/par string? "OR-restrict to these relation IDs (white space separated list)"),
+                           (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
+                           (ds/opt :limit) (taxonomy/par int? "Return list limit"),
+                           (ds/opt :version) (taxonomy/par int? "Version to use")}}
+      :get {:responses {200 {:body types/concepts-spec}
+                        500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [id preferred-label type deprecated relation
+                                    related-ids offset limit version]} :query} :parameters}]
+                       (log/info (str "GET private /concepts "
+                                      "id:" id
+                                      " preferred-label:" preferred-label
+                                      " type:" type
+                                      " deprecated:" deprecated
+                                      " related-ids  " related-ids
+                                      " offset:" offset
+                                      " limit:" limit))
+
+                       {:status 200
+                        :body (vec (map types/map->nsmap (concepts/find-concepts-including-unpublished
+                                                          {:id id
+                                                           :preferred-label preferred-label
+                                                           :type (when type (clojure.string/split type #" "))
+                                                           :deprecated deprecated
+                                                           :relation relation
+                                                           :related-ids (when related-ids (clojure.string/split related-ids #" "))
+                                                           :offset offset
+                                                           :limit limit
+                                                           :version version
+                                                           }
+
+                                                          )))})}}]
+
      ["/accumulate-concept"
      {
       :summary      "Accumulate data on an existing concept."
