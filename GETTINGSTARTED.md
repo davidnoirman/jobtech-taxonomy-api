@@ -34,8 +34,7 @@ The Suggesters section contains endpoints that helps end users finding values fr
 
 For a more in depth documentation about Jobtech Taxonomy please see this guide:
 
-[JobTechTaxonomyDocumentation.md](JobTechTaxonomyDocumentation.md)
-
+(Reference documentation)[https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/REFERENCE.md]
 
 ## Status
 For the time being the Jobtech Taxonomy API is still in beta and minor breaking changes can still occur to the API event though 
