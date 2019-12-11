@@ -1,252 +1,211 @@
-DOCUMENT IS WORK IN PROGRESS!
+# JobTech Taxonomy Beta - Getting started
 
-# Getting started with JobTech Taxonomy API
+The Jobtech Taxonomy API gives access to different taxonomies like occupation names, skills and SSYK, SNI etc.      
 
-Hello developer! This document will get you started using the API at [www.jobtech-taxonomy-api.dev.services.jtech.se/v0/taxonomy/swagger-ui/index.html][API Swagger page]
-. The tools we provide gives you access to the Taxonomy Database containing terminology used in the Swedish labour market and the relationships between concepts within taxonomies like occupations, skills, education levels and much more!
+It’s main purpose is to act as a common language for labour market related systems.
 
-The public API is open source (code found at [www.github.com/JobtechSwe/jobtech-taxonomy-api][This repo on Github]) and the data is free to use by anyone. Make sure to read through the documentation for the specific resource you want, and the information about the Taxonomy Database, to understand what this API can offer. If you have any questions about the API or the data, don’t hesitate to contact us at [contact@jobtechdev.se][Jobtechdev contact email adress] , or create an issue on Github if you find any bugs.
+[Jobtech Taxonomy API Swagger UI](https://taxonomy.api.jobtechdev.se/v0/taxonomy/swagger-ui/index.html)
 
-# Table of content
-* [ Getting started - Short version ](#short)
-* [ Getting started - Longer version ](#long)
-  * [ Background - The Taxonomy Database ](#background)
-    * [ Schema: Occupations ](#occupations)
-    * [ Schema: Skills ](#skills)
-    * [ Schema: Geographical places ](#geography)
-    * [ Schema: Wage type ](#wageType)
-    * [ Schema: Employment type ](#eType)
-    * [ Schema: Driving licence ](#driving)
-    * [ Schema: Worktime extent ](#worktime)
-    * [ Schema: SUN ](#sun)
-    * [ Schema: SNI ](#sni)
-    * [ Schema: Languages ](#language)
-    * [ Schema: Language levels ](#languageLevel)
-    * [ Schema: Employment duration ](#employmentDuration)
-  * [ Using the API ](#using)
-    * [ Authentication ](#auth)
-  * [ Resources ](#resources)
-    * [ Endpoint: /v0/taxonomy/public/versions ](#versions)
-    * [ Endpoint: /v0/taxonomy/public/changes ](#changes)
-    * [ Endpoint: /v0/taxonomy/public/concepts ](#concepts)
-    * [ Endpoint: /v0/taxonomy/public/search ](#search)
-    * [ Endpoint: /v0/taxonomy/public/replaced-by-changes ](#replaced)
-    * [ Endpoint: /v0/taxonomy/public/concept/types ](#types)
-    * [ Endpoint: /v0/taxonomy/public/parse-text ](#parse)
-  * [ Results ](#results)
-    * [ Successful queries ](#success)
-    * [ Errors ](#error)
-  * [ Use cases ](#useCases)
-* [ Contact Information ](#contact)
+In order to use the api you need a key which you need to authenticate yourself.
 
-<a name="short"></a>
-# Getting started - Short version
+[How to get a key](https://apirequest.jobtechdev.se/)
 
-EXPLAIN HOW TO GET AN API KEY!
 
-<a name="long"></a>
-# Getting started - Longer version 
 
-<a name="background"></a>
-## Background - The Taxonomy Database 
+# Table of Contents
+* [Introduction](#introduction)
+* [Status](#status)
+* [Versions](#versions)
+* [Authentication](#authentication)
+* [Endpoints](#endpoints)
+* [Results](#results)
+* [Errors](#errors)
 
-The Taxonomy Database contains terms or phrases used within the Swedish labour market. These are called concepts in the database. Every concept in the database has a unique concept-ID, a preferred label and a type. Some concepts have extra attributes like definitions and alternative labels. The concepts are grouped together in schemas (see the schema headlines below) and within schemas the concepts from different types are linked with relationships.
 
-The content of the Taxonomy Database is constantly improved and updated behind the scenes by Jobtech’s editorial team. When enough updates of the database has been made, a new version is released. However, nothing ever gets deleted in the Taxonomy Database. If a concept or an attribute becomes outdated it is tagged with a deprecated flag but it is still available in the API from some endpoints.
+## Introduction
+The JobTech Taxonomy API is divided into three sections Main, Specific Types and Suggesters.
 
-The Taxonomy Database contains a number of schemas. Some of these schemas are multilevel taxonomies with hierarchical relationships between concepts. Some schemas are merely simple collections of concepts. The following section will walk you through all the different schemas.
+The Main section contains the core functionalities of the API like retrieving concepts (words) from different taxonomies. It also has endpoints helping you to track and react to changes in the taxonomies.
 
-<a name="occupations"></a>
-### Schema: Occupations
+The Specific Types section contains typed endpoints for taxonomies that has specific fields like statistical codes for SSYK and SNI.
 
+The Suggesters section contains endpoints that helps end users finding values from the taxonomies when they are creating structured data based on the taxonomies. There is an autocomplete endpoint that suggest concepts that can assist users creating CVs or job ads.
 
-<!---
-Chart created in www.draw.io
---->
 
-![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Untitled%20Diagram.png "Diagram for Occupation Schema")
+For a more in depth documentation about Jobtech Taxonomy please see this guide:
 
-The occupation taxonomy is a multilevel collection of occupations. The taxonomy is based on external standards together with content created by the editorial team for use in the Swedish labour market, with the concepts all connected to each other directly or indirectly. Depending on your needs you might be interested in different parts of the schema. If you work with job seekers or employers the recommended types to use is the Occupation Field type together with SSYK-4 and Occupation Names. The Occupation collections and Keywords might also be useful. If you are working with official labour market statistics you are more likely to use the SSYK or ISCO types.
+(Reference documentation)[https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/REFERENCE.md]
 
-Most types in the Occupation schema comes from “[Svensk standard för yrkesklassificering][SSYK at SCB]" (Swedish Standard Classification of Occupations), or SSYK, which is based on “[International Standard Classification of Occupation][ISCO occupations]”, or ISCO. The current version used is SSYK-2012 and ISCO-08. All the concepts in the SSYK and ISCO types have external-standard codes. If you are using the taxonomy for statistical reasons for example, these codes come in handy. **Very important to note is that the SSYK and ISCO codes are not to be used as unique ID numbers for specific concepts since they are not fixed**. When the external standard gets updated the SSYK and ISCO codes are moved around according to the new version of the standard. **Always use the Concept ID as identification for specific concepts. This is guaranteed to not change over time**. 
+## Status
+For the time being the Jobtech Taxonomy API is still in beta and minor breaking changes can still occur to the API event though 
+it's not very likely.  
+About SLA, we will provide statistics on our actual uptime to give users a realistic idea on our availability.
+Our commitment is that the Jobtech Taxonomy API will be operating during office hours.  
+If you are in need of a higher uptime you should implement a fall back solution with a local copy of the Jobtech Taxonomy.
 
-The external standard types at the topmost level in the schema (SSYK-1 and ISCO-1) contain general areas of work, like "Yrken inom administration och kundtjänst". Since the concepts at this level covers very broad areas of the labour market, there aren’t that many in each type. The third top level type, Occupation Field, is also very broad. This type isn’t an external standard but a collection of nonspecific occupation areas created specifically for the job seeking market. 
 
-The lower you get in the taxonomy, the more detailed concepts you’ll find with Occupation Name at the bottom. This type contains more than 3000 concepts, collected by the editorial team often by suggestions from employers and industry organizations. In this level you’ll find concepts like “Stödpedagog”. 
+## Versions
 
-Every concept at a lower and more detailed level is connected to one concept at the parent level, throughout the taxonomy. Example: 
+The content of the taxonomies is constantly being updated and changes will be released in a controlled manner.
 
-<!---
-Chart created in www.draw.io
---->
+There are two versions accesible from the API at the time of writing this documentation.   
+Version 1 is from 2016  
+Version 2 is all changes after version 1 until we will remove the beta status on the API. 
 
-![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Hierarchy.png "Diagram linked occupation levels")
+This means that version 2 is not fixed for the moment but will be in a future release of the API.
 
-In the type Occupation Collections you’ll find listings of Occupation Names grouped by different variables that may span over different occupation areas. examples are “Arbeten utan krav på utbildning” and “Chefsyrken”.
-The Keyword type contains a variety of different search terms and phrases in some way related to Occupation Names. They can be used to help candidates find job ads they are interested in even if they don’t know the exact Occupation Name. An example is the Keyword “Coop” (like the food store), mapped to the Occupation Name “Butiksbiträde”. 
 
-<a name="skills"></a>
-### Schema: Skills
+## Authentication
 
-This taxonomy contains two levels. The top type contains a number of broader skill areas, like “Databaser”. The lower type contains specific skill concepts like “SQL-Base, databashanterare”. Each of these concepts are mapped to a parent skill headline in the above level. The database contains around 5500 skills as of May 2019.
+1. Follow the instructions on how to get and api key here: [https://apirequest.jobtechdev.se/](https://apirequest.jobtechdev.se/)
 
-<a name="geography"></a>
-### Schema: Geographical places
+2. If you are using curl you have to add the api-key in the headers like this:
 
-The database contains a four level taxonomy of geographical places. Like the occupation taxonomy and the skill taxonomy the concepts are related to each other in a hierarchical structure.
+  ``` curl "{URL}" -H "accept: application/json" -H "api-key: {YOUR API KEY}" ```
 
-The top geographic type lists all continents in the world, including Antarctica. The taxonomy is based on the [UN standard for continents][Continents]. In this level you’ll also find the concept “Hela världen”, which can be used in cases where a system requires a location but a job seeker for example doesn’t want to specify.
+3. If you are using the swagger UI you have to log in with the "Authorize" button in the top right corner and add your api-key.
 
-The second type in this taxonomy contains all countries in the world. The countries are categorized according to [ISO standard for countries][Countries]. Each country in this level has a parent continent in the top level.
+![alt text](swagger-authorize.png "How to log into swagger")
 
-The third type is simply called regions and it contains all regions within the EU with a “NUTS code” (See [Eurostat][NUTS] for information about NUTS). In Sweden the regions corresponds to “län”. Every region is mapped to a specific parent country in the second level in the taxonomy. 
+## Endpoints
+Below we only show the URLs. If you prefer the curl command, you type it like:
 
-The fourth level in the geographic places taxonomy contains the Swedish municipalities. Each municipality is mapped to a specific parent region in the above level.
+  curl "{URL}" -H "accept: application/json" -H "api-key: {YOUR API KEY}"
 
-<a name="wageType"></a>
-### Schema: Wage type
+### Main
 
-This schema only has one type. This type contains descriptions of different forms of payment, like “Rörlig ackords- eller provisionslön”.
 
-<a name="eType"></a>
-### Schema: Employment type
 
-This schema only contain one type. It lists different types of employment, like “Säsongsanställning” och “Behovsanställning”.
+#### /v1/taxonomy/main/concept/types
+This endpoint will list all available types in the taxonomies
 
-<a name="driving"></a>
-### Schema: Driving licence
+#### v1/taxonomy/main/relation/types
+This endpoint will list all available relation types in the taxonomies.
 
-This single type schema contains all different driving licence categories in Sweden, according to [EU standard][Driving licence], and the description and limitation of each licence. 
+The broader / narrower relation is for hierarchical relations.
 
-All but the “lowest” ranked licence also contain a list of the licences that are implicit within that level. The A2 licence for example has the Implicit licence attribute listing AM and A1. These are lower level licences for scooters that you are automatically allowed to drive if you carry the A2 licence.
+The related relation is a non specific relation like a keyword that is related to an occupation name.
 
-<a name="worktime"></a>
-### Schema: Worktime extent
- 
-This schema only contains the two concepts “Heltid” and “Deltid”.
+The substitutability relation is for showing related occupations that can substitute one another.
+For example, if an employer wants to hire a  “Barnmorska, förlossning" but can’t find any they can do a search for a "Barnmorska, vårdavdelning/BB-avdelning" instead. The substitutability-percentage will show how well the occupation can substitute another occupation.
 
-<a name="sun"></a>
-### Schema: SUN
 
-INFORMATION ABOUT SUN HERE!
 
-<a name="sni"></a>
-### Schema: SNI
+#### /v1/taxonomy/main/concepts
+This endpoint will let you retrieve concepts from different taxonomies.
 
-SNI stands for “svensk näringsgrensindelning” and the collection contains terms for different industries. This taxonomy follows the [SCB documentation][SNI] and has two levels. 
+##### Example List all Skill headlines
+```
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?type=skill-headline
+```
+This request will fetch all concepts of type skill headline.
 
-The SNI-level-1 contains general area term of industries. An example is the concept “Tillverkning”.
 
-The second level, SNI-level-2, lists the industries in more detail. It has concepts like “Livsmedelsframställning”. Every concept in this level has a parent concept in the first level.
+##### Example Relations
+```
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?related-ids=xAWr_WYq_JPP%20Uj5W_dft_Ssg&relation=narrower
 
-<a name="language"></a>
-### Schema: Languages
+```
+This request will fetch concepts that has a narrower relation from the concepts “Databaser” and “Operativsystem”.
 
-The language taxonomy lists more than 400 natural languages in the world, like “Svenska” and “Xhosa/Isixhosa”. The language names follows the [ISO standard][Languages].
+##### Example 2. Multiple types
 
-<a name="languageLevel"></a>
-### Schema: Language levels
+```
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?type=ssyk-level-1%20ssyk-level-2%20ssyk-level-3
+```
+This request will fetch concepts of types ssyk-level-1 ssyk-level-2 and ssyk-level-3
 
-The language level taxonomy is a simple collection of different terms used to describe language proficiency. It contains concepts like “Lite” and “Flytande”.
 
-<a name="employmentDuration"></a>
-### Schema: Employment duration
 
-The employment duration taxonomy contains concepts describing how long an employment is meant to last. The schema contains concepts like “3 månader – upp till 6 månader”.
+#### /v1/taxonomy/main/graph
 
-<a name="using"></a>
-## Using the API
+This endpoint will list relations between two types of concepts in the taxonomies. It’s main use case is to be able to build tree views of the taxonomy. It will also list extra metadata on the relations.
 
-<a name="auth"></a>
-### Authentication
+##### Example Tree view Occupation Field, ssyk-level-4, occupation-name
 
-At [the API page][API Swagger page] you’ll see the headlines public and private. You can access the endpoints under public by authenticating with the API key EXPLAIN HOW TO GET AN API KEY! The private endpoint is only for the editorial team and not open to the public.
+```
 
-<a name="resources"></a>
-## Resources
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/graph?edge-relation-type=broader&source-concept-type=occupation-name&target-concept-type=ssyk-level-4
 
-<a name="versions"></a>
-### Endpoint: /v0/taxonomy/public/versions
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/graph?edge-relation-type=broader&source-concept-type=ssyk-level-4&target-concept-type=occupation-field
 
-The response is a list of all versions of the database that exists. It starts with version 0 - which is the empty database - and ends with the last published version.
 
-<a name="changes"></a>
-### Endpoint: /v0/taxonomy/public/changes
 
-This endpoint returns a list of all “events” that has occured for concepts in the database between versions. The possible events are “CREATED”, “DEPRECATED” and “UPDATED”. The earliest possible version that exists is 0, which represent the database before any data were created in it. If you choose to see the changes from version 0 to version 1 you will see all the concepts that were added to the database in the first iteration. If you don’t choose any specific “toVersion” parameter you will get changes that happened all the way to the latest version by default.
+```
+With the help of these two request you can build a tree view bottom up of the occupation-name -> ssyk-level-4 -> occupation-field hierarchy
 
-<a name="concepts"></a>
-### Endpoint: /v0/taxonomy/public/concepts
 
-This endpoint allows you to search specific concepts in the database. In the response you’ll see the concept ID, the description and the type. If the concept is outdated (i.e. no longer recommended for use in the Swedish labour market) you’ll also see  “deprecated”: true in the json response.
+##### Example Occupation name substitutability
 
-<a name="search"></a>
-### Endpoint: /v0/taxonomy/public/search
+```
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/graph?edge-relation-type=substitutability&source-concept-type=occupation-name&target-concept-type=occupation-name&limit=10
+```
+This request will fetch occupation names that has a substitutability relation to each other.
+For example, if an employer wants to hire a  “Barnmorska, förlossning" but can’t find any they can instead use information from this endpoint to search for a "Barnmorska, vårdavdelning/BB-avdelning". The substitutability-percentage will show how well the occupation can substitute another occupation.
 
-This endpoint lets you search concepts based on part of the label. The result will contain all concepts with the search string, no matter if the search string is at the beginning, middle or end of the concept label. Like the concepts endpoint, the result will contain the concept ID, the description, the type and if applicable also the “deprecated”: true attribute.
 
-<a name="replaced"></a>
-### Endpoint: /v0/taxonomy/public/replaced-by-changes
+#### /v1/taxonomy/main/changes
+This endpoint will list all changes that have occurred to the taxonomies. It’s a list of events of the types CREATED, DEPRECATED and UPDATED.
 
-Similar to the Changes endpoint, this will give you changes between versions of the database but in this endpoint you will only see concepts that has been replaced by another concept. This means one concept has been deprecated and is pointing to another existing concept in the database. One example is the Occupation Name “Användbarhetsexpert” with Concept ID HciA_Cu7_FXt from version 1, that has been replaced by “Interaktionsdesigner” with Concept ID QQjZ_NAN_bDR in version 2. The replaced concept will still be searchable in the database but from this point it will have the Deprecated-flag attached to it.
+You can use it to be able to react to changes in the taxonomies.
+For example if a jobseeker is subscribing to job recommendations based on a specific occupation name and that occupation name becomes deprecated, this endpoint will contain information that the deprecation occurred so you can inform the jobseeker to update their search profile.
 
-<a name="types"></a>
-### Endpoint: /v0/taxonomy/public/concept/types
+##### /v1/taxonomy/main/replaced-by-changes
 
-With this endpoint you’ll get a list with all concept types that exists in the taxonomy.
+This endpoint will list all deprecated concepts that has been replaced by another newer concept.
 
-<a name="parse"></a>
-### Endpoint: /v0/taxonomy/public/parse-text
+####  /v1/taxonomy/main/versions
+This endpoint will list all published versions of the taxonomies.
 
-The Parse Text is a “post” endpoint, allowing you to input a string. The response will return all the concepts from the database that relates to the words in the input text. For example, if you input the string “I Skövde arbetade jag som clown. Jag är även bra på handkirurgi.”, the result will contain the concepts “Skövde” (Municipality), “clown” (Occupation name) and “handkirurgi” (Skill).
+### Specific
+These endpoint acts like the  /v1/taxonomy/main/concepts but will also display specific metadata on the concepts like ssyk or country codes.
 
-This endpoint can be used to automatically parse CVs to match words or phrases to job ads. Or vice versa. 
+### Suggesters
 
-<a name="results"></a>
-### Results
+#####  /v1/taxonomy/suggesters/autocomplete
+This endpoint is to help end users to find concepts in the taxonomies.
 
-All API responses are in json format.
+##### Example Autocomplete programming languages starting on “sc”
 
-<a name="success"></a>
-### Successful queries
+```
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/suggesters/autocomplete?query-string=sc&type=skill&relation=narrower&related-ids=ShQw_McG_oti
 
-Successful requests will return the HTTP status code 200. The details in the response will vary depending on the specific endpoint. 
 
-<a name="error"></a>
-### Errors
+```
+With this request you can autocomplete programming languages starting on the letter “sc”
 
-The three possible error codes are listed below. Note that a request returning an empty list does not count as an error and will return status code 200.
+
+##### Example Autocomplete occupation names with related keywords
+
+
+
+```
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/suggesters/autocomplete?query-string=lastb&type=occupation-name%20keyword
+
+http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?related-ids=d68E_e74_a59&relation=related
+
+
+
+```
+Let’s say a user wants to find jobs as a “Lastbilsförare” and starts typing the word “lastb”.
+
+We make a first request to this endpoint also limiting the result to occupation-name and keyword.
+The response contains the concept “Lastbilsförare” but not as an occupation-name but as a keyword.
+
+If the user show interest in the word “Lastbilsförare” we can make another request for related occupation names with the  /v1/taxonomy/main/concepts endpoint.
+
+
+## Results
+The results of your queries will be in edn, transit+messagepack or transit+json or JSON.
+
+Successful queries will have a response code of 200 and give you a result set that consists of:
+...
+
+## Errors
+Unsuccessful queries will have a response code of:
 
 | HTTP Status code | Reason | Explanation |
 | ------------- | ------------- | -------------|
-| 500 | Internal Server Error | Something wrong on the server side |
 | 400 | Bad Request | Something wrong in the query |
-| 401 | Unauthorized | You are not using an API key |
-
-<a name="useCases"></a>
-## Use cases
-
-Insert link to example application!
-
-<a name="contact"></a>
-# Contact Information
-
-
-Bug reports are issued at [the Github repo][This repo on Github].
-
-Questions about the Taxonomy database, about Jobtech, about the API in general are best emailed to [contact@jobtechdev.se][Jobtechdev contact email adress].
-
-Check out our other open API:s at [jobtechdev][Jobtechdev].
-
-[API Swagger page]: http://jobtech-taxonomy-api.dev.services.jtech.se/v0/taxonomy/swagger-ui/index.html
-[This repo on Github]: https://github.com/JobtechSwe/jobtech-taxonomy-api
-[Jobtechdev contact email adress]: contact@jobtechdev.se
-[SSYK at SCB]: https://www.scb.se/dokumentation/klassifikationer-och-standarder/standard-for-svensk-yrkesklassificering-ssyk/
-[ISCO occupations]: https://www.ilo.org/public/english/bureau/stat/isco/
-[Continents]: https://unstats.un.org/unsd/methodology/m49/
-[Countries]: https://www.iso.org/iso-3166-country-codes.html
-[NUTS]: https://ec.europa.eu/eurostat/web/nuts/background
-[Driving licence]: https://europa.eu/youreurope/citizens/vehicles/driving-licence/driving-licence-recognition-validity/index_en.htm
-[SNI]: https://www.scb.se/contentassets/d43b798da37140999abf883e206d0545/mis-2007-2.pdf
-[Languages]: https://www.iso.org/iso-639-language-codes.html
-[Jobtechdev]: www.jobtechdev.se
+| 401 | Unauthorized | You are not using a valid API key |
+| 500 | Internal Server Error | Something wrong on the server side |
