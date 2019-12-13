@@ -330,9 +330,7 @@
                       (concat concept-pull-pattern (:extra-pull-fields args))
                       concept-pull-pattern
                       )
-        db (if (:version args)
-             (get-db (:version args))
-             (get-db))]
+        db (get-db (:version args))]  ;; if version is nil it will use the latest published database
     (-> args
         (assoc :db db)
         (assoc :pull-pattern pull-pattern)
@@ -343,10 +341,9 @@
   [args]
   #_{:pre [(every? #(contains? args %) [:version :preferred-label])
            ]}
-  (println args) ;; TODO clean println
   (find-concepts-by-db (add-find-concepts-args args)))
 
-;;"TODO expose this as a private end point for the editor"
+
 (defn find-concepts-including-unpublished [args]
   (find-concepts-by-db (add-find-concepts-args args)))
 
