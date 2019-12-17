@@ -28,10 +28,10 @@ the database.
 ## Schema: Occupations
 
 <!---
-Chart created in www.draw.io
+Chart created in www.lucidchart.com
 --->
 
-![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Untitled%20Diagram.png "Diagram for Occupation Schema")
+![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/occupation%20schema.svg "Diagram for Occupation Schema")
 
 
 **The occupation taxonomy** is a multilevel collection, based on a
@@ -80,10 +80,10 @@ Every concept at a lower and more detailed level is connected to one
 concept at the parent level, throughout the taxonomy. Example:
 
 <!---
-Chart created in www.draw.io
+Chart created in www.lucidchart.com
 --->
 
-![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/Hierarchy.png "Diagram linked occupation levels")
+![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/occupations%20hiearchy.svg "Diagram linked occupation levels")
 
 
 In the type **Occupation Collections,** you’ll find listings of
