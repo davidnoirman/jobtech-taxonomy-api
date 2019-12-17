@@ -129,12 +129,12 @@ Den här relationen är vertikal och används för att uttrycka när ett koncept
 
 ### Substitutability (benämningssläktskap)
 
-Den här relationen är horisontellt och beskriver närhet mellan två Occupation Names (yrkesbenämningar). Förhållandet kan uttryckas som antingen hög (75) och låg (25) benämningssläktskap mellan yrken. Till exempel: Occupation Name (yrkesbenämningen) ”Beläggningsarbetare” har en hög benämningssläktskap med yrkesbenämningen ”Väg- och anläggningsarbetare”. I API uttrycks yrkesbenämningarna i benämningssläktskapen som demanded och offered. I exemplet ovan är yrkesbenämningen ”Beläggningsarbetare” demanded.
+Den här relationen är horisontell och beskriver närhet mellan två Occupation Names (yrkesbenämningar). Förhållandet kan uttryckas som antingen hög (75) och låg (25) benämningssläktskap mellan yrken. Till exempel: Occupation Name (yrkesbenämningen) ”Beläggningsarbetare” har en hög benämningssläktskap med yrkesbenämningen ”Väg- och anläggningsarbetare”. I API uttrycks yrkesbenämningarna i benämningssläktskapen som demanded och offered. I exemplet ovan är yrkesbenämningen ”Beläggningsarbetare” demanded.
 De två nivåerna för benämningssläktskapen är:
 
-•	Hög (eller 75%): mycket nära besläktad med stor likhet i arbetsuppgifterna
+-	Hög (eller 75%): mycket nära besläktad med stor likhet i arbetsuppgifterna
 
-•	Låg (eller 25%): några av arbetsuppgifterna är liknande och/eller någon form av utbildningsinsats kan behövas för att man ska fungera i yrkesrollen
+-	Låg (eller 25%): några av arbetsuppgifterna är liknande och/eller någon form av utbildningsinsats kan behövas för att man ska fungera i yrkesrollen
 
 Benämningssläktskapet kan vara asymmetrisk, vilket innebär att en hög nivå av släktskap från en yrkesbenämning till en annan inte nödvändigtvis är densamma i motsatt relation. I exemplet ovan är den omvända nivån av släktskap (från Väg- och underhållningsarbetare till Beläggningsarbetare) låg.
 
