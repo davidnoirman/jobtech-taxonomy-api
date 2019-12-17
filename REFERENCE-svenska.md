@@ -12,6 +12,12 @@ Taxonomy-databasen innehåller flera schemas. Några av dem är taxonomier på f
 
 ## Schema: Occupations (yrkesbenämningar)
 
+<!---
+Chart created in www.lucidchart.com
+--->
+
+![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/occupation%20schema.svg "Diagram for Occupation Schema")
+
 Taxonomin på yrken (**The occupation taxonomy**) finns på flera nivåer och är baserad på en nationell standard. Innehållet (yrkesbenämningar, synonymer och andra concepts) är skapade och uppdateras kontinuerligt i samråd med aktörerna på arbetsmarknaden. Concepts är direkt eller indirekt kopplade till varandra. 
 
 Yrkes-schema har strukturerats enligt “SSYK, Svensk standard för yrkesklassificering” som bygger på en internationell yrkesklassificering ”ISCO, International Standard Classification of Occupation”. Den nuvarande versionen är SSYK-2012. 
@@ -31,6 +37,13 @@ Den mest detaljerade nivån av concepts, **Occupation Name** (yrkesbenämningar)
 
 Varje concept på lägre nivå är kopplat till högre nivå (parent level). 
 Exempel:
+
+
+<!---
+Chart created in www.lucidchart.com
+--->
+
+![alt text](https://github.com/JobtechSwe/jobtech-taxonomy-api/blob/develop/pictures-for-md/occupations%20hiearchy.svg "Diagram linked occupation levels")
 
 
 **Occupation Collections** (yrkessamlingar) innehåller Occupation Names (yrkesbenämningar) som är grupperade enligt ett tema: “Yrken utan krav på utbildning” and “Chefer, direktörer och föreståndare”. Yrkessamlingarna är skapade för att synliggöra grupperingar som inte är baserade på yrkesklassificeringen SSYK. 
@@ -84,7 +97,7 @@ SUN ger förutsättningarna för att producera jämförbar statistik och analys 
 
 ## Schema: SNI (Svensk näringsgrensindelning)
 
-Detta schema ska uppdateras inom kort. 
+*Detta schema ska uppdateras inom kort.*
 
 ”Svensk näringsgrensindelning SNI” används för att klassificera företag och arbetsställen efter vilken verksamhet de bedriver. Denna taxonomi följer [<span class="underline">SCB:s dokumentation</span>](https://www.scb.se/contentassets/d43b798da37140999abf883e206d0545/mis-2007-2.pdf). 
 
@@ -95,7 +108,7 @@ class="underline">ISO standard</span>](https://www.iso.org/iso-639-language-code
 
 ## Schema: Language levels (kunskapsnivåer i språk)
 
-Detta schema ska uppdateras inom kort.
+*Detta schema ska uppdateras inom kort.*
 
 ## Schema: Employment duration (anställningsvaraktighet)
 
