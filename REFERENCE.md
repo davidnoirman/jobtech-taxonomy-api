@@ -185,7 +185,7 @@ describing education *level* and another describing education
 
 ## Schema: SNI
 
-*This schema will soon be updated*
+*This schema will soon be updated.*
 
 “Svensk näringsgrensindelning SNI” contains terms for industries. This
 taxonomy follows the [<span class="underline">SCB
@@ -210,7 +210,7 @@ vacancy and the languages a job seeker is able to work with.
 
 ## Schema: Language levels
 
-*This schema will soon be updated*
+*This schema will soon be updated.*
 
 ## Schema: Employment duration
 
