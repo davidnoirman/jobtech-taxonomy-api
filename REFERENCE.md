@@ -1,6 +1,6 @@
 *Reference Guide JobTech Taxonomy API*
 
-**The Taxonomy Database**
+# The Taxonomy Database
 
 The Taxonomy Database contains terms or phrases used at the Swedish
 labour market. These are called **concepts** in the database. Every
@@ -25,7 +25,7 @@ concepts. Some schemas are merely simple collections of concepts. The
 following section will walk you through the schemas and relations within
 the database.
 
-**Schema: Occupations**
+## Schema: Occupations
 
 <!---
 Chart created in www.draw.io
@@ -57,10 +57,10 @@ guaranteed to not change over time**.
 The external standard type at the topmost level in the schema (SSYK-1)
 contain nine **major groups of occupations**, like " Yrken med krav på
 fördjupad högskolekompetens". These major groups of occupations are
-recommended to be used for statistic purposes only.
+recommended to be used for statistical purposes only.
 
 Another “top level” groups of occupations, **Occupation Field**, is
-based labour market sectors, created to make it easier for job seekers
+based on labour market sectors, created to make it easier for job seekers
 to find relevant jobs. Occupation Field is not an external standard.
 
 **The connections between SSYK Occupation Groups and Occupation Field is
@@ -100,7 +100,7 @@ Keyword “Asfaltarbetare”, mapped to the Occupation Name
 terms, connected to one or several official Occupation Names. Keywords
 should not be exposed to end users.
 
-**Schema: Skills**
+## Schema: Skills
 
 The skills taxonomy contains two levels: Skills headlines like
 “Databaser” and Skills like “SQL-Base, databashanterare”. Each of the
@@ -113,9 +113,9 @@ four-digit SSYK Occupation Group.
 The skill headline named “**General skills**” contains broader skills
 like “Projektledning, erfarenhet”. They are not mapped to any Occupation
 groups. They are recommended to use as optional skills for all job
-seekers and employers
+seekers and employers.
 
-**Schema: Geographical areas**
+## Schema: Geographical areas
 
 The database contains a four-level taxonomy of geographical areas. Like
 the occupation and skill taxonomy, the concepts are related to each
@@ -125,10 +125,10 @@ The top geographic type lists all continents in the world, including
 Antarctica. The taxonomy is based on the [<span class="underline">UN
 standard for
 continents</span>](https://unstats.un.org/unsd/methodology/m49/). In
-this type, there is also the concept “Hela världen”, which is a list of
+this type, there is also the concept “Alla länder”, which is a list of
 all countries.
 
-The second type in this taxonomy contains all countries in the world,
+The second type in this taxonomy contains all countries,
 according to [<span class="underline">ISO standard for
 countries</span>](https://www.iso.org/iso-3166-country-codes.html). Each
 country in this level has a parent continent in the top level.
@@ -142,20 +142,22 @@ in the taxonomy.
 
 The fourth type of the geographic areas contains the Swedish
 municipalities. Each municipality is mapped to a specific parent region
-in the above level. Geographical areas are recommended to use when a
-vacancy is abroad or when a job seeker looks for a job abroad.
+in the above level. 
 
-**Schema: Wage type**
+**Geographical areas are recommended to use when a
+vacancy is abroad or when a job seeker looks for a job abroad.**
+
+## Schema: Wage type
 
 This schema only has one type. This type contains descriptions of forms
 of payment, like “Rörlig ackords- eller provisionslön”.
 
-**Schema: Employment type**
+## Schema: Employment type
 
 This schema only contains one type. It lists types of employment, like
 “Säsongsanställning” och “Behovsanställning/Timanställning”.
 
-**Schema: Driving license**
+## Schema: Driving license
 
 This single type schema contains driving license categories in Sweden,
 according to [<span class="underline">EU
@@ -168,11 +170,11 @@ A2 license for example has the Implicit license attribute listing AM and
 A1. These are lower level licenses for scooters that you are
 automatically allowed to drive if you carry the A2 license.
 
-**Schema: Worktime extent**
+## Schema: Worktime extent
 
 This schema only contains the two concepts “Heltid” and “Deltid”.
 
-**Schema: SUN**
+## Schema: SUN
 
 “Svensk utbildningsklassifkation” SUN is used for classifying education.
 SUN provides the conditions for producing comparable statistics and
@@ -181,7 +183,9 @@ nationally and internationally. SUN consists of two classifications: one
 describing education *level* and another describing education
 *orientation*.
 
-**Schema: SNI**
+## Schema: SNI
+
+*This schema will soon be updated*
 
 “Svensk näringsgrensindelning SNI” contains terms for industries. This
 taxonomy follows the [<span class="underline">SCB
@@ -195,55 +199,49 @@ The second level, SNI-level-2, lists the industries in more detail. It
 has concepts like “Livsmedelsframställning”. Every concept in this level
 has a parent concept in the first level.
 
-**Schema: Languages**
+## Schema: Languages
 
-The language taxonomy lists natural languages like “Svenska” and
-“Xhosa/Isixhosa”. The language taxonomy is based on [<span
+The language taxonomy lists natural languages like “Engelska” and
+“Nederländska”. The language taxonomy is based on [<span
 class="underline">ISO
 standard</span>](https://www.iso.org/iso-639-language-codes.html) and
 it’s recommended to highlight which languages are requested for a
 vacancy and the languages a job seeker is able to work with.
 
-**Schema: Language levels**
+## Schema: Language levels
 
-The language level taxonomy is a simple collection of different terms
-used to describe language proficiency. It contains concepts like “Lite”
-and “Flytande”.
+*This schema will soon be updated*
 
-**Schema: Employment duration**
+## Schema: Employment duration
 
 The employment duration taxonomy contains concepts describing how long
 an employment is meant to last. The schema contains concepts like “3
 månader – upp till 6 månader”.
 
-Relations
-=========
+## Relations
 
 The concepts in the Taxonomy database may be related to each other in a
 number of ways. The different types of relations are in part based on
-the SKOS standard found here: [<span
-class="underline">https://www.w3.org/TR/skos-reference/\#L1170</span>](https://www.w3.org/TR/skos-reference/#L1170).
+[<span class="underline">this SKOS standard</span>](https://www.w3.org/TR/skos-reference/\#L1170)
+
 The relations can be either vertical (describing a hierarchy) or
 horizontal.
 
-Narrower
---------
+### Narrower
 
 This relation is vertical and is used to express when one concept is on
 a lower level than another in a hierarchy. For example: the occupation
 “Beläggningsarbetare” is narrower than the occupation group
 “Anläggningsarbetare”.
 
-Broader
--------
+### Broader
 
 This relation is vertical and is used to express when one concept is on
 a higher level than another in a hierarchy. For example: the occupation
 group “Anläggningsarbetare” is broader than the occupation
 “Beläggningsarbetare”.
 
-Substitutability
-----------------
+### Substitutability
 
 This relation is horizontal and describes the closeness of two
 occupations. The relation can be expressed as both *high* (75) and *low*
