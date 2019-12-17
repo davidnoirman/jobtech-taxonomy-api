@@ -23,6 +23,7 @@
    [jobtech-taxonomy-api.db.search :as search]
    [jobtech-taxonomy-api.db.graph :as graph]
    [jobtech-taxonomy-api.db.core :as core]
+   [jobtech-taxonomy-api.db.daynotes :as daynotes]
    [taxonomy :as types]
    [clojure.tools.logging :as log]
    [clojure.spec.alpha :as s]
@@ -436,4 +437,21 @@
                             {:status 200 :body (types/map->nsmap {:message "A new version of the Taxonomy was created."}) }
                             {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")}) }
                             )))}}]
+
+
+    ["/automatic-daynotes/concept"
+     {
+      :summary      "Fetches automatic day notes from a concept id"
+      :parameters {:query {:id (taxonomy/par string? "ID of concept")}}
+      :get {:responses     {200 {:body [ any?  ]}
+                           404 {:body types/error-spec}
+                           500 {:body types/error-spec}}
+               :handler (fn [{{{:keys [id]} :query} :parameters}]
+                          (log/info (str "GET /automatic-daynotes/concept" id ))
+                          {:status 200
+                           :body (daynotes/get-automatic-day-note-for-concept id)
+                           }
+                          )}}]
+
+
     ]])

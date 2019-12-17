@@ -4,8 +4,6 @@
    [jobtech-taxonomy-api.db.daynotes :refer :all])
   )
 
-
-
 (def example-event-history {[13194139533325 22390454788030565]
                             [{:e 22390454788030565,
                               :a :concept/id,
