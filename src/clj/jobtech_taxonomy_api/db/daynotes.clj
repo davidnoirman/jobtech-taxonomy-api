@@ -29,16 +29,22 @@
     ]
   )
 
+
+#_(or-join [?c]
+           [?r :relation/concept-1 ?c]
+           [?r :relation/concept-2 ?c]
+           )
+
 (def fetch-all-relations-entity-ids-for-concept-query
-  '[:find ?e
+  '[:find ?r
+    :in $ ?concept-id
     :where
-    [?cr :concept/id ?related-ids]
-    [?r :relation/concept-1 ?cr]
-    [?r :relation/concept-2 ?c]
-    [?r :relation/type ?relation]
+    [?c :concept/id ?concept-id]
+    (or [?r :relation/concept-1 ?c]
+        [?r :relation/concept-2 ?c])
     ]
   )
-;; TODO skapa delete relation i apiet
+
 
 (defn get-concept-entity-id [concept-id]
   (ffirst (d/q show-concept-entity-id (get-db) concept-id)))
