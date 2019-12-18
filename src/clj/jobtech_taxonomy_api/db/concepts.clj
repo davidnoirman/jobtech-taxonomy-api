@@ -447,6 +447,40 @@
       (assert-relation-part (concept-to-entity concept-1) (concept-to-entity concept-2) type description substitutability-percentage)
       )))
 
+
+(def fetch-relation-entity-id-query
+  '[:find ?r
+    :in $ ?id-1 ?id-2 ?relation
+    :where
+    [?c1 :concept/id ?id-1]
+    [?r :relation/concept-1 ?c1]
+    [?c2 :concept/id ?id-2]
+    [?r :relation/concept-2 ?c2]
+    [?r :relation/type ?relation]
+    ]
+  )
+
+(defn fetch-relation-entity-id-from-concept-ids-and-relation-type [concept-1 concept-2 relation-type]
+  (ffirst (d/q fetch-relation-entity-id-query (get-db) concept-1 concept-2 relation-type))
+  )
+
+(defn retract-relation [user-id concept-1 concept-2 relation-type]
+  (let [relation-entity-id
+        (fetch-relation-entity-id-from-concept-ids-and-relation-type
+         concept-1
+         concept-2
+         relation-type)
+
+        result (when relation-entity-id
+                 (d/transact (get-conn) {:tx-data [[:db/retractEntity relation-entity-id]
+                                                   [:db/add "datomic.tx" :taxonomy-user/id user-id]
+                                                   ]})
+                 )
+        ]
+    )
+  )
+
+
 (def fetch-simple-concept-query
   '[:find (pull ?e [:concept/id
                     :concept/type

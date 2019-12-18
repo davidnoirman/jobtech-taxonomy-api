@@ -392,6 +392,30 @@
                             {:status 200 :body (types/map->nsmap {:message "Created relation."}) }
                             {:status 409 :body (types/map->nsmap {:error "Can't create new relation since it is in conflict with existing relation."}) })))}}]
 
+
+    ;; retract-relation [user-id concept-1 concept-2 relation-type]
+     ["/delete-relation"
+     {
+      :summary      "Retract a relation."
+      :parameters {:query {(ds/opt :user-id) (taxonomy/par string? "User id")
+                           (ds/opt :relation) (taxonomy/par #{"broader" "related" "substitutability" } "Relation type")
+                           (ds/opt :concept-1) (taxonomy/par string? "ID of source concept"),
+                           (ds/opt :concept-2) (taxonomy/par string? "ID of target concept"),
+
+                           }}
+      :delete {:responses {200 {:body types/msg-spec}
+                         409 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [user-id relation concept-1 concept-2]} :query} :parameters}]
+                        (log/info (str "DELETE /relation " user-id " " relation " " concept-1 " " concept-2))
+                        (let [result  (concepts/retract-relation user-id concept-1 concept-2 relation)
+
+                              ]
+                          (if result
+                            {:status 200 :body (types/map->nsmap {:message "Retracted relation."}) }
+                            {:status 400 :body (types/map->nsmap {:error "Relation not found."}) })))}}]
+
+
      ["/graph"
      {:summary "Fetch nodes and edges from the Taxonomies. Only one depth is returned at the time."
       :parameters {:query {:edge-relation-type (taxonomy/par string? "Edge relation type")

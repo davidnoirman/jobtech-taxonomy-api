@@ -13,9 +13,6 @@
 
 ;; TODO Utred om vi ska ha egna attribut för created updated at
 
-
-
-
 (def show-concept-entity-id
   '[:find ?e ?concept-id
     :in $ ?concept-id
@@ -23,6 +20,25 @@
     [?e :concept/id ?concept-id ]
     ]
   )
+
+(def show-concept-relations-entity-ids
+  '[:find ?e ?concept-id
+    :in $ ?concept-id
+    :where
+    [?e :concept/id ?concept-id ]
+    ]
+  )
+
+(def fetch-all-relations-entity-ids-for-concept-query
+  '[:find ?e
+    :where
+    [?cr :concept/id ?related-ids]
+    [?r :relation/concept-1 ?cr]
+    [?r :relation/concept-2 ?c]
+    [?r :relation/type ?relation]
+    ]
+  )
+;; TODO skapa delete relation i apiet
 
 (defn get-concept-entity-id [concept-id]
   (ffirst (d/q show-concept-entity-id (get-db) concept-id)))
@@ -146,150 +162,4 @@
       group-by-transaction-and-entity-id
       map-entity-transaction-datoms-to-events
       )
-  )
-
-(comment
-  "example data"
-   (def example-event-history {[13194139533325 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/id,
-   :v "t1G1_sg9_Pkk",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}
-  {:e 22390454788030565,
-   :a :concept/type,
-   :v "skill",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}
-  {:e 22390454788030565,
-   :a :concept/definition,
-   :v "Hoppa som en groda",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}
-  {:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "Hoppning",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}],
- [13194139533326 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "dansa",
-   :tx 13194139533326,
-   :added true,
-   :inst #inst "2019-11-20T16:14:05.364-00:00"}
-  {:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "Hoppning",
-   :tx 13194139533326,
-   :added false,
-   :inst #inst "2019-11-20T16:14:05.364-00:00"}],
- [13194139533327 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "dansa",
-   :tx 13194139533327,
-   :added false,
-   :inst #inst "2019-11-20T16:14:59.807-00:00"}
-  {:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "dansa3",
-   :tx 13194139533327,
-   :added true,
-   :inst #inst "2019-11-20T16:14:59.807-00:00"}],
- [13194139533458 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/deprecated,
-   :v true,
-   :tx 13194139533458,
-   :added true,
-   :inst #inst "2019-12-16T15:11:34.692-00:00"}]})
-
-
-  (def deprecated-entity-transaction-datoms
-    [{:e 22390454788030565,
-      :a :concept/deprecated,
-      :v true,
-      :tx 13194139533458,
-      :added true,
-      :inst #inst "2019-12-16T15:11:34.692-00:00"}])
-
-
-  (def created-entity-transaction-datoms
-    [{:e 22390454788030565,
-      :a :concept/id,
-      :v "t1G1_sg9_Pkk",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}
-     {:e 22390454788030565,
-      :a :concept/type,
-      :v "skill",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}
-     {:e 22390454788030565,
-      :a :concept/definition,
-      :v "Hoppa som en groda",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}
-     {:e 22390454788030565,
-      :a :concept/preferred-label,
-      :v "Hoppning",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}]
-    )
-
-  (def updated-entity-transaction-datoms
-    [{:e 22390454788030565,
-      :a :concept/preferred-label,
-      :v "dansa",
-      :tx 13194139533326,
-      :added true,
-      :inst #inst "2019-11-20T16:14:05.364-00:00"}
-     {:e 22390454788030565,
-      :a :concept/preferred-label,
-      :v "Hoppning",
-      :tx 13194139533326,
-      :added false,
-      :inst #inst "2019-11-20T16:14:05.364-00:00"}]
-    )
-
-  (def two-updated-entity-transaction-datoms
-    {[13194139533326 22390454788030565]
-     [{:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "dansa",
-       :tx 13194139533326,
-       :added true,
-       :inst #inst "2019-11-20T16:14:05.364-00:00"}
-      {:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "Hoppning",
-       :tx 13194139533326,
-       :added false,
-       :inst #inst "2019-11-20T16:14:05.364-00:00"}],
-     [13194139533327 22390454788030565]
-     [{:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "dansa",
-       :tx 13194139533327,
-       :added false,
-       :inst #inst "2019-11-20T16:14:59.807-00:00"}
-      {:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "dansa3",
-       :tx 13194139533327,
-       :added true,
-       :inst #inst "2019-11-20T16:14:59.807-00:00"}]},
-    )
-
-  ;;(group-by-transaction-and-entity-id (get-entity-history 22390454788030565))
-
   )
