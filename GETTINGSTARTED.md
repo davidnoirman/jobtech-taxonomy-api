@@ -213,6 +213,7 @@ Unsuccessful queries will have a response code of:
 
 ## Diagrams
 
-![text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-1.svg "Taxonomy diagram 1")
+![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-1.svg?sanitize=true)
 
-![text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-2.svg "Taxonomy diagram 2")
+![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-2.svg?sanitize=true)
+
