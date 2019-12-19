@@ -4,7 +4,7 @@ The Jobtech Taxonomy API gives access to different taxonomies like occupation na
 
 It’s main purpose is to act as a common language for labour market related systems.
 
-[Jobtech Taxonomy API Swagger UI](https://taxonomy.api.jobtechdev.se/v0/taxonomy/swagger-ui/index.html)
+[Jobtech Taxonomy API Swagger UI](https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html)
 
 In order to use the api you need a key which you need to authenticate yourself.
 
