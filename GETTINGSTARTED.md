@@ -20,6 +20,7 @@ In order to use the api you need a key which you need to authenticate yourself.
 * [Endpoints](#endpoints)
 * [Results](#results)
 * [Errors](#errors)
+* [Relations](#relations)
 
 
 ## Introduction
@@ -209,3 +210,46 @@ Unsuccessful queries will have a response code of:
 | 400 | Bad Request | Something wrong in the query |
 | 401 | Unauthorized | You are not using a valid API key |
 | 500 | Internal Server Error | Something wrong on the server side |
+
+## Relations
+
+```mermaid
+graph BT;
+ON-->|substitutability|ON
+ON(occupation-name) -->|broader| S4(ssyk-level-4)
+S4 -->|broader| S3(ssyk-level-3)
+S3 -->|broader| S2(ssyk-level-2)
+S2 -->|broader| S1(ssyk-level-1)
+S4-->|broader|OF(occupation-field)
+OC(occupation-collection)-->|related|ON
+I4(isco-level-4)-->|related|S4
+K(keyword)-->|related|ON
+S(skill)-->|related|I4
+S-->|broader|SH(skill-headline)
+
+M(municipality)-->|broader|REGION
+COUNTRY(country)-->|broader|CONTINENT(continent)
+REGION(region)-->|broader|COUNTRY
+	
+
+SNI2(sni-level-2)-->|broader|SNI1(sni-level-1)
+
+
+SUNEF4(sun-education-field-4)-->|broader|SUNEF3(sun-education-field-3)
+SUNEF3-->|broader|SUNEF2(sun-education-field-2)-->|broader|SUNEF1(sun-education-field-1)
+
+SUNEL3(sun-education-level-3)-->|broader|SUNEL2(sun-education-level-2)-->|broader|SUNEL1(sun-education-level-1)
+
+D(driving-license)-->D
+
+ED(employment-duration)
+
+ET(employment-type)
+
+WT(wage-type)
+
+L(language)
+LL(language-level)
+
+WTE(worktime-extent)
+```
