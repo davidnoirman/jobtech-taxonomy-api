@@ -216,7 +216,7 @@ The "broader" relation always has an implicit "narrower" relation in the opposit
 The "related" relation always has an implicit "related" relation in the opposite direction.
 
 ___
-
+<!- The diagrams are generated from the mermaid file taxonomies.mmd --> 
 ![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-1.svg?sanitize=true)
 
 ___
