@@ -217,8 +217,14 @@ Here is a diagram over the types in the taxonomies and what relations they have 
 The "broader" relation always has an implicit "narrower" relation in the opposite direction.
 The "related" relation always has an implicit "related" relation in the opposite direction.
 
+___
+
 ![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-1.svg?sanitize=true)
 
+___
+
 ![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-2.svg?sanitize=true)
+
+___
 
 ![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-3.svg?sanitize=true)
