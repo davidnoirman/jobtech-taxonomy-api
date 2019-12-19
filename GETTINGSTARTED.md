@@ -60,9 +60,7 @@ This means that version 2 is not fixed for the moment but will be in a future re
 
 1. Follow the instructions on how to get and api key here: [https://apirequest.jobtechdev.se/](https://apirequest.jobtechdev.se/)
 
-2. If you are using curl you have to add the api-key in the headers like this:
-
-``` curl "{URL}" -H "accept: application/json" -H "api-key: {YOUR API KEY}" ```
+2. If you are using curl you have to add the api-key in the headers like this: curl "{URL}" -H "accept: application/json" -H "api-key: {YOUR API KEY}"
 
 3. If you are using the swagger UI you have to log in with the "Authorize" button in the top right corner and add your api-key.
 
