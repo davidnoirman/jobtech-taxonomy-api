@@ -65,7 +65,7 @@ This means that version 2 is not fixed for the moment but will be in a future re
 
 3. If you are using the swagger UI you have to log in with the "Authorize" button in the top right corner and add your api-key.
 
-![alt text](swagger-authorize.png "How to log into swagger")
+![text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/swagger-authorize.png "How to log into swagger")
 
 ## Endpoints
 Below we only show the URLs. If you prefer the curl command, you type it like:
