@@ -97,14 +97,14 @@ This endpoint will let you retrieve concepts from different taxonomies.
 
 ##### Example List all Skill headlines
 ```
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?type=skill-headline
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/concepts?type=skill-headline
 ```
 This request will fetch all concepts of type skill headline.
 
 
 ##### Example Relations
 ```
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?related-ids=xAWr_WYq_JPP%20Uj5W_dft_Ssg&relation=narrower
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/concepts?related-ids=xAWr_WYq_JPP%20Uj5W_dft_Ssg&relation=narrower
 
 ```
 This request will fetch concepts that has a narrower relation from the concepts “Databaser” and “Operativsystem”.
@@ -112,7 +112,7 @@ This request will fetch concepts that has a narrower relation from the concepts 
 ##### Example 2. Multiple types
 
 ```
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?type=ssyk-level-1%20ssyk-level-2%20ssyk-level-3
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/concepts?type=ssyk-level-1%20ssyk-level-2%20ssyk-level-3
 ```
 This request will fetch concepts of types ssyk-level-1 ssyk-level-2 and ssyk-level-3
 
@@ -126,9 +126,9 @@ This endpoint will list relations between two types of concepts in the taxonomie
 
 ```
 
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/graph?edge-relation-type=broader&source-concept-type=occupation-name&target-concept-type=ssyk-level-4
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/graph?edge-relation-type=broader&source-concept-type=occupation-name&target-concept-type=ssyk-level-4
 
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/graph?edge-relation-type=broader&source-concept-type=ssyk-level-4&target-concept-type=occupation-field
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/graph?edge-relation-type=broader&source-concept-type=ssyk-level-4&target-concept-type=occupation-field
 
 
 
@@ -139,7 +139,7 @@ With the help of these two request you can build a tree view bottom up of the oc
 ##### Example Occupation name substitutability
 
 ```
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/graph?edge-relation-type=substitutability&source-concept-type=occupation-name&target-concept-type=occupation-name&limit=10
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/graph?edge-relation-type=substitutability&source-concept-type=occupation-name&target-concept-type=occupation-name&limit=10
 ```
 This request will fetch occupation names that has a substitutability relation to each other.
 For example, if an employer wants to hire a  “Barnmorska, förlossning" but can’t find any they can instead use information from this endpoint to search for a "Barnmorska, vårdavdelning/BB-avdelning". The substitutability-percentage will show how well the occupation can substitute another occupation.
@@ -169,7 +169,7 @@ This endpoint is to help end users to find concepts in the taxonomies.
 ##### Example Autocomplete programming languages starting on “sc”
 
 ```
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/suggesters/autocomplete?query-string=sc&type=skill&relation=narrower&related-ids=ShQw_McG_oti
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/suggesters/autocomplete?query-string=sc&type=skill&relation=narrower&related-ids=ShQw_McG_oti
 
 
 ```
@@ -181,9 +181,9 @@ With this request you can autocomplete programming languages starting on the let
 
 
 ```
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/suggesters/autocomplete?query-string=lastb&type=occupation-name%20keyword
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/suggesters/autocomplete?query-string=lastb&type=occupation-name%20keyword
 
-http://jobtech-taxonomy-api-develop-jobtech-taxonomy-api.test.services.jtech.se/v1/taxonomy/main/concepts?related-ids=d68E_e74_a59&relation=related
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/concepts?related-ids=d68E_e74_a59&relation=related
 
 
 
