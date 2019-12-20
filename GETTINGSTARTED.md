@@ -73,7 +73,7 @@ Below we only show the URLs. If you prefer the curl command, you type it like:
 curl "{URL}" -H "accept: application/json" -H "api-key: {YOUR API KEY}" 
 ```
 
-### Main
+### Main Endpoints
 
 
 
@@ -158,10 +158,10 @@ This endpoint will list all deprecated concepts that has been replaced by anothe
 ####  /v1/taxonomy/main/versions
 This endpoint will list all published versions of the taxonomies.
 
-### Specific
+### Specific Endpoints
 These endpoint acts like the  /v1/taxonomy/main/concepts but will also display specific metadata on the concepts like ssyk or country codes.
 
-### Suggesters
+### Suggesters Endpoints
 
 #####  /v1/taxonomy/suggesters/autocomplete
 This endpoint is to help end users to find concepts in the taxonomies.
