@@ -69,7 +69,9 @@ This means that version 2 is not fixed for the moment but will be in a future re
 ## Endpoints
 Below we only show the URLs. If you prefer the curl command, you type it like:
 
-``` curl "{URL}" -H "accept: application/json" -H "api-key: {YOUR API KEY}" ```
+``` 
+curl "{URL}" -H "accept: application/json" -H "api-key: {YOUR API KEY}" 
+```
 
 ### Main
 
