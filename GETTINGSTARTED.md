@@ -234,7 +234,7 @@ ___
 
 ## Taxonomy + Ontology
 
-The Jobmarket Ontology will be merged with the JobTech Taxonomy, and all identifiers will be replaced.
+The Jobmarket Ontology will be merged with the JobTech Taxonomy during 2020, and all identifiers will be replaced with Jobtech Taxonomy identifiers. 
 
 ###  Ontology files
 A file dump of the Ontology can be downloaded here:
