@@ -21,6 +21,7 @@ In order to use the api you need a key which you need to authenticate yourself.
 * [Results](#results)
 * [Errors](#errors)
 * [Diagrams](#diagrams)
+* [Taxonomy + Ontology](#Taxonomy+Ontology)
 
 
 ## Introduction
@@ -228,3 +229,15 @@ ___
 ___
 
 ![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-3.svg?sanitize=true)
+
+
+
+## Taxonomy + Ontology
+
+The Jobmarket Ontology will be merged with the JobTech Taxonomy, and all identifiers will be replaced.
+
+###  Ontology files
+A file dump of the Ontology can be downloaded here:
+[Ontology Files](https://github.com/JobtechSwe/ontology-files)
+
+
