@@ -21,7 +21,7 @@ In order to use the api you need a key which you need to authenticate yourself.
 * [Results](#results)
 * [Errors](#errors)
 * [Diagrams](#diagrams)
-* [Taxonomy + Ontology](#Taxonomy+Ontology)
+* [Taxonomy + Ontology](#taxonomy--ontology)
 
 
 ## Introduction
