@@ -162,11 +162,13 @@
         changes (map handle-updated-attribute grouped)
         timestamp (:inst (first entity-transaction-datoms))
         transaction-id (:tx (first entity-transaction-datoms))
+        user-id (:user-id (first entity-transaction-datoms))
         ]
 
     {:event-type "UPDATED"
      :timestamp timestamp
      :transaction-id transaction-id
+     :user-id user-id
      :changes changes
      }
     )
@@ -177,6 +179,7 @@
     {:event-type "DEPRECATED"
      :timestamp (:inst first-datom)
      :transaction-id (:tx first-datom)
+     :user-id (:user-id first--datom)
      })
 
   )
