@@ -162,6 +162,12 @@ This endpoint will list all published versions of the taxonomies.
 ### Specific Endpoints
 These endpoint acts like the  /v1/taxonomy/main/concepts but will also display specific metadata on the concepts like ssyk or country codes.
 
+##### Example Fetch SSYK codes for all levels 
+
+```
+https://taxonomy.api.jobtechdev.se/v1/taxonomy/specific/concepts/ssyk?type=ssyk-level-1%20ssyk-level-2%20ssyk-level-3%20ssyk-level-4
+```
+
 ### Suggesters Endpoints
 
 #####  /v1/taxonomy/suggesters/autocomplete
