@@ -36,15 +36,44 @@
            )
 
 (def fetch-all-relations-entity-ids-for-concept-query
-  '[:find ?r
+  '[:find ?r ?inst ?added ;;?user-id
     :in $ ?concept-id
     :where
     [?c :concept/id ?concept-id]
-    (or [?r :relation/concept-1 ?c]
-        [?r :relation/concept-2 ?c])
+    [?r :relation/concept-1 ?c ?tx ?added]
+    #_(or [?r :relation/concept-1 ?c ?tx ?added]
+        [?r :relation/concept-2 ?c ?tx ?added])
+    ;;[?tx :taxonomy-user/id ?user-id]
+    [?tx :db/txInstant ?inst]
     ]
   )
 
+(def fetch-all-relations-entity-ids-for-concept-query-2
+  '[:find ?r ?inst ?added ?user-id ?pl-1 ?pl-2
+    :in $ ?concept-id-1
+    :where
+    [?c1 :concept/id ?concept-id-1]
+    [?c1 :concept/preferred-label ?pl-1]
+    [?c2 :concept/id ?concept-id-2]
+    [?c2 :concept/preferred-label ?pl-2]
+
+    (or-join [?r ?c1 ?c2 ?tx ?added]
+             (and      [?r :relation/concept-1 ?c1 ?tx ?added]
+                       [?r :relation/concept-2 ?c2 ?tx ?added]
+                       )
+             (and
+              [?r :relation/concept-1 ?c2 ?tx ?added]
+              [?r :relation/concept-2 ?c1 ?tx ?added]
+              )
+             )
+    [?tx :taxonomy-user/id ?user-id]
+    [?tx :db/txInstant ?inst]
+    ]
+  )
+;; list transactions made by user "0"
+;; (d/q '[:find ?tx  :in $ ?user-id :where [?tx :taxonomy-user/id ?user-id]] (get-db-hist (get-db))  "0")
+
+;; (d/q '[:find ?tx ?user-id :in $ :where [?tx :taxonomy-user/id ?user-id]] (get-db-hist (get-db)) )
 
 (defn get-concept-entity-id [concept-id]
   (ffirst (d/q show-concept-entity-id (get-db) concept-id)))

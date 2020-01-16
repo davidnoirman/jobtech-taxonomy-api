@@ -422,7 +422,7 @@
     (when (> (count response) 0)
       (ffirst response))))
 
-(defn assert-relation-part [c1 c2 type desc substitutability-percentage]
+(defn assert-relation-part [user-id c1 c2 type desc substitutability-percentage]
   (let* [new-rel (cond->
                      {:relation/concept-1 c1
                       :relation/concept-2 c2
@@ -436,15 +436,18 @@
                    (assoc :relation/substitutability-percentage substitutability-percentage)
                    )
 
-         tx        [ new-rel]
-         result     (d/transact (get-conn) {:tx-data tx})]
+         tx        [ new-rel  {:db/id "datomic.tx" :taxonomy-user/id user-id}]
+         result     (d/transact (get-conn) {:tx-data tx})
+         _ (println result)
+         ]
+
          [result new-rel]))
 
-(defn assert-relation "" [concept-1 concept-2 type description substitutability-percentage]
+(defn assert-relation "" [user-id concept-1 concept-2 type description substitutability-percentage]
   (let [existing (find-relations-including-unpublished {:concept-1 concept-1 :concept-2 concept-2 :type type})]
     (if (> (count existing) 0)
       [false nil]
-      (assert-relation-part (concept-to-entity concept-1) (concept-to-entity concept-2) type description substitutability-percentage)
+      (assert-relation-part user-id (concept-to-entity concept-1) (concept-to-entity concept-2) type description substitutability-percentage)
       )))
 
 
@@ -473,12 +476,11 @@
 
         result (when relation-entity-id
                  (d/transact (get-conn) {:tx-data [[:db/retractEntity relation-entity-id]
-                                                   [:db/add "datomic.tx" :taxonomy-user/id user-id]
-                                                   ]})
-                 )
+                                                   {:db/id "datomic.tx" :taxonomy-user/id user-id}
+                                                   ]}))
         ]
-    )
-  )
+    result
+    ))
 
 
 (def fetch-simple-concept-query

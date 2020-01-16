@@ -29,6 +29,7 @@
    [clojure.spec.alpha :as s]
    [spec-tools.core :as st]
    [spec-tools.data-spec :as ds]
+   [jobtech-taxonomy-api.routes.parameter-util :as pu]
    ))
 
 ;; Status:
@@ -306,25 +307,27 @@
       :post {:responses {200 {:body types/ok-concept-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [type definition preferred-label]} :query} :parameters}]
-                        (log/info "POST /concept")
-                        (let [[result timestamp new-concept] (concepts/assert-concept type definition preferred-label)]
-                          (if result
-                            {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
-                            {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) })))}}]
+             :handler (fn [request]
+                        (let [{:keys [type definition preferred-label]} (pu/get-query-from-request request)
+                              user-id (pu/get-user-id-from-request request)
+                              _ (log/info user-id)
+                              ]
+
+                          (log/info "POST /concept")
+                          (let [[result timestamp new-concept] (concepts/assert-concept type definition preferred-label)]
+                            (if result
+                              {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
+                              {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) }))))}}]
 
     ["/concepts"
      {
       :summary      "Get concepts. Supply at least one search parameter."
-      :parameters {:query {(ds/opt :id) (taxonomy/par string? "ID of concept"),
-                           (ds/opt :preferred-label) (taxonomy/par string? "Textual name of concept"),
-                           (ds/opt :type) (st/spec {:name "types" :spec string? :description "Restrict to concept type"})
-                           (ds/opt :deprecated) (taxonomy/par boolean? "Restrict to deprecation state"),
-                           (ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability-to" "substitutability-from" } "Relation type"),
-                           (ds/opt :related-ids) (taxonomy/par string? "OR-restrict to these relation IDs (white space separated list)"),
-                           (ds/opt :offset) (taxonomy/par int? "Return list offset (from 0)"),
-                           (ds/opt :limit) (taxonomy/par int? "Return list limit"),
-                           (ds/opt :version) (taxonomy/par int? "Version to use")}}
+      :parameters {:query
+
+                   (pu/build-parameter-map [:id :preferred-label :type :deprecated :relation :related-ids :offset :limit :version])
+
+
+                   }
       :get {:responses {200 {:body types/concepts-spec}
                         500 {:body types/error-spec}}
             :handler (fn [{{{:keys [id preferred-label type deprecated relation
@@ -356,10 +359,9 @@
      ["/accumulate-concept"
      {
       :summary      "Accumulate data on an existing concept."
-      :parameters {:query {(ds/opt :id) (taxonomy/par string? "Concept id")
-                           (ds/opt :type) (taxonomy/par string? "Concept type"),
-                           (ds/opt :definition) (taxonomy/par string? "Definition"),
-                           (ds/opt :preferred-label) (taxonomy/par string? "Preferred label")}}
+      :parameters {:query
+                   (pu/build-parameter-map [:id :type :definition :preferred-label])
+                   }
       :patch {:responses {200 {:body types/ok-concept-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
@@ -374,18 +376,21 @@
     ["/relation"
      {
       :summary      "Assert a new relation."
-      :parameters {:query {(ds/opt :relation) (taxonomy/par #{"broader" "narrower" "related" "substitutability" } "Relation type"),
-                           (ds/opt :definition) (taxonomy/par string? "Description"),
-                           (ds/opt :concept-1) (taxonomy/par string? "ID of source concept"),
-                           (ds/opt :concept-2) (taxonomy/par string? "ID of target concept"),
-                           (ds/opt :substitutability-percentage) (taxonomy/par int? "You only need this one if the relation is substitutability")
-                           }}
+      :parameters {:query
+
+                   (pu/build-parameter-map [:user-id
+                                            :relation-type
+                                            :concept-1
+                                            :concept-2
+                                            :definition
+                                            :substitutability-percentage])
+                   }
       :post {:responses {200 {:body types/msg-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [relation definition concept-1 concept-2 substitutability-percentage]} :query} :parameters}]
+             :handler (fn [{{{:keys [user-id relation-type definition concept-1 concept-2 substitutability-percentage]} :query} :parameters}]
                         (log/info "POST /relation")
-                        (let [[result new-relation] (concepts/assert-relation concept-1 concept-2 relation definition substitutability-percentage)
+                        (let [[result new-relation] (concepts/assert-relation user-id concept-1 concept-2 relation-type definition substitutability-percentage)
                               _ (log/info new-relation)
                               ]
                           (if result
@@ -393,22 +398,19 @@
                             {:status 409 :body (types/map->nsmap {:error "Can't create new relation since it is in conflict with existing relation."}) })))}}]
 
 
-    ;; retract-relation [user-id concept-1 concept-2 relation-type]
+
      ["/delete-relation"
      {
       :summary      "Retract a relation."
-      :parameters {:query {(ds/opt :user-id) (taxonomy/par string? "User id")
-                           (ds/opt :relation) (taxonomy/par #{"broader" "related" "substitutability" } "Relation type")
-                           (ds/opt :concept-1) (taxonomy/par string? "ID of source concept"),
-                           (ds/opt :concept-2) (taxonomy/par string? "ID of target concept"),
-
-                           }}
+      :parameters {:query
+                   (pu/build-parameter-map [:user-id :relation-type :concept-1 :concept-2])
+                   }
       :delete {:responses {200 {:body types/msg-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [user-id relation concept-1 concept-2]} :query} :parameters}]
-                        (log/info (str "DELETE /relation " user-id " " relation " " concept-1 " " concept-2))
-                        (let [result  (concepts/retract-relation user-id concept-1 concept-2 relation)
+             :handler (fn [{{{:keys [user-id relation-type concept-1 concept-2]} :query} :parameters}]
+                        (log/info (str "DELETE /relation " user-id " " relation-type " " concept-1 " " concept-2))
+                        (let [result  (concepts/retract-relation user-id concept-1 concept-2 relation-type)
 
                               ]
                           (if result
