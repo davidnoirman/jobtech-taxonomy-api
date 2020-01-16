@@ -310,11 +310,10 @@
              :handler (fn [request]
                         (let [{:keys [type definition preferred-label]} (pu/get-query-from-request request)
                               user-id (pu/get-user-id-from-request request)
-                              _ (log/info user-id)
                               ]
 
-                          (log/info "POST /concept")
-                          (let [[result timestamp new-concept] (concepts/assert-concept type definition preferred-label)]
+                          (log/info "POST /concept" )
+                          (let [[result timestamp new-concept] (concepts/assert-concept user-id type definition preferred-label)]
                             (if result
                               {:status 200 :body (types/map->nsmap {:time timestamp :concept new-concept}) }
                               {:status 409 :body (types/map->nsmap {:error "Can't create new concept since it is in conflict with existing concept."}) }))))}}]

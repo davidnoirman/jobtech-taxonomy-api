@@ -84,15 +84,16 @@
   [eid]
   (->> eid
        (d/q
-        '[:find ?e ?attr ?v ?tx ?added ?inst
+        '[:find ?e ?attr ?v ?tx ?added ?inst ?user-id
           :in $ ?e
           :where
           [?e ?a ?v ?tx ?added]
           [?tx :db/txInstant ?inst]
+          [?tx :taxonomy-user/id ?user-id]
           [?a :db/ident ?attr]]
         (get-db-hist (get-db)))
        (map #(->> %
-                  (map vector [:e :a :v :tx :added :inst])
+                  (map vector [:e :a :v :tx :added :inst :user-id])
                   (into {})))
        (sort-by :tx)))
 
@@ -119,6 +120,7 @@
       (assoc (:a element) (:v element))
       (assoc :timestamp (:inst element))
       (assoc :transaction-id (:tx element ))
+      (assoc :user-id (:user-id element))
       )
   )
 
@@ -126,14 +128,17 @@
   (let [concept (reduce created-event-reducer {} entity-transaction-datoms)
         timestamp (:timestamp concept)
         transaction-id (:transaction-id concept)
+        user-id (:user-id concept)
         concept-no-timestamp (-> concept
                                  (dissoc  :timestamp)
                                  (dissoc :transaction-id)
+                                 (dissoc :user-id)
                                  )
         ]
     {:event-type "CREATED"
      :timestamp timestamp
      :transaction-id transaction-id
+     :user-id user-id
      :concept concept-no-timestamp
      }
     )

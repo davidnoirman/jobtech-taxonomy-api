@@ -395,22 +395,26 @@
   "The response schema for /concepts. Beta for v0.9."
   [concept-schema ])
 
-(defn assert-concept-part [type desc preferred-label]
+(defn user-id-tx [user-id]
+  {:db/id "datomic.tx" :taxonomy-user/id user-id}
+  )
+
+(defn assert-concept-part [user-id type desc preferred-label]
   (let* [new-concept {:concept/id (nano/generate-new-id-with-underscore)
                       :concept/definition desc
                       :concept/type type
                       :concept/preferred-label preferred-label
                       }
 
-         tx        [ new-concept]
+         tx        [ new-concept (user-id-tx user-id)]
          result     (d/transact (get-conn) {:tx-data tx})]
          [result new-concept]))
 
-(defn assert-concept "" [type desc preferred-label]
+(defn assert-concept "" [user-id type desc preferred-label]
   (let [existing (find-concepts-including-unpublished {:preferred-label preferred-label :type type})]
     (if (> (count existing) 0)
       [false nil]
-      (let [[result new-concept] (assert-concept-part type desc preferred-label)
+      (let [[result new-concept] (assert-concept-part user-id type desc preferred-label)
             timestamp (if result (nth (first (:tx-data result)) 2) nil)]
         [result timestamp  new-concept]))))
 
