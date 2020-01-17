@@ -292,11 +292,15 @@
       :delete {:responses {200 {:body types/ok-spec}
                            404 {:body types/error-spec}
                            500 {:body types/error-spec}}
-               :handler (fn [{{{:keys [id]} :query} :parameters}]
+               :handler (fn [request]
                           (log/info "DELETE /concept")
-                          (if (core/retract-concept id)
-                            {:status 200 :body (types/map->nsmap {:message "ok"}) }
-                            {:status 404 :body (types/map->nsmap {:error "not found"}) }))}}]
+                          (let [{:keys [id]} (pu/get-query-from-request  request)
+                                user-id (pu/get-user-id-from-request request)
+                                ]
+
+                            (if (core/retract-concept user-id id)
+                              {:status 200 :body (types/map->nsmap {:message "ok"}) }
+                              {:status 404 :body (types/map->nsmap {:error "not found"}) })))}}]
 
     ["/concept"
      {

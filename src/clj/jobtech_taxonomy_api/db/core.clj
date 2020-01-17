@@ -16,14 +16,16 @@
    ))
 
 
-(defn retract-concept [id]
+(defn retract-concept [user-id id]
   (let [found-concept (db-concepts/find-concepts-including-unpublished {:id id})]
     (if (or (= 0 (count found-concept))
             (get (ffirst found-concept) :concept/deprecated))
       false
       (and (d/transact (get-conn) {:tx-data
                                    [{:concept/id id
-                                     :concept/deprecated true}]})
+                                     :concept/deprecated true}
+                                    (user-id-tx user-id)
+                                    ]})
            true))))
 
 

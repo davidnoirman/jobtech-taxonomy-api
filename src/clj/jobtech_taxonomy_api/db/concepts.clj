@@ -395,9 +395,7 @@
   "The response schema for /concepts. Beta for v0.9."
   [concept-schema ])
 
-(defn user-id-tx [user-id]
-  {:db/id "datomic.tx" :taxonomy-user/id user-id}
-  )
+
 
 (defn assert-concept-part [user-id type desc preferred-label]
   (let* [new-concept {:concept/id (nano/generate-new-id-with-underscore)
@@ -406,7 +404,7 @@
                       :concept/preferred-label preferred-label
                       }
 
-         tx        [ new-concept (user-id-tx user-id)]
+         tx        [ new-concept (api-util/user-id-tx user-id)]
          result     (d/transact (get-conn) {:tx-data tx})]
          [result new-concept]))
 

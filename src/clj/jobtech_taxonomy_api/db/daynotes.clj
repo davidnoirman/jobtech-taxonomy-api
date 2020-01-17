@@ -179,7 +179,7 @@
     {:event-type "DEPRECATED"
      :timestamp (:inst first-datom)
      :transaction-id (:tx first-datom)
-     :user-id (:user-id first--datom)
+     :user-id (:user-id first-datom)
      })
 
   )
