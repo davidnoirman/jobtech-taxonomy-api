@@ -16,6 +16,7 @@
    [jobtech-taxonomy-api.middleware.formats :as formats]
    [jobtech-taxonomy-api.middleware.cors :as cors]
    [jobtech-taxonomy-api.middleware :as middleware]
+   [jobtech-taxonomy-api.webhooks :as webhooks]
    [jobtech-taxonomy-api.db.versions :as v]
    [jobtech-taxonomy-api.db.concepts :as concepts]
    [jobtech-taxonomy-api.db.events :as events]
@@ -24,6 +25,7 @@
    [jobtech-taxonomy-api.db.graph :as graph]
    [jobtech-taxonomy-api.db.core :as core]
    [jobtech-taxonomy-api.db.daynotes :as daynotes]
+   [jobtech-taxonomy-api.webhooks :as webhooks]
    [taxonomy :as types]
    [clojure.tools.logging :as log]
    [clojure.spec.alpha :as s]
@@ -434,7 +436,12 @@
                         (log/info (str "POST /versions" new-version-id))
                         (let [result (v/create-new-version new-version-id)]
                           (if result
-                            {:status 200 :body (types/map->nsmap {:message "A new version of the Taxonomy was created."}) }
+                            (let [notification-result
+                                  (webhooks/send-notifications
+                                   (webhooks/get-client-list-from-conf!)
+                                   new-version-id)]
+                              {:status 200 :body (types/map->nsmap
+                                                  {:message (format "A new version of the Taxonomy was created. %d webhook notifications were sent." (count (remove nil? notification-result)))})})
                             {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")}) }
                             )))}}]
 
