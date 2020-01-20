@@ -87,5 +87,6 @@
 
 
 (defn user-id-tx [user-id]
-  {:db/id "datomic.tx" :taxonomy-user/id user-id}
+  {:db/id "datomic.tx"
+   :taxonomy-user/id user-id}
   )

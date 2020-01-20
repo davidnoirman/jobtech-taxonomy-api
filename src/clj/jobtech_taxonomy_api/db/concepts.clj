@@ -8,6 +8,7 @@
    [jobtech-taxonomy-api.db.api-util :refer :all]
    [jobtech-taxonomy-api.db.api-util :as api-util]
    [clojure.set :as set]
+   [clojure.tools.logging :as log]
    ))
 
 (comment
@@ -330,7 +331,10 @@
                       (concat concept-pull-pattern (:extra-pull-fields args))
                       concept-pull-pattern
                       )
-        db (get-db (:version args))]  ;; if version is nil it will use the latest published database
+        db  (if (contains? args :version)
+              (get-db (:version args))
+              (get-db) ;; will return the unpublished version of the database
+              )]
     (-> args
         (assoc :db db)
         (assoc :pull-pattern pull-pattern)
@@ -404,9 +408,12 @@
                       :concept/preferred-label preferred-label
                       }
 
-         tx        [ new-concept (api-util/user-id-tx user-id)]
-         result     (d/transact (get-conn) {:tx-data tx})]
-         [result new-concept]))
+         tx        [(api-util/user-id-tx user-id) new-concept ]
+         result     (d/transact (get-conn) {:tx-data tx})
+         _          (log/info result)
+         ]
+
+    [result new-concept]))
 
 (defn assert-concept "" [user-id type desc preferred-label]
   (let [existing (find-concepts-including-unpublished {:preferred-label preferred-label :type type})]
@@ -533,7 +540,7 @@
      })
   )
 
-(defn accumulate-concept [id type definition preferred-label]
+(defn accumulate-concept [user-id id type definition preferred-label]
   {:pre [id (or preferred-label definition type)]}
 
   (let [old-concept (fetch-simple-concept id)
@@ -548,7 +555,7 @@
 
         duplicate-exists (duplicate-concept-exists? concept)
         datomic-result (when (not (:result duplicate-exists))
-                 (d/transact (get-conn) {:tx-data [concept]}))
+                         (d/transact (get-conn) {:tx-data [concept (api-util/user-id-tx user-id)]}))
         ]
 
     (when datomic-result

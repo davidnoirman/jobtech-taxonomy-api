@@ -1,4 +1,4 @@
-{ :datomic-name "jobtech-taxonomy-henrik-dev-4" ;;  ;; "jobtech-taxonomy-development-2019-11-19-1" ;;
+{ :datomic-name "henrik-dev-5" ;;  ;; "jobtech-taxonomy-development-2019-11-19-1" ;;
 :datomic-cfg {
               :server-type :ion
               :region "eu-west-1" ;; e.g. us-east-1

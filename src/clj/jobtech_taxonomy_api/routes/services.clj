@@ -368,12 +368,16 @@
       :patch {:responses {200 {:body types/ok-concept-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [id type definition preferred-label]} :query} :parameters}]
-                        (log/info "PATCH /accumulate-concept")
-                        (let [result (concepts/accumulate-concept id type definition preferred-label)]
-                          (if result
-                            {:status 200 :body (types/map->nsmap result) }
-                            {:status 409 :body (types/map->nsmap {:error "Can't update concept since it is in conflict with existing concept." }) })))}}]
+              :handler (fn [request ]
+                         (let [{:keys [id type definition preferred-label]} (pu/get-query-from-request request)
+                               user-id (pu/get-user-id-from-request request)
+                               ]
+
+                           (log/info "PATCH /accumulate-concept")
+                           (let [result (concepts/accumulate-concept user-id id type definition preferred-label)]
+                             (if result
+                               {:status 200 :body (types/map->nsmap result) }
+                               {:status 409 :body (types/map->nsmap {:error "Can't update concept since it is in conflict with existing concept." }) }))))}}]
 
 
     ["/relation"

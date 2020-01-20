@@ -21,6 +21,19 @@
     ]
   )
 
+(def show-data-made-by-user-id
+  '[:find ?user-id ?attr ?v
+    :in $
+    :where
+    [?tx :taxonomy-user/id ?user-id]
+    [?e ?a ?v ?tx ]
+    [?a :db/ident ?attr]
+    ]
+  )
+
+;; (d/q show-data-made-by-user-id (get-db))
+
+
 (def show-concept-relations-entity-ids
   '[:find ?e ?concept-id
     :in $ ?concept-id
@@ -28,6 +41,7 @@
     [?e :concept/id ?concept-id ]
     ]
   )
+
 
 
 #_(or-join [?c]
@@ -84,7 +98,7 @@
   [eid]
   (->> eid
        (d/q
-        '[:find ?e ?attr ?v ?tx ?added ?inst ?user-id
+        '[:find ?e ?attr ?v ?tx ?added ?inst  ?user-id
           :in $ ?e
           :where
           [?e ?a ?v ?tx ?added]
