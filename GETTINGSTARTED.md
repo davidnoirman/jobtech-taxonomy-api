@@ -21,6 +21,7 @@ In order to use the api you need a key which you need to authenticate yourself.
 * [Results](#results)
 * [Errors](#errors)
 * [Diagrams](#diagrams)
+* [Convert between old and new Taxonomy ids](#convert-between-old-and-new-taxonomy-ids)
 * [Taxonomy + Ontology](#taxonomy--ontology)
 
 
@@ -240,10 +241,10 @@ ___
 ## Convert between Old and New Taxonomy ids
 If you need to convert data that contains ids from the old taxonomy service you can use these json-objects to convert between old and new Taxonomy ids.
 
-Convert from old to new json:
+Convert from old to new json:  
 https://github.com/JobtechSwe/elastic-importers/blob/develop/importers/taxonomy/resources/taxonomy_to_concept.json
 
-Convert from new to old json:
+Convert from new to old json:  
 https://github.com/JobtechSwe/elastic-importers/blob/develop/importers/taxonomy/resources/concept_to_taxonomy.json
 
 Please be aware of that occupation-group, municipality, region are not using the legacyDatabase id but statistical codes, like SSYK, länskod, kommunkod.
