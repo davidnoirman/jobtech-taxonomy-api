@@ -315,7 +315,7 @@
 
 (defn find-concepts-by-db
   ([args]
-   (let [ result (d/q (fetch-concepts args))
+   (let [result (d/q (fetch-concepts args))
          parsed-result (parse-find-concept-datomic-result result)]
      parsed-result
      ))
@@ -325,33 +325,36 @@
    (d/q (fetch-relations args)))
 
 ;;add extra-concept-fields to pull pattern
-
 (defn add-find-concepts-args [args]
   (let [pull-pattern (if (:extra-pull-fields args)
                       (concat concept-pull-pattern (:extra-pull-fields args))
                       concept-pull-pattern
                       )
-        db  (if (contains? args :version)
-              (get-db (:version args))
-              (get-db) ;; will return the unpublished version of the database
-              )]
+        ]
     (-> args
-        (assoc :db db)
         (assoc :pull-pattern pull-pattern)
         )))
 
 (defn find-concepts
   "Supply version: Use nil as value to get the latest published database."
   [args]
-  #_{:pre [(every? #(contains? args %) [:version :preferred-label])
-           ]}
-  (find-concepts-by-db (add-find-concepts-args args)))
-
+  (-> args
+      add-find-concepts-args
+      (assoc :db (get-db (:version args)))
+      find-concepts-by-db
+      )
+  )
 
 (defn find-concepts-including-unpublished [args]
-  (find-concepts-by-db (add-find-concepts-args args)))
+  (-> args
+      add-find-concepts-args
+      (assoc :db (get-db)) ;; impure!
+      find-concepts-by-db
+      )
+  )
 
 
+;; TODO FIX get db som innehåller unpublished sätt db innan! i args
 (defn add-find-relations-args [args]
   (let [pull-pattern relation-pull-pattern
         db (if (:version args)
