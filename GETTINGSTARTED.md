@@ -237,6 +237,19 @@ ___
 ![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-3.svg?sanitize=true)
 
 
+## Convert Old Taxonomy ids
+If you need to convert data that contains ids from the old taxonomy service you can use these json-objects to convert between old and new Taxonomy ids.
+
+Convert from old to new json:
+https://github.com/JobtechSwe/elastic-importers/blob/develop/importers/taxonomy/resources/taxonomy_to_concept.json
+
+Convert from new to old json:
+https://github.com/JobtechSwe/elastic-importers/blob/develop/importers/taxonomy/resources/concept_to_taxonomy.json
+
+Please be aware of that occupation-group, municipality, region are not using the legacyDatabase id but statistical codes, like SSYK, länskod, kommunkod.
+
+Also note that "driving license", is named "driving licence", in the the new taxonomy API
+
 
 ## Taxonomy + Ontology
 
