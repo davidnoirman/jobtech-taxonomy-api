@@ -62,7 +62,7 @@
   )
 
 (def fetch-all-relations-entity-ids-for-concept-query-2
-  '[:find ?r ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
+  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
     :in $ ?concept-id-1
     :where
     [?c1 :concept/id ?concept-id-1]
@@ -84,10 +84,48 @@
     [?tx :db/txInstant ?inst]
     ]
   )
+
+
+
+(defn convert-relation-datoms-to-events [datom]
+
+  (-> datom
+      (assoc :event-type (if (:added-1 datom) "CREATED" "DEPRECATED"))
+      (dissoc :added-1)
+      (dissoc :added-2)
+      )
+  ;; TODO refactor {:event-type Created
+  ;;                  :user-id henri
+  ;;                 :relation {:relation-type related
+  ;;                            concept-1 { :id 123 :label banan}
+  ;;                            concept-2  {:id 567 :label orange}}
+  ;;                              }
+  ;;
+  ;;
+  )
+
+
+(defn get-relation-history [concept-id]
+  (let [result (d/q fetch-all-relations-entity-ids-for-concept-query-2 (get-db) concept-id)]
+    (map #(->> % (map vector [:transaction-id
+                              :timestamp
+                              :user-id
+                              :concept-id-1
+                              :preferred-label-1
+                              :added-1
+                              :concept-id-2
+                              :preferred-label-2
+                              :added-2
+                              :relation-type]) (into {})) result)
+    )
+  )
+
 ;; list transactions made by user "0"
 ;; (d/q '[:find ?tx  :in $ ?user-id :where [?tx :taxonomy-user/id ?user-id]] (get-db-hist (get-db))  "0")
 
 ;; (d/q '[:find ?tx ?user-id :in $ :where [?tx :taxonomy-user/id ?user-id]] (get-db-hist (get-db)) )
+
+
 
 (defn get-concept-entity-id [concept-id]
   (ffirst (d/q show-concept-entity-id (get-db) concept-id)))
