@@ -1,5 +1,6 @@
 (ns jobtech-taxonomy-api.webhooks
   (:require
+   [jobtech-taxonomy-api.config :refer [env]]
    [clojure.tools.logging :as log]
    [clj-http.client :as client]))
 
@@ -17,11 +18,9 @@
                                      :exception e})))))
 
 (defn send-notifications [clients version]
-  ""
   (map #(send-notification % version) clients))
 
 (defn get-client-list-from-conf! []
-  "FIXME: fetch from the configuration/environment."
-  [{:url "https://postman-echo.com/put"
-    ;;:headers {"api-key" "yyy"}
-    :headers {}}])
+  "Set webhook-clients either in config.edn or the environment, for example:
+ webhook-clients='[{:url \"https://postman-echo.com/put\" :headers {}}]'"
+  (set (keys (get env :webhook-clients))))
