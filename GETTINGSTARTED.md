@@ -237,7 +237,7 @@ ___
 ![Alt text](https://raw.githubusercontent.com/JobtechSwe/jobtech-taxonomy-api/develop/taxonomy-diagram-part-3.svg?sanitize=true)
 
 
-## Convert Old Taxonomy ids
+## Convert between Old and New Taxonomy ids
 If you need to convert data that contains ids from the old taxonomy service you can use these json-objects to convert between old and new Taxonomy ids.
 
 Convert from old to new json:
