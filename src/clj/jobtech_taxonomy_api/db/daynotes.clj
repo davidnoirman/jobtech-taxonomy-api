@@ -50,34 +50,34 @@
            )
 
 (def fetch-all-relations-entity-ids-for-concept-query
-  '[:find ?r ?inst ?added ;;?user-id
+  '[:find ?r ?inst ?added ?user-id
     :in $ ?concept-id
     :where
     [?c :concept/id ?concept-id]
-    [?r :relation/concept-1 ?c ?tx ?added]
-    #_(or [?r :relation/concept-1 ?c ?tx ?added]
+    (or [?r :relation/concept-1 ?c ?tx ?added]
         [?r :relation/concept-2 ?c ?tx ?added])
-    ;;[?tx :taxonomy-user/id ?user-id]
+    [?tx :taxonomy-user/id ?user-id]
     [?tx :db/txInstant ?inst]
     ]
   )
 
 (def fetch-all-relations-entity-ids-for-concept-query-2
-  '[:find ?r ?inst ?added ?user-id ?pl-1 ?pl-2
+  '[:find ?r ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
     :in $ ?concept-id-1
     :where
     [?c1 :concept/id ?concept-id-1]
     [?c1 :concept/preferred-label ?pl-1]
     [?c2 :concept/id ?concept-id-2]
     [?c2 :concept/preferred-label ?pl-2]
+    [?r  :relation/type ?rt]
 
-    (or-join [?r ?c1 ?c2 ?tx ?added]
-             (and      [?r :relation/concept-1 ?c1 ?tx ?added]
-                       [?r :relation/concept-2 ?c2 ?tx ?added]
+    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2]
+             (and      [?r :relation/concept-1 ?c1 ?tx ?added-1]
+                       [?r :relation/concept-2 ?c2 ?tx ?added-2]
                        )
              (and
-              [?r :relation/concept-1 ?c2 ?tx ?added]
-              [?r :relation/concept-2 ?c1 ?tx ?added]
+              [?r :relation/concept-1 ?c2 ?tx ?added-1]
+              [?r :relation/concept-2 ?c1 ?tx ?added-2]
               )
              )
     [?tx :taxonomy-user/id ?user-id]

@@ -383,46 +383,22 @@
     ["/relation"
      {
       :summary      "Assert a new relation."
-      :parameters {:query
-
-                   (pu/build-parameter-map [:user-id
-                                            :relation-type
-                                            :concept-1
-                                            :concept-2
-                                            :definition
-                                            :substitutability-percentage])
-                   }
+      :parameters {:query (concepts/assert-relation-query-params)}
       :post {:responses {200 {:body types/msg-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [user-id relation-type definition concept-1 concept-2 substitutability-percentage]} :query} :parameters}]
-                        (log/info "POST /relation")
-                        (let [[result new-relation] (concepts/assert-relation user-id concept-1 concept-2 relation-type definition substitutability-percentage)
-                              _ (log/info new-relation)
-                              ]
-                          (if result
-                            {:status 200 :body (types/map->nsmap {:message "Created relation."}) }
-                            {:status 409 :body (types/map->nsmap {:error "Can't create new relation since it is in conflict with existing relation."}) })))}}]
+             :handler concepts/assert-relation-handler}}]
 
 
 
      ["/delete-relation"
      {
       :summary      "Retract a relation."
-      :parameters {:query
-                   (pu/build-parameter-map [:user-id :relation-type :concept-1 :concept-2])
-                   }
+      :parameters {:query (concepts/delete-relation-query-params)}
       :delete {:responses {200 {:body types/msg-spec}
                          409 {:body types/error-spec}
                          500 {:body types/error-spec}}
-             :handler (fn [{{{:keys [user-id relation-type concept-1 concept-2]} :query} :parameters}]
-                        (log/info (str "DELETE /relation " user-id " " relation-type " " concept-1 " " concept-2))
-                        (let [result  (concepts/retract-relation user-id concept-1 concept-2 relation-type)
-
-                              ]
-                          (if result
-                            {:status 200 :body (types/map->nsmap {:message "Retracted relation."}) }
-                            {:status 400 :body (types/map->nsmap {:error "Relation not found."}) })))}}]
+               :handler concepts/delete-relation-handler}}]
 
 
      ["/graph"

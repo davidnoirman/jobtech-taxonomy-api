@@ -9,6 +9,8 @@
    [jobtech-taxonomy-api.db.api-util :as api-util]
    [clojure.set :as set]
    [clojure.tools.logging :as log]
+   [jobtech-taxonomy-api.routes.parameter-util :as pu]
+   [taxonomy :as types]
    ))
 
 (comment
@@ -434,6 +436,8 @@
     (when (> (count response) 0)
       (ffirst response))))
 
+
+;; CREATE RELATION
 (defn assert-relation-part [user-id c1 c2 type desc substitutability-percentage]
   (let* [new-rel (cond->
                      {:relation/concept-1 c1
@@ -463,6 +467,39 @@
       )))
 
 
+
+(defn assert-relation-query-params []
+  (pu/build-parameter-map [:relation-type
+                           :concept-1
+                           :concept-2
+                           :definition
+                           :substitutability-percentage])
+  )
+
+(defn assert-relation-handler [request]
+  (let [{:keys
+         [relation-type
+          definition
+          concept-1
+          concept-2
+          substitutability-percentage]} (pu/get-query-from-request request)
+         user-id (pu/get-user-id-from-request request)
+        ]
+    (do
+      (log/info "POST /relation")
+      (let [[result new-relation]
+            (assert-relation user-id concept-1 concept-2
+                            relation-type definition substitutability-percentage)]
+        (if result
+          {:status 200 :body (types/map->nsmap {:message "Created relation."}) }
+          {:status 409 :body (types/map->nsmap {:error "Can't create new relation since it is in conflict with existing relation."}) })
+        )))
+  )
+
+
+
+
+
 (def fetch-relation-entity-id-query
   '[:find ?r
     :in $ ?id-1 ?id-2 ?relation
@@ -479,13 +516,15 @@
   (ffirst (d/q fetch-relation-entity-id-query (get-db) concept-1 concept-2 relation-type))
   )
 
-(defn retract-relation [user-id concept-1 concept-2 relation-type]
-  (let [relation-entity-id
-        (fetch-relation-entity-id-from-concept-ids-and-relation-type
-         concept-1
-         concept-2
-         relation-type)
 
+
+
+;; DELETE RELATION
+(defn retract-relation [user-id concept-1 concept-2 relation-type]
+  (let [relation-entity-id (fetch-relation-entity-id-from-concept-ids-and-relation-type
+                            concept-1
+                            concept-2
+                            relation-type)
         result (when relation-entity-id
                  (d/transact (get-conn) {:tx-data [[:db/retractEntity relation-entity-id]
                                                    {:db/id "datomic.tx" :taxonomy-user/id user-id}
@@ -493,6 +532,26 @@
         ]
     result
     ))
+
+(defn delete-relation-query-params []
+  (pu/build-parameter-map [ :relation-type :concept-1 :concept-2])
+  )
+
+(defn delete-relation-handler [request]
+  (let [{:keys [user-id relation-type concept-1 concept-2]} (pu/get-query-from-request request)
+        user-id (pu/get-user-id-from-request request)
+        ]
+    (do
+      (log/info (str "DELETE /relation " user-id " " relation-type " " concept-1 " " concept-2))
+      (let [result  (retract-relation user-id concept-1 concept-2 relation-type)]
+        (if result
+          {:status 200 :body (types/map->nsmap {:message "Retracted relation."}) }
+          {:status 400 :body (types/map->nsmap {:error "Relation not found."}) }))
+      )
+    )
+  )
+
+
 
 
 (def fetch-simple-concept-query
