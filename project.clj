@@ -22,7 +22,7 @@
                  [metosin/ring-http-response "0.9.1"]
                  [mount "0.1.16"]
                  [nrepl "0.6.0"]
-
+                 [io.replikativ/konserve "0.5.1"]
                  [clj-http "3.10.0"]
 
 
