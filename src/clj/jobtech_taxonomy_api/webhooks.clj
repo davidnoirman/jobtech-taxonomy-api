@@ -8,7 +8,7 @@
   "A client is a map: {:url callback-url :headers map-of-headers}. A useful map-of-headers value could be {\"api-key\" \"hejhopp\"}."
   (let [{:keys [url headers]} client]
     (try
-      (client/put url {:body (format "{\"version\": %d}" version)
+      (client/post url {:body (format "{\"version\": %d}" version)
                        :headers headers
                        :content-type :json
                        :socket-timeout 1000      ;; in milliseconds
@@ -22,5 +22,5 @@
 
 (defn get-client-list-from-conf! []
   "Set webhook-clients either in config.edn or the environment, for example:
- webhook-clients='[{:url \"https://postman-echo.com/put\" :headers {}}]'"
+ webhook-clients='[{:url \"https://postman-echo.com/post\" :headers {}}]'"
   (set (keys (get env :webhook-clients))))
