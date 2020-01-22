@@ -87,21 +87,22 @@
   )
 
 (def fetch-all-relations-entity-ids-for-concept-query-3
-  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt ?c1-or-c2
-    :in $ ?concept-id-1
+  '[:find ?tx ?inst  ?user-id ?input-concept-id ?pl-1 ?added-1
+    ?concept-id-2 ?pl-2  ?added-2 ?rt ?input-is-c1-or-c2
+    :in $ ?input-concept-id
     :where
     [?r  :relation/type ?rt]
-    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2 ?concept-id-1 ?pl-1 ?concept-id-2 ?pl-2 ?c1-or-c2]
+    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2 ?input-concept-id ?pl-1 ?concept-id-2 ?pl-2 ?input-is-c1-or-c2]
              (and      [?r :relation/concept-1 ?c1 ?tx ?added-1]
                        [?r :relation/concept-2 ?c2 ?tx ?added-2]
 
-                       [?c1 :concept/id ?concept-id-1]
+                       [?c1 :concept/id ?input-concept-id]
                        [?c1 :concept/preferred-label ?pl-1]
 
                        [?c2 :concept/id ?concept-id-2]
                        [?c2 :concept/preferred-label ?pl-2]
 
-                       [(ground :input-is-concept-1) ?c1-or-c2]
+                       [(ground :input-concept-is-source) ?input-is-c1-or-c2]
                        )
              (and
               [?r :relation/concept-1 ?c2 ?tx ?added-2]
@@ -110,9 +111,9 @@
               [?c2 :concept/id ?concept-id-2]
               [?c2 :concept/preferred-label ?pl-2]
 
-              [?c1 :concept/id ?concept-id-1]
+              [?c1 :concept/id ?input-concept-id]
               [?c1 :concept/preferred-label ?pl-1]
-              [(ground :input-is-concept-2) ?c1-or-c2]
+              [(ground :input-concept-is-target) ?input-is-c1-or-c2]
               )
              )
     [?tx :taxonomy-user/id ?user-id]
