@@ -1,10 +1,14 @@
+
 # JobTech Taxonomy - Getting started
+
 
 The Jobtech Taxonomy API gives access to different taxonomies like occupation names, skills and SSYK, SNI etc.      
 
 It’s main purpose is to act as a common language for labour market related systems.
 
+
 [Jobtech Taxonomy API Swagger UI](https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html)
+
 
 In order to use the api you need a key which you need to authenticate yourself.
 
@@ -23,6 +27,7 @@ In order to use the api you need a key which you need to authenticate yourself.
 * [Diagrams](#diagrams)
 * [Convert between old and new Taxonomy ids](#convert-between-old-and-new-taxonomy-ids)
 * [Taxonomy + Ontology](#taxonomy--ontology)
+
 
 
 ## Introduction
@@ -261,5 +266,4 @@ The values of the Ontology will become either new concepts, alternative labels o
 ###  Ontology files
 A file dump of the Ontology can be downloaded here:
 [Ontology Files](https://github.com/JobtechSwe/ontology-files)
-
 
