@@ -55,7 +55,8 @@
     :where
     [?c :concept/id ?concept-id]
     (or [?r :relation/concept-1 ?c ?tx ?added]
-        [?r :relation/concept-2 ?c ?tx ?added])
+          [?r :relation/concept-2 ?c ?tx ?added])
+    [?r :relation/concept-2 ?c ?tx ?added]
     [?tx :taxonomy-user/id ?user-id]
     [?tx :db/txInstant ?inst]
     ]
@@ -85,28 +86,99 @@
     ]
   )
 
+(def fetch-all-relations-entity-ids-for-concept-query-3
+  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt ?c1-or-c2
+    :in $ ?concept-id-1
+    :where
+    [?r  :relation/type ?rt]
+    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2 ?concept-id-1 ?pl-1 ?concept-id-2 ?pl-2 ?c1-or-c2]
+             (and      [?r :relation/concept-1 ?c1 ?tx ?added-1]
+                       [?r :relation/concept-2 ?c2 ?tx ?added-2]
+
+                       [?c1 :concept/id ?concept-id-1]
+                       [?c1 :concept/preferred-label ?pl-1]
+
+                       [?c2 :concept/id ?concept-id-2]
+                       [?c2 :concept/preferred-label ?pl-2]
+
+                       [(ground :input-is-concept-1) ?c1-or-c2]
+                       )
+             (and
+              [?r :relation/concept-1 ?c2 ?tx ?added-2]
+              [?r :relation/concept-2 ?c1 ?tx ?added-1]
+
+              [?c2 :concept/id ?concept-id-2]
+              [?c2 :concept/preferred-label ?pl-2]
+
+              [?c1 :concept/id ?concept-id-1]
+              [?c1 :concept/preferred-label ?pl-1]
+              [(ground :input-is-concept-2) ?c1-or-c2]
+              )
+             )
+    [?tx :taxonomy-user/id ?user-id]
+    [?tx :db/txInstant ?inst]
+    ]
+  )
+
+;;; den kommer alltid att lägga sig som concept-1 eftersom den kommer in som det
+
+(def fetch-all-relations-entity-ids-for-concept-query-4
+  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
+    :in $ ?concept-id-1
+    :where
+    [?r  :relation/type ?rt]
+
+    [?r :relation/concept-1 ?c1 ?tx ?added-1]
+    [?r :relation/concept-2 ?c2 ?tx ?added-2]
+    [?c1 :concept/id ?concept-id-1]
+    [?c1 :concept/preferred-label ?pl-1]
+    [?c2 :concept/id ?concept-id-2]
+    [?c2 :concept/preferred-label ?pl-2]
+
+    [?tx :taxonomy-user/id ?user-id]
+    [?tx :db/txInstant ?inst]
+    ]
+  )
+
+(def fetch-all-relations-entity-ids-for-concept-query-5
+  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
+    :in $ ?concept-id-2
+    :where
+    [?r  :relation/type ?rt]
+    [?r :relation/concept-1 ?c1 ?tx ?added-1]
+    [?r :relation/concept-2 ?c2 ?tx ?added-2]
+    [?c1 :concept/id ?concept-id-1]
+    [?c1 :concept/preferred-label ?pl-1]
+    [?c2 :concept/id ?concept-id-2]
+    [?c2 :concept/preferred-label ?pl-2]
+    [?tx :taxonomy-user/id ?user-id]
+    [?tx :db/txInstant ?inst]
+    ]
+  )
 
 
-(defn convert-relation-datoms-to-events [datom]
 
-  (-> datom
-      (assoc :event-type (if (:added-1 datom) "CREATED" "DEPRECATED"))
-      (dissoc :added-1)
-      (dissoc :added-2)
-      )
-  ;; TODO refactor {:event-type Created
-  ;;                  :user-id henri
-  ;;                 :relation {:relation-type related
-  ;;                            concept-1 { :id 123 :label banan}
-  ;;                            concept-2  {:id 567 :label orange}}
-  ;;                              }
-  ;;
-  ;;
+(defn convert-relation-datoms-to-events [{:keys [transaction-id timestamp user-id
+                                                 concept-id-1 preferred-label-1
+                                                 concept-id-2 preferred-label-2
+                                                 added-1 relation-type]}]
+  {:event-type (if added-1 "CREATED" "DEPRECATED")
+   :user-id user-id
+   :relation {
+              :relation-type relation-type
+              :concept-1 {:concept/id concept-id-1
+                          :concept/preferred-label preferred-label-1
+                          }
+              :concept-2 {:concept/id concept-id-2
+                          :concept/preferred-label preferred-label-2
+                          }
+              }
+   }
   )
 
 
 (defn get-relation-history [concept-id]
-  (let [result (d/q fetch-all-relations-entity-ids-for-concept-query-2 (get-db) concept-id)]
+  (let [result (d/q fetch-all-relations-entity-ids-for-concept-query-2 (get-db-hist (get-db)) concept-id)]
     (map #(->> % (map vector [:transaction-id
                               :timestamp
                               :user-id
@@ -116,8 +188,13 @@
                               :concept-id-2
                               :preferred-label-2
                               :added-2
-                              :relation-type]) (into {})) result)
+                              :relation-type
+                              ]) (into {})) result)
     )
+  )
+
+(defn get-automatic-day-notes-for-relation [concept-id]
+  (map convert-relation-datoms-to-events (get-relation-history concept-id))
   )
 
 ;; list transactions made by user "0"
@@ -250,7 +327,7 @@
   (map map-entity-transaction-datoms-to-event entity-transaction-datoms)
   )
 
-(defn get-automatic-day-note-for-concept [concept-id]
+(defn get-automatic-day-notes-for-concept [concept-id]
   (-> concept-id
       get-concept-entity-id
       get-entity-history

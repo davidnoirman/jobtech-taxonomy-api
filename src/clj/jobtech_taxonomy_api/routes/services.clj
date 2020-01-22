@@ -448,19 +448,33 @@
                             )))}}]
 
 
-    ["/automatic-daynotes/concept"
+    ["/concept/automatic-daynotes/"
      {
       :summary      "Fetches automatic day notes from a concept id"
       :parameters {:query {:id (taxonomy/par string? "ID of concept")}}
       :get {:responses     {200 {:body [ any?  ]}
-                           404 {:body types/error-spec}
-                           500 {:body types/error-spec}}
-               :handler (fn [{{{:keys [id]} :query} :parameters}]
-                          (log/info (str "GET /automatic-daynotes/concept" id ))
-                          {:status 200
-                           :body (daynotes/get-automatic-day-note-for-concept id)
-                           }
-                          )}}]
+                            404 {:body types/error-spec}
+                            500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [id]} :query} :parameters}]
+                       (log/info (str "GET /concepts/automatic-daynotes/" id ))
+                       {:status 200
+                        :body (daynotes/get-automatic-day-notes-for-concept id)
+                        }
+                       )}}]
+
+    ["/relation/automatic-daynotes/"
+     {
+      :summary      "Fetches automatic day notes for relations from a concept id"
+      :parameters {:query {:id (taxonomy/par string? "ID of concept")}}
+      :get {:responses     {200 {:body [ any?  ]}
+                            404 {:body types/error-spec}
+                            500 {:body types/error-spec}}
+            :handler (fn [{{{:keys [id]} :query} :parameters}]
+                       (log/info (str "GET /relations/automatic-daynotes/" id ))
+                       {:status 200
+                        :body (daynotes/get-automatic-day-notes-for-relation id)
+                        }
+                       )}}]
 
 
     ]])
