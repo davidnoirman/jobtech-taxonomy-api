@@ -43,56 +43,15 @@
   )
 
 
-
-#_(or-join [?c]
-           [?r :relation/concept-1 ?c]
-           [?r :relation/concept-2 ?c]
-           )
-
 (def fetch-all-relations-entity-ids-for-concept-query
-  '[:find ?r ?inst ?added ?user-id
-    :in $ ?concept-id
-    :where
-    [?c :concept/id ?concept-id]
-    (or [?r :relation/concept-1 ?c ?tx ?added]
-          [?r :relation/concept-2 ?c ?tx ?added])
-    [?r :relation/concept-2 ?c ?tx ?added]
-    [?tx :taxonomy-user/id ?user-id]
-    [?tx :db/txInstant ?inst]
-    ]
-  )
-
-(def fetch-all-relations-entity-ids-for-concept-query-2
-  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
-    :in $ ?concept-id-1
-    :where
-    [?c1 :concept/id ?concept-id-1]
-    [?c1 :concept/preferred-label ?pl-1]
-    [?c2 :concept/id ?concept-id-2]
-    [?c2 :concept/preferred-label ?pl-2]
-    [?r  :relation/type ?rt]
-
-    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2]
-             (and      [?r :relation/concept-1 ?c1 ?tx ?added-1]
-                       [?r :relation/concept-2 ?c2 ?tx ?added-2]
-                       )
-             (and
-              [?r :relation/concept-1 ?c2 ?tx ?added-1]
-              [?r :relation/concept-2 ?c1 ?tx ?added-2]
-              )
-             )
-    [?tx :taxonomy-user/id ?user-id]
-    [?tx :db/txInstant ?inst]
-    ]
-  )
-
-(def fetch-all-relations-entity-ids-for-concept-query-3
   '[:find ?tx ?inst  ?user-id ?input-concept-id ?pl-1 ?added-1
-    ?concept-id-2 ?pl-2  ?added-2 ?rt ?input-is-c1-or-c2
+    ?concept-id-2 ?pl-2  ?added-2 ?rt ?input-concept-is-source
     :in $ ?input-concept-id
     :where
     [?r  :relation/type ?rt]
-    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2 ?input-concept-id ?pl-1 ?concept-id-2 ?pl-2 ?input-is-c1-or-c2]
+    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2
+              ?input-concept-id ?pl-1 ?concept-id-2 ?pl-2 ?input-concept-is-source]
+
              (and      [?r :relation/concept-1 ?c1 ?tx ?added-1]
                        [?r :relation/concept-2 ?c2 ?tx ?added-2]
 
@@ -102,7 +61,7 @@
                        [?c2 :concept/id ?concept-id-2]
                        [?c2 :concept/preferred-label ?pl-2]
 
-                       [(ground :input-concept-is-source) ?input-is-c1-or-c2]
+                       [(ground true) ?input-concept-is-source]
                        )
              (and
               [?r :relation/concept-1 ?c2 ?tx ?added-2]
@@ -113,7 +72,7 @@
 
               [?c1 :concept/id ?input-concept-id]
               [?c1 :concept/preferred-label ?pl-1]
-              [(ground :input-concept-is-target) ?input-is-c1-or-c2]
+              [(ground false) ?input-concept-is-source]
               )
              )
     [?tx :taxonomy-user/id ?user-id]
@@ -121,65 +80,35 @@
     ]
   )
 
-;;; den kommer alltid att lägga sig som concept-1 eftersom den kommer in som det
-
-(def fetch-all-relations-entity-ids-for-concept-query-4
-  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
-    :in $ ?concept-id-1
-    :where
-    [?r  :relation/type ?rt]
-
-    [?r :relation/concept-1 ?c1 ?tx ?added-1]
-    [?r :relation/concept-2 ?c2 ?tx ?added-2]
-    [?c1 :concept/id ?concept-id-1]
-    [?c1 :concept/preferred-label ?pl-1]
-    [?c2 :concept/id ?concept-id-2]
-    [?c2 :concept/preferred-label ?pl-2]
-
-    [?tx :taxonomy-user/id ?user-id]
-    [?tx :db/txInstant ?inst]
-    ]
-  )
-
-(def fetch-all-relations-entity-ids-for-concept-query-5
-  '[:find ?tx ?inst  ?user-id ?concept-id-1 ?pl-1 ?added-1 ?concept-id-2 ?pl-2  ?added-2 ?rt
-    :in $ ?concept-id-2
-    :where
-    [?r  :relation/type ?rt]
-    [?r :relation/concept-1 ?c1 ?tx ?added-1]
-    [?r :relation/concept-2 ?c2 ?tx ?added-2]
-    [?c1 :concept/id ?concept-id-1]
-    [?c1 :concept/preferred-label ?pl-1]
-    [?c2 :concept/id ?concept-id-2]
-    [?c2 :concept/preferred-label ?pl-2]
-    [?tx :taxonomy-user/id ?user-id]
-    [?tx :db/txInstant ?inst]
-    ]
-  )
-
-
 
 (defn convert-relation-datoms-to-events [{:keys [transaction-id timestamp user-id
                                                  concept-id-1 preferred-label-1
                                                  concept-id-2 preferred-label-2
-                                                 added-1 relation-type]}]
-  {:event-type (if added-1 "CREATED" "DEPRECATED")
-   :user-id user-id
-   :relation {
-              :relation-type relation-type
-              :concept-1 {:concept/id concept-id-1
-                          :concept/preferred-label preferred-label-1
-                          }
-              :concept-2 {:concept/id concept-id-2
-                          :concept/preferred-label preferred-label-2
-                          }
-              }
-   }
+                                                 added-1 relation-type
+                                                 concept-1-is-source
+                                                 ]}]
+  (let [concept-1 {:concept/id concept-id-1
+                   :concept/preferred-label preferred-label-1
+                   }
+        concept-2 {:concept/id concept-id-2
+                   :concept/preferred-label preferred-label-2
+                   }
+        ]
+    {:event-type (if added-1 "CREATED" "DEPRECATED")
+     :timestamp timestamp
+     :transaction-id transaction-id
+     :user-id user-id
+     :relation {
+                :relation-type relation-type
+                :source (if concept-1-is-source concept-1 concept-2)
+                :target (if concept-1-is-source concept-2 concept-1)
+                }
+     })
   )
 
 
 (defn get-relation-history [concept-id]
-  (let [result (d/q fetch-all-relations-entity-ids-for-concept-query-2 (get-db-hist (get-db)) concept-id)]
+  (let [result (d/q fetch-all-relations-entity-ids-for-concept-query (get-db-hist (get-db)) concept-id)]
     (map #(->> % (map vector [:transaction-id
                               :timestamp
                               :user-id
@@ -190,6 +119,7 @@
                               :preferred-label-2
                               :added-2
                               :relation-type
+                              :concept-1-is-source
                               ]) (into {})) result)
     )
   )
