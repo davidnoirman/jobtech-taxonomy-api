@@ -11,11 +11,11 @@
    [buddy.auth.middleware :refer [wrap-authentication]]
    [buddy.auth :refer [authenticated?]]
    [buddy.auth.http :as http]
-   [environ.core :refer [env]]
    [ring.util.http-response :as resp]
    [jobtech-taxonomy-api.middleware.formats :as formats]
    [jobtech-taxonomy-api.middleware.cors :as cors]
    [jobtech-taxonomy-api.middleware :as middleware]
+   [jobtech-taxonomy-api.webhooks :as webhooks]
    [jobtech-taxonomy-api.db.versions :as v]
    [jobtech-taxonomy-api.db.concepts :as concepts]
    [jobtech-taxonomy-api.db.events :as events]
@@ -24,6 +24,8 @@
    [jobtech-taxonomy-api.db.graph :as graph]
    [jobtech-taxonomy-api.db.core :as core]
    [jobtech-taxonomy-api.db.daynotes :as daynotes]
+   [jobtech-taxonomy-api.webhooks :as webhooks]
+   [jobtech-taxonomy-api.store :as store]
    [taxonomy :as types]
    [clojure.tools.logging :as log]
    [clojure.spec.alpha :as s]
@@ -35,7 +37,6 @@
 ;; Status:
 ;;   - adjust tests
 ;;   - fixa replaced-by-modell i /changes, /replaced-by-changes, /search, /private/concept
-
 
 (defn log-info [message]
   (log/info message)
@@ -443,10 +444,11 @@
                         (log/info (str "POST /versions" new-version-id))
                         (let [result (v/create-new-version new-version-id)]
                           (if result
-                            {:status 200 :body (types/map->nsmap {:message "A new version of the Taxonomy was created."}) }
-                            {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")}) }
-                            )))}}]
-
+                            (let [clients (webhooks/get-client-list-from-store!)
+                                  notification-result (webhooks/send-notifications clients new-version-id)]
+                              {:status 200 :body (types/map->nsmap
+                                                  {:message (format "A new version of the Taxonomy was created. %d webhook notifications were sent." (count (remove nil? notification-result)))})})
+                            {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")})})))}}]
 
     ["/concept/automatic-daynotes/"
      {
@@ -474,7 +476,25 @@
                        {:status 200
                         :body (daynotes/get-automatic-day-notes-for-relation id)
                         }
-                       )}}]
+                       )}}]]
 
+   ["/webhooks"
+    {:swagger {:tags ["Webhooks"]}
+     :middleware [cors/cors auth authorized-private?]}
 
-    ]])
+    ["/register"
+     {
+      :summary ""
+      :parameters {:query {:api-key (taxonomy/par string? "A unique API-key used as identifier.")
+                           :callback-url (taxonomy/par string? "A URL to a webhook callback listener.")}}
+      :post {:responses {200 {:body types/ok-spec}
+                         406 {:body types/error-spec}
+                         500 {:body types/error-spec}}
+             :handler (fn [{{{:keys [api-key callback-url]} :query} :parameters}]
+                        (log/info (str "POST /webhooks/register " api-key " " callback-url))
+                        (let [result (store/store-update api-key callback-url)]
+                          (if result
+                            {:status 200 :body (types/map->nsmap
+                                                {:message (format "The webhook callback was registered.")})}
+                            {:status 406 :body (types/map->nsmap {:error (str "Could not create webhook callback with values " api-key " " callback-url)}) }
+                            )))}}]]])
