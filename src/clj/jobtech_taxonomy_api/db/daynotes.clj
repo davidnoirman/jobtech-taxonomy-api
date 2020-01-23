@@ -13,9 +13,6 @@
 
 ;; TODO Utred om vi ska ha egna attribut för created updated at
 
-
-
-
 (def show-concept-entity-id
   '[:find ?e ?concept-id
     :in $ ?concept-id
@@ -23,6 +20,120 @@
     [?e :concept/id ?concept-id ]
     ]
   )
+
+(def show-data-made-by-user-id
+  '[:find ?user-id ?attr ?v
+    :in $
+    :where
+    [?tx :taxonomy-user/id ?user-id]
+    [?e ?a ?v ?tx ]
+    [?a :db/ident ?attr]
+    ]
+  )
+
+;; (d/q show-data-made-by-user-id (get-db))
+
+
+(def show-concept-relations-entity-ids
+  '[:find ?e ?concept-id
+    :in $ ?concept-id
+    :where
+    [?e :concept/id ?concept-id ]
+    ]
+  )
+
+
+(def fetch-all-relations-entity-ids-for-concept-query
+  '[:find ?tx ?inst  ?user-id ?input-concept-id ?pl-1 ?added-1
+    ?concept-id-2 ?pl-2  ?added-2 ?rt ?input-concept-is-source
+    :in $ ?input-concept-id
+    :where
+    [?r  :relation/type ?rt]
+    (or-join [?r ?c1 ?c2 ?tx ?added-1 ?added-2
+              ?input-concept-id ?pl-1 ?concept-id-2 ?pl-2 ?input-concept-is-source]
+
+             (and      [?r :relation/concept-1 ?c1 ?tx ?added-1]
+                       [?r :relation/concept-2 ?c2 ?tx ?added-2]
+
+                       [?c1 :concept/id ?input-concept-id]
+                       [?c1 :concept/preferred-label ?pl-1]
+
+                       [?c2 :concept/id ?concept-id-2]
+                       [?c2 :concept/preferred-label ?pl-2]
+
+                       [(ground true) ?input-concept-is-source]
+                       )
+             (and
+              [?r :relation/concept-1 ?c2 ?tx ?added-2]
+              [?r :relation/concept-2 ?c1 ?tx ?added-1]
+
+              [?c2 :concept/id ?concept-id-2]
+              [?c2 :concept/preferred-label ?pl-2]
+
+              [?c1 :concept/id ?input-concept-id]
+              [?c1 :concept/preferred-label ?pl-1]
+              [(ground false) ?input-concept-is-source]
+              )
+             )
+    [?tx :taxonomy-user/id ?user-id]
+    [?tx :db/txInstant ?inst]
+    ]
+  )
+
+
+(defn convert-relation-datoms-to-events [{:keys [transaction-id timestamp user-id
+                                                 concept-id-1 preferred-label-1
+                                                 concept-id-2 preferred-label-2
+                                                 added-1 relation-type
+                                                 concept-1-is-source
+                                                 ]}]
+  (let [concept-1 {:concept/id concept-id-1
+                   :concept/preferred-label preferred-label-1
+                   }
+        concept-2 {:concept/id concept-id-2
+                   :concept/preferred-label preferred-label-2
+                   }
+        ]
+    {:event-type (if added-1 "CREATED" "DEPRECATED")
+     :timestamp timestamp
+     :transaction-id transaction-id
+     :user-id user-id
+     :relation {
+                :relation-type relation-type
+                :source (if concept-1-is-source concept-1 concept-2)
+                :target (if concept-1-is-source concept-2 concept-1)
+                }
+     })
+  )
+
+
+(defn get-relation-history [concept-id]
+  (let [result (d/q fetch-all-relations-entity-ids-for-concept-query (get-db-hist (get-db)) concept-id)]
+    (map #(->> % (map vector [:transaction-id
+                              :timestamp
+                              :user-id
+                              :concept-id-1
+                              :preferred-label-1
+                              :added-1
+                              :concept-id-2
+                              :preferred-label-2
+                              :added-2
+                              :relation-type
+                              :concept-1-is-source
+                              ]) (into {})) result)
+    )
+  )
+
+(defn get-automatic-day-notes-for-relation [concept-id]
+  (map convert-relation-datoms-to-events (get-relation-history concept-id))
+  )
+
+;; list transactions made by user "0"
+;; (d/q '[:find ?tx  :in $ ?user-id :where [?tx :taxonomy-user/id ?user-id]] (get-db-hist (get-db))  "0")
+
+;; (d/q '[:find ?tx ?user-id :in $ :where [?tx :taxonomy-user/id ?user-id]] (get-db-hist (get-db)) )
+
+
 
 (defn get-concept-entity-id [concept-id]
   (ffirst (d/q show-concept-entity-id (get-db) concept-id)))
@@ -33,15 +144,16 @@
   [eid]
   (->> eid
        (d/q
-        '[:find ?e ?attr ?v ?tx ?added ?inst
+        '[:find ?e ?attr ?v ?tx ?added ?inst  ?user-id
           :in $ ?e
           :where
           [?e ?a ?v ?tx ?added]
           [?tx :db/txInstant ?inst]
+          [?tx :taxonomy-user/id ?user-id]
           [?a :db/ident ?attr]]
         (get-db-hist (get-db)))
        (map #(->> %
-                  (map vector [:e :a :v :tx :added :inst])
+                  (map vector [:e :a :v :tx :added :inst :user-id])
                   (into {})))
        (sort-by :tx)))
 
@@ -68,6 +180,7 @@
       (assoc (:a element) (:v element))
       (assoc :timestamp (:inst element))
       (assoc :transaction-id (:tx element ))
+      (assoc :user-id (:user-id element))
       )
   )
 
@@ -75,14 +188,17 @@
   (let [concept (reduce created-event-reducer {} entity-transaction-datoms)
         timestamp (:timestamp concept)
         transaction-id (:transaction-id concept)
+        user-id (:user-id concept)
         concept-no-timestamp (-> concept
                                  (dissoc  :timestamp)
                                  (dissoc :transaction-id)
+                                 (dissoc :user-id)
                                  )
         ]
     {:event-type "CREATED"
      :timestamp timestamp
      :transaction-id transaction-id
+     :user-id user-id
      :concept concept-no-timestamp
      }
     )
@@ -106,11 +222,13 @@
         changes (map handle-updated-attribute grouped)
         timestamp (:inst (first entity-transaction-datoms))
         transaction-id (:tx (first entity-transaction-datoms))
+        user-id (:user-id (first entity-transaction-datoms))
         ]
 
     {:event-type "UPDATED"
      :timestamp timestamp
      :transaction-id transaction-id
+     :user-id user-id
      :changes changes
      }
     )
@@ -121,6 +239,7 @@
     {:event-type "DEPRECATED"
      :timestamp (:inst first-datom)
      :transaction-id (:tx first-datom)
+     :user-id (:user-id first-datom)
      })
 
   )
@@ -139,157 +258,11 @@
   (map map-entity-transaction-datoms-to-event entity-transaction-datoms)
   )
 
-(defn get-automatic-day-note-for-concept [concept-id]
+(defn get-automatic-day-notes-for-concept [concept-id]
   (-> concept-id
       get-concept-entity-id
       get-entity-history
       group-by-transaction-and-entity-id
       map-entity-transaction-datoms-to-events
       )
-  )
-
-(comment
-  "example data"
-   (def example-event-history {[13194139533325 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/id,
-   :v "t1G1_sg9_Pkk",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}
-  {:e 22390454788030565,
-   :a :concept/type,
-   :v "skill",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}
-  {:e 22390454788030565,
-   :a :concept/definition,
-   :v "Hoppa som en groda",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}
-  {:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "Hoppning",
-   :tx 13194139533325,
-   :added true,
-   :inst #inst "2019-11-20T15:40:47.394-00:00"}],
- [13194139533326 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "dansa",
-   :tx 13194139533326,
-   :added true,
-   :inst #inst "2019-11-20T16:14:05.364-00:00"}
-  {:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "Hoppning",
-   :tx 13194139533326,
-   :added false,
-   :inst #inst "2019-11-20T16:14:05.364-00:00"}],
- [13194139533327 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "dansa",
-   :tx 13194139533327,
-   :added false,
-   :inst #inst "2019-11-20T16:14:59.807-00:00"}
-  {:e 22390454788030565,
-   :a :concept/preferred-label,
-   :v "dansa3",
-   :tx 13194139533327,
-   :added true,
-   :inst #inst "2019-11-20T16:14:59.807-00:00"}],
- [13194139533458 22390454788030565]
- [{:e 22390454788030565,
-   :a :concept/deprecated,
-   :v true,
-   :tx 13194139533458,
-   :added true,
-   :inst #inst "2019-12-16T15:11:34.692-00:00"}]})
-
-
-  (def deprecated-entity-transaction-datoms
-    [{:e 22390454788030565,
-      :a :concept/deprecated,
-      :v true,
-      :tx 13194139533458,
-      :added true,
-      :inst #inst "2019-12-16T15:11:34.692-00:00"}])
-
-
-  (def created-entity-transaction-datoms
-    [{:e 22390454788030565,
-      :a :concept/id,
-      :v "t1G1_sg9_Pkk",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}
-     {:e 22390454788030565,
-      :a :concept/type,
-      :v "skill",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}
-     {:e 22390454788030565,
-      :a :concept/definition,
-      :v "Hoppa som en groda",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}
-     {:e 22390454788030565,
-      :a :concept/preferred-label,
-      :v "Hoppning",
-      :tx 13194139533325,
-      :added true,
-      :inst #inst "2019-11-20T15:40:47.394-00:00"}]
-    )
-
-  (def updated-entity-transaction-datoms
-    [{:e 22390454788030565,
-      :a :concept/preferred-label,
-      :v "dansa",
-      :tx 13194139533326,
-      :added true,
-      :inst #inst "2019-11-20T16:14:05.364-00:00"}
-     {:e 22390454788030565,
-      :a :concept/preferred-label,
-      :v "Hoppning",
-      :tx 13194139533326,
-      :added false,
-      :inst #inst "2019-11-20T16:14:05.364-00:00"}]
-    )
-
-  (def two-updated-entity-transaction-datoms
-    {[13194139533326 22390454788030565]
-     [{:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "dansa",
-       :tx 13194139533326,
-       :added true,
-       :inst #inst "2019-11-20T16:14:05.364-00:00"}
-      {:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "Hoppning",
-       :tx 13194139533326,
-       :added false,
-       :inst #inst "2019-11-20T16:14:05.364-00:00"}],
-     [13194139533327 22390454788030565]
-     [{:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "dansa",
-       :tx 13194139533327,
-       :added false,
-       :inst #inst "2019-11-20T16:14:59.807-00:00"}
-      {:e 22390454788030565,
-       :a :concept/preferred-label,
-       :v "dansa3",
-       :tx 13194139533327,
-       :added true,
-       :inst #inst "2019-11-20T16:14:59.807-00:00"}]},
-    )
-
-  ;;(group-by-transaction-and-entity-id (get-entity-history 22390454788030565))
-
   )
