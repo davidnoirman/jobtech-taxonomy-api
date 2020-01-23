@@ -1,6 +1,7 @@
 (ns jobtech-taxonomy-api.webhooks
   (:require
    [jobtech-taxonomy-api.config :refer [env]]
+   [jobtech-taxonomy-api.store :as store]
    [clojure.tools.logging :as log]
    [clj-http.client :as client]))
 
@@ -24,3 +25,10 @@
   "Set webhook-clients either in config.edn or the environment, for example:
  webhook-clients='[{:url \"https://postman-echo.com/post\" :headers {}}]'"
   (set (keys (get env :webhook-clients))))
+
+(defn get-client-list-from-store! []
+  ""
+  (map #(let [key (:key %)
+              url (store/store-get key)]
+          {:url url :headers {:api-key key}})
+       (into [] (store/store-list-keys))))

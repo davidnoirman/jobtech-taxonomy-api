@@ -37,7 +37,6 @@
 ;;   - adjust tests
 ;;   - fixa replaced-by-modell i /changes, /replaced-by-changes, /search, /private/concept
 
-
 (defn log-info [message]
   (log/info message)
   )
@@ -436,15 +435,11 @@
                         (log/info (str "POST /versions" new-version-id))
                         (let [result (v/create-new-version new-version-id)]
                           (if result
-                            (let [notification-result
-                                  (webhooks/send-notifications
-                                   (webhooks/get-client-list-from-conf!)
-                                   new-version-id)]
+                            (let [clients (webhooks/get-client-list-from-store!)
+                                  notification-result (webhooks/send-notifications clients new-version-id)]
                               {:status 200 :body (types/map->nsmap
                                                   {:message (format "A new version of the Taxonomy was created. %d webhook notifications were sent." (count (remove nil? notification-result)))})})
-                            {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")}) }
-                            )))}}]
-
+                            {:status 406 :body (types/map->nsmap {:error (str new-version-id " is not the next valid version id!")})})))}}]
 
     ["/automatic-daynotes/concept"
      {
