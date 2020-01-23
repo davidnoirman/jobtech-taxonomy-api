@@ -6,5 +6,10 @@
               ;;:creds-profile "<your_aws_profile_if_not_using_the_default>"
               :endpoint "http://entry.prod-jobtech-taxonomy-db.eu-west-1.datomic.net:8182/"
               :proxy-port 8182}
- :jobtech-taxonomy-api {:auth-tokens {:111 :user :222 :admin} }
+ :jobtech-taxonomy-api {:auth-tokens {:111 :user :222 :admin}
+                        :user-ids {:222 "admin-1"}}
+ ;; Some online service, can be handy when debugging
+ :webhook-clients [{:url "https://postman-echo.com/post" :headers {}}]
+ ;; konserve store directory
+ :filestore "/tmp/store"
 }
