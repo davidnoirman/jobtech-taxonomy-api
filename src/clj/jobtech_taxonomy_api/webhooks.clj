@@ -18,9 +18,8 @@
                                         :socket-timeout 1000      ;; in milliseconds
                                         :connection-timeout 1000  ;; in milliseconds
                                         :accept :json}))
-                    (catch Exception e (log/error {:what :uncaught-exception
-                                                   :exception e})))]
-        (async/commit-job (hash url) call-fun 4 #(+ % %))))
+                    (catch Exception e (log/error {:what :uncaught-exception :exception e})))]
+        (async/commit-job (hash url) call-fun 4 #(* % 2))))
 
 (defn send-notifications [clients version]
   (map #(send-notification % version) clients))

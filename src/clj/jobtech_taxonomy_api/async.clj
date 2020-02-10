@@ -16,8 +16,11 @@ scheduling multiple jobs with the same ID."
 (defn deregister-job [id]
   (swap! jobs dissoc (symbol (str id))))
 
+(defn job-active? [id]
+  (get @jobs (symbol (str id))))
+
 (defn run-job [id job]
-  (let [active (get @jobs (symbol (str id)))]
+  (let [active (job-active? id)]
     (if (and active
              (apply (:fun job) []))
       (deregister-job id)
@@ -27,5 +30,6 @@ scheduling multiple jobs with the same ID."
           (run-job id (assoc job :delay new-delay)))))))
 
 (defn commit-job [id fun delay delay-fun]
-  (register-active-job id)
-  (run-job id {:fun fun :delay delay :delay-fun delay-fun}))
+  (when (not (job-active? id))
+    (register-active-job id)
+    (run-job id {:fun fun :delay delay :delay-fun delay-fun})))
