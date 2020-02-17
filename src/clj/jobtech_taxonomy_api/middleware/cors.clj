@@ -6,13 +6,17 @@
 
 (def allow-methods "GET, PUT, PATCH, POST, DELETE, OPTIONS")
 
-(def allow-headers "Authorization, Content-Type")
+(def allow-headers "api-key, Authorization, Content-Type")
+
+(def expose-headers "access-control-allow-origin,access-control-allow-methods,access-control-allow-headers")
 
 (defn add-cors-headers [resp]
   (-> resp
       (assoc-in [:headers "Access-Control-Allow-Origin"] "*")
       (assoc-in [:headers "Access-Control-Allow-Methods"] allow-methods)
-      (assoc-in [:headers "Access-Control-Allow-Headers"] allow-headers)))
+      (assoc-in [:headers "Access-Control-Allow-Headers"] allow-headers)
+      (assoc-in [:headers "Access-Control-Expose-Headers"] expose-headers)
+      ))
 
 (defn cors
   "Cross-origin Resource Sharing (CORS) middleware. Allow requests from all
