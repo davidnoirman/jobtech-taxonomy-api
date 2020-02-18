@@ -17,4 +17,7 @@
   (stop)
   (start))
 
-
+(comment
+  (stop)
+  (reset! @#'mount/-args {:options {:port 3000}})
+  (start))
