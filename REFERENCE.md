@@ -110,7 +110,7 @@ updated in co-operation with employers’ organisations, professional
 boards and recruiters and includes the most relevant skills for each
 four-digit SSYK Occupation Group.
 
-The skill headline named “**General skills**” contains broader skills
+The skill headline named “**Generella kompetenser**” contains broader skills
 like “Projektledning, erfarenhet”. They are not mapped to any Occupation
 groups. They are recommended to use as optional skills for all job
 seekers and employers.
